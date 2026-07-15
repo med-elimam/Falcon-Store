@@ -153,14 +153,15 @@
 }
 
 @media (max-width: 700px) {
-  .prototypeHeader { height: 68px; padding-inline: 14px; }
+  .prototypeHeader { height: 68px; padding-inline: 14px; grid-template-columns: 1fr auto; direction: rtl; }
+  .lockup { justify-self: start; }
   .lockup > svg { width: 38px; }
-  .lockup small { display: none; }
+  .lockup span { display: none; }
   .themeSwitch { min-height: 38px; }
   .opening { min-height: 100svh; }
   .openingMedia img { object-position: center 44%; }
-  .openingCopy { align-self: end; padding-bottom: 90px; }
-  .openingCopy h1 { font-size: clamp(3rem, 16vw, 4.7rem); }
+  .openingCopy { align-self: end; padding-bottom: 32px; }
+  .openingCopy h1 { width: 100%; max-width: 9ch; font-size: clamp(2.7rem, 13vw, 3.3rem); line-height: 1.08; overflow-wrap: anywhere; }
   .openingCopy p { font-size: .58rem; }
   .scrollCue { display: none; }
   .signatureTrack { min-height: 190svh; }
@@ -190,9 +191,8 @@
 }
 
 @media (max-width: 390px) {
-  .lockup b { font-size: .7rem; }
   .themeSwitch span:last-child { display: none; }
-  .openingCopy h1 { font-size: 3.35rem; }
+  .openingCopy h1 { font-size: 2.85rem; }
   .signatureCopy h2, .purchasePanel h2 { overflow-wrap: anywhere; }
   .liveCommerce { align-items: stretch; flex-direction: column; }
   .quantity { width: max-content; }

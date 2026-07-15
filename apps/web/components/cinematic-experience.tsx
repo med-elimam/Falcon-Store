@@ -25,7 +25,7 @@ const STOCK_LABELS = {
 } as const;
 
 function OpeningMedia() {
-  const common = { alt: "", sizes: "100vw", priority: true, quality: 86 } as const;
+  const common = { alt: "", sizes: "100vw", priority: true, quality: 75 } as const;
   const desktop = getImageProps({ ...common, src: "/images/hero-wide.jpg", width: 1672, height: 941 });
   const mobile = getImageProps({ ...common, src: "/images/hero-tall.jpg", width: 941, height: 1672 });
 
