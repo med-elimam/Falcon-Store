@@ -40,4 +40,27 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.claude/worktrees/
+.claude/
+.codex/
+.agents/
+
+# monorepo artifacts
+apps/api/dist/
+media-uploads/
+.env
+.env.local
+
+
+@"
+node_modules/
+.next/
+**/.next/
+dist/
+**/dist/
+build/
+**/build/
+.env
+.env.local
+.env.*.local
+*.log
+"@ | Set-Content .gitignore

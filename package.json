@@ -1,28 +1,28 @@
 {
-  "name": "falcon-store",
-  "version": "0.1.0",
+  "name": "falcon-store-platform",
   "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev:web": "npm run dev -w @falcon/web",
+    "dev:api": "npm run dev -w @falcon/api",
+    "build": "npm run build -w @falcon/web && npm run build -w @falcon/api",
+    "build:web": "npm run build -w @falcon/web",
+    "build:api": "npm run build -w @falcon/api",
+    "lint": "npm run lint -w @falcon/web",
+    "typecheck": "npm run typecheck -w @falcon/web && npm run typecheck -w @falcon/api && npm run typecheck -w @falcon/database",
+    "test": "npm run test -w @falcon/api",
+    "db:generate": "npm run generate -w @falcon/database",
+    "db:migrate": "npm run migrate -w @falcon/database",
+    "db:seed": "npm run seed -w @falcon/database"
   },
-  "dependencies": {
-    "framer-motion": "^12.42.2",
-    "next": "16.2.10",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "zustand": "^5.0.14"
+  "engines": {
+    "node": ">=20.9"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.10",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.7.3"
   }
 }

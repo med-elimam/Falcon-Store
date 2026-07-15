@@ -1,30 +1,70 @@
 # Falcon Store — The Scent Vault
 
-Arabic-first perfume storefront for Falcon Store in Nouakchott. The project includes a cinematic home page, filterable catalog, static product pages, persistent Zustand cart, local checkout, WhatsApp order handoff, Supabase-ready order API, and an Arabic admin preview.
+منصة تجارة إلكترونية عربية أولًا لمتجر الصقر للعطور في نواكشوط:
+واجهة Next.js على Vercel + واجهة برمجة TypeScript مستقلة على Railway + PostgreSQL.
 
-## Run locally
+## بنية المستودع (Monorepo)
+
+```
+apps/
+  web/        واجهة المتجر + لوحة الإدارة (/manage) — Next.js App Router
+  api/        الخادم الموثوق الوحيد — Fastify + Drizzle (مصادقة، كتالوج، طلبات، مخزون، إعدادات، وسائط، تدقيق)
+packages/
+  database/   مخطط Drizzle + الهجرات + أمر الزرع + PGlite للاختبارات
+  shared/     أنواع وDTO وصلاحيات وTOTP مشتركة
+  validation/ مخططات Zod لكل مدخلات API
+  config/     ثوابت المنصة وتحميل متغيرات البيئة الموثّق
+```
+
+الواجهة لا تتصل بقاعدة البيانات إطلاقًا — كل شيء عبر `NEXT_PUBLIC_API_URL` بـHTTPS.
+
+## التشغيل المحلي
 
 ```bash
 npm install
-npm run dev
+
+# الخادم — خياران:
+npm run dev -w @falcon/api         # يتطلب PostgreSQL محليًا (apps/api/.env)
+npm run dev:local -w @falcon/api   # بدون تثبيت Postgres: PGlite داخل الذاكرة + هجرات + زرع تلقائي
+
+# الواجهة:
+npm run dev:web
 ```
 
-Open `http://localhost:3000`.
+ثم افتح `http://localhost:3000`. لإنشاء حساب المالك محليًا استخدم رمز
+`BOOTSTRAP_TOKEN` الموجود في `apps/api/.env` عبر `POST /api/v1/bootstrap/owner`.
 
-## Before publishing
-
-1. Replace the placeholder WhatsApp number in `lib/config.ts`.
-2. Copy `.env.example` to `.env.local` and add the production site URL.
-3. Create a Supabase project, run `supabase/schema.sql`, then add the Supabase URL and service-role key to `.env.local`.
-4. Replace or confirm any product price currently set to `null` in `lib/products.ts`.
-5. Protect `/admin` with Supabase Auth before giving it to staff. The current admin screen is an editable local preview and stores price changes in the current browser only.
-
-## Commands
+## أوامر الجودة
 
 ```bash
-npm run lint
-npm run build
-npm run start
+npm run typecheck   # فحص الأنواع في كل مساحات العمل
+npm run lint        # ESLint للواجهة
+npm test            # اختبارات API (مصادقة/صلاحيات/طلبات/أسعار ومخزون) على PGlite بهجرات حقيقية
+npm run build       # بناء إنتاجي للواجهة والخادم
+npm run db:generate # توليد هجرة جديدة من المخطط
+npm run db:migrate  # تطبيق الهجرات (DATABASE_URL)
+npm run db:seed     # زرع الأدوار والصلاحيات والكتالوج وخيارات الدفع/التوصيل
 ```
 
-All prices are displayed in new Mauritanian ouguiya (`MRU`). Products without a confirmed price display “السعر عبر واتساب”.
+فحوص الأداء: `lighthouserc.json` يضبط ميزانيات LCP/CLS/TBT للهاتف — شغّلها مع
+`npx @lhci/cli autorun` أثناء تشغيل الواجهة محليًا.
+
+## النشر
+
+- **Railway (API + PostgreSQL):** أنشئ خدمة من هذا المستودع؛ `apps/api/railway.toml`
+  يضبط البناء والتشغيل (يشغّل الهجرات قبل الإقلاع) ومسار الفحص `/health`.
+  اربط Volume على `MEDIA_DIR` لتخزين الصور المرفوعة. المتغيرات المطلوبة في
+  `apps/api/.env.example`.
+- **Vercel (الواجهة):** Root Directory = `apps/web`؛ `vercel.json` يضبط أوامر
+  التثبيت والبناء لمساحات العمل. المتغيرات في `apps/web/.env.example`.
+- **حساب المالك الأول:** يُنشأ مرة واحدة عبر رمز `BOOTSTRAP_TOKEN` في بيئة
+  Railway، ثم يتعطل المسار نهائيًا — احذف الرمز من البيئة بعد الإنشاء.
+
+## قواعد المحتوى
+
+- الأسعار أعداد صحيحة بالأوقية الجديدة (MRU) في قاعدة البيانات؛ طريقة العرض
+  (جديدة/قديمة) إعداد يحدده المالك.
+- المنتج لا يُنشر للزبائن قبل اكتمال بياناته (اسم عربي، وصف، علامة، صورة،
+  حجم مسعّر) — يفرضه الخادم.
+- أقسام الموقع المرتبطة ببيانات تجارية (واتساب، توصيل، دفع، أصالة، تواصل)
+  تظهر فقط بعد أن يُكملها المالك من معالج الإعداد في `/manage/setup`.
