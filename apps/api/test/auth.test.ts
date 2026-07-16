@@ -109,6 +109,33 @@ describe("authentication & sessions", () => {
     }
   });
 
+  it("returns a structured 429 response when the login rate limit is exceeded", async () => {
+    const limited = await createTestApp({}, { disableRateLimit: false });
+    try {
+      await bootstrapOwner(limited.app);
+      const responses = [];
+
+      for (let attempt = 0; attempt < 11; attempt += 1) {
+        responses.push(
+          await limited.app.inject({
+            method: "POST",
+            url: "/api/v1/auth/login",
+            headers: { origin: TEST_ORIGIN },
+            payload: { identifier: OWNER_EMAIL, password: OWNER_PASSWORD },
+          })
+        );
+      }
+
+      const response = responses.at(-1)!;
+      expect(response.statusCode).toBe(429);
+      expect(response.json()).toMatchObject({
+        error: { code: "rate_limited" },
+      });
+    } finally {
+      await limited.app.close();
+    }
+  });
+
   it("rejects mutating authenticated requests without a trusted origin (CSRF)", async () => {
     const cookie = await login(ctx.app);
     const res = await ctx.app.inject({

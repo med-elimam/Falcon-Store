@@ -2,7 +2,9 @@
 
 /** عميل موحّد لواجهة Railway API من المتصفح — كوكيز الجلسة + مهلة + أخطاء مفهومة. */
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+/** Browser requests stay same-origin so Safari can retain the HttpOnly session cookie. */
+export const API_URL = "";
+const MEDIA_ORIGIN = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 export class ApiError extends Error {
   constructor(
@@ -90,5 +92,5 @@ export async function uploadMedia(file: File): Promise<{ asset: { id: string; ur
 
 export function apiMediaSrc(url: string | null): string | null {
   if (!url) return null;
-  return url.startsWith("/media/") ? `${API_URL}${url}` : url;
+  return url.startsWith("/media/") ? `${MEDIA_ORIGIN}${url}` : url;
 }

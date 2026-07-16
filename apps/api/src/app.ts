@@ -92,8 +92,10 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
       global: true,
       max: 300,
       timeWindow: "1 minute",
-      errorResponseBuilder: () => ({
-        error: { code: "rate_limited", message: "محاولات كثيرة. انتظر قليلًا ثم أعد المحاولة." },
+      errorResponseBuilder: (_request, context) => ({
+        statusCode: context.statusCode,
+        code: "rate_limited",
+        message: "محاولات كثيرة. انتظر قليلًا ثم أعد المحاولة.",
       }),
     });
   }

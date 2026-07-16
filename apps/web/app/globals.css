@@ -157,11 +157,8 @@ p { text-wrap: pretty; }
 
 /* Theme control — one preference shared by the storefront and management workspace. */
 .theme-switcher { color: var(--ivory); }
-.theme-switcher-copy { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 9px; }
-.theme-switcher-copy span { font-size: .76rem; font-weight: 800; }
-.theme-switcher-copy small { color: var(--silver); font-size: .62rem; }
-.theme-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); }
-.theme-options button { position: relative; min-width: 38px; min-height: 38px; padding: 7px 9px; border: 0; border-radius: 7px; background: transparent; color: var(--silver); display: inline-flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; transition: background-color .2s var(--ease), color .2s var(--ease), transform .2s var(--ease); }
+.theme-options { display: grid; grid-template-columns: repeat(3, 38px); gap: 2px; width: max-content; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); }
+.theme-options button { position: relative; width: 38px; height: 38px; padding: 0; border: 0; border-radius: 7px; background: transparent; color: var(--silver); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: background-color .2s var(--ease), color .2s var(--ease), transform .2s var(--ease); }
 .theme-options button:hover { color: var(--ivory); background: var(--surface-hover); }
 .theme-options button[data-active] { color: white; background: var(--crimson); }
 .theme-options button:active { transform: scale(.96); }
@@ -171,11 +168,16 @@ p { text-wrap: pretty; }
 .theme-switcher[data-variant="compact"] .theme-options button { color: var(--header-muted); }
 .theme-switcher[data-variant="compact"] .theme-options button:hover { color: var(--header-ink); background: color-mix(in oklch, var(--header-ink) 9%, transparent); }
 .theme-switcher[data-variant="compact"] .theme-options button[data-active] { color: white; background: var(--crimson); }
-.theme-switcher[data-variant="compact"] .theme-options button span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-.theme-switcher[data-variant="panel"] { padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); }
-.mobile-theme-switcher { margin: 4px 0 16px; }
-.manage-theme { margin: 2px 0 10px; order: 2; }
-.manage-login-theme { border-width: 0 0 1px; border-radius: 0; background: var(--surface-soft); }
+.theme-options button span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.theme-switcher[data-variant="panel"] { width: max-content; }
+.mobile-theme-switcher { margin: 8px auto 18px; }
+.manage-theme { margin: 2px auto 10px; order: 2; }
+.manage-login-theme { margin: 12px auto 0; }
+
+@media (pointer: coarse) {
+  .theme-options { grid-template-columns: repeat(3, 44px); }
+  .theme-options button { width: 44px; height: 44px; }
+}
 
 /* Header — الشريط يبدأ شفافًا فوق الـHero ويكتسب سطحًا صلبًا عند التمرير.
    الضبابية على ::before وليس على الهيدر نفسه: backdrop-filter على عنصر أب

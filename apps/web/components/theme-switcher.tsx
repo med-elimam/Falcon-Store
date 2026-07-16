@@ -21,7 +21,6 @@ const THEME_COLORS: Record<ResolvedTheme, string> = {
 
 interface ThemeContextValue {
   mode: ThemeMode;
-  resolvedTheme: ResolvedTheme;
   setMode: (mode: ThemeMode) => void;
 }
 
@@ -50,7 +49,6 @@ function applyTheme(mode: ThemeMode): ResolvedTheme {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mode, setModeState] = useState<ThemeMode>("system");
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("dark");
 
   const setMode = useCallback((nextMode: ThemeMode) => {
     try {
@@ -59,7 +57,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // The theme still applies for this visit when storage is unavailable.
     }
     setModeState(nextMode);
-    setResolvedTheme(applyTheme(nextMode));
+    applyTheme(nextMode);
   }, []);
 
   useEffect(() => {
@@ -70,17 +68,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // Private browsing can make localStorage unavailable.
     }
     const initialMode = isThemeMode(saved) ? saved : "system";
-    const initialResolvedTheme = applyTheme(initialMode);
+    applyTheme(initialMode);
 
     const readyFrame = requestAnimationFrame(() => {
       setModeState(initialMode);
-      setResolvedTheme(initialResolvedTheme);
       document.documentElement.dataset.themeReady = "true";
     });
     const onStorage = (event: StorageEvent) => {
       if (event.key !== STORAGE_KEY || !isThemeMode(event.newValue)) return;
       setModeState(event.newValue);
-      setResolvedTheme(applyTheme(event.newValue));
+      applyTheme(event.newValue);
     };
     window.addEventListener("storage", onStorage);
     return () => {
@@ -92,12 +89,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (mode !== "system") return;
     const media = window.matchMedia("(prefers-color-scheme: light)");
-    const onChange = () => setResolvedTheme(applyTheme("system"));
+    const onChange = () => applyTheme("system");
     media.addEventListener("change", onChange);
     return () => media.removeEventListener("change", onChange);
   }, [mode]);
 
-  const value = useMemo(() => ({ mode, resolvedTheme, setMode }), [mode, resolvedTheme, setMode]);
+  const value = useMemo(() => ({ mode, setMode }), [mode, setMode]);
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
@@ -146,17 +143,10 @@ export function ThemeSwitcher({
   variant?: "compact" | "panel";
   className?: string;
 }) {
-  const { mode, resolvedTheme, setMode } = useTheme();
-  const resolvedLabel = resolvedTheme === "light" ? "إضاءة فاتحة" : "إضاءة داكنة";
+  const { mode, setMode } = useTheme();
 
   return (
     <div className={`theme-switcher ${className}`.trim()} data-variant={variant}>
-      {variant === "panel" && (
-        <div className="theme-switcher-copy">
-          <span>مظهر الواجهة</span>
-          <small aria-live="polite">{mode === "system" ? `تلقائي · ${resolvedLabel}` : resolvedLabel}</small>
-        </div>
-      )}
       <div className="theme-options" role="group" aria-label="اختيار مظهر الواجهة">
         {OPTIONS.map((option) => {
           const Icon = option.icon;
@@ -165,6 +155,7 @@ export function ThemeSwitcher({
             <button
               key={option.mode}
               type="button"
+              aria-label={option.label}
               aria-pressed={active}
               data-active={active || undefined}
               onClick={() => setMode(option.mode)}

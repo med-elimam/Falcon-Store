@@ -17,7 +17,10 @@ export interface TestContext {
   db: AnyDb;
 }
 
-export async function createTestApp(envOverrides: Record<string, string | undefined> = {}): Promise<TestContext> {
+export async function createTestApp(
+  envOverrides: Record<string, string | undefined> = {},
+  options: { disableRateLimit?: boolean } = {}
+): Promise<TestContext> {
   const { db } = await createTestDb();
   await seedCore(db as unknown as AnyDb);
   const env = loadApiEnv({
@@ -30,7 +33,11 @@ export async function createTestApp(envOverrides: Record<string, string | undefi
     LOG_LEVEL: "fatal",
     ...envOverrides,
   });
-  const app = await buildApp({ env, db: db as unknown as AnyDb, disableRateLimit: true });
+  const app = await buildApp({
+    env,
+    db: db as unknown as AnyDb,
+    disableRateLimit: options.disableRateLimit ?? true,
+  });
   await app.ready();
   return { app, db: db as unknown as AnyDb };
 }
