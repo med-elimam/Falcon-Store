@@ -24,6 +24,16 @@ describe("order creation, stock and idempotency", () => {
     throw new Error("variant not found");
   }
 
+  async function getRevenue30d(): Promise<number> {
+    const overview = await ctx.app.inject({
+      method: "GET",
+      url: "/api/v1/admin/overview",
+      headers: authed(ownerCookie),
+    });
+    expect(overview.statusCode).toBe(200);
+    return overview.json().revenue30dMru as number;
+  }
+
   beforeAll(async () => {
     ctx = await createTestApp();
     await bootstrapOwner(ctx.app);
@@ -166,6 +176,7 @@ describe("order creation, stock and idempotency", () => {
     });
     expect(created.statusCode).toBe(201);
     expect(await getVariantStock(variantId)).toBe(0);
+    const revenueBeforeCancel = await getRevenue30d();
 
     const list = await ctx.app.inject({
       method: "GET",
@@ -182,6 +193,7 @@ describe("order creation, stock and idempotency", () => {
     });
     expect(cancel.statusCode).toBe(200);
     expect(await getVariantStock(variantId)).toBe(2);
+    expect(await getRevenue30d()).toBe(revenueBeforeCancel - created.json().totalMru);
 
     const detail = await ctx.app.inject({ method: "GET", url: `/api/v1/admin/orders/${orderId}`, headers: authed(ownerCookie) });
     const history = detail.json().history as { toStatus: string }[];
@@ -196,5 +208,6 @@ describe("order creation, stock and idempotency", () => {
     });
     expect(reopen.statusCode).toBe(200);
     expect(await getVariantStock(variantId)).toBe(2);
+    expect(await getRevenue30d()).toBe(revenueBeforeCancel);
   });
 });

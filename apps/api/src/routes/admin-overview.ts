@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { desc, gte, isNull, sql } from "drizzle-orm";
+import { and, desc, gte, isNull, ne, sql } from "drizzle-orm";
 import { API_PREFIX } from "@falcon/config";
 import { customers, orders, products, productVariants } from "@falcon/database";
 import { requirePermission } from "../plugins/auth.js";
@@ -24,7 +24,7 @@ export async function registerAdminOverviewRoutes(app: FastifyInstance): Promise
       app.db
         .select({ total: sql<number>`coalesce(sum(${orders.totalMru}), 0)::int` })
         .from(orders)
-        .where(gte(orders.createdAt, since30)),
+        .where(and(gte(orders.createdAt, since30), ne(orders.status, "cancelled"))),
     ]);
 
     const low = await app.db
