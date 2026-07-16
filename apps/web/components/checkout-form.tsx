@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cartTotal, useCart } from "@/lib/cart";
 import { formatMRU, waLink } from "@/lib/format";
@@ -37,6 +37,17 @@ export function CheckoutForm() {
   const checkoutReady = settings?.checkoutReady ?? false;
   const [zoneId, setZoneId] = useState("");
   const selectedZone = zones.find((z) => z.id === zoneId) ?? null;
+  const whatsappUrl = result?.whatsappNumber ? waLink(result.whatsappNumber, result.whatsappMessage) : null;
+
+  useEffect(() => {
+    if (!whatsappUrl) return;
+
+    const redirect = window.setTimeout(() => {
+      window.location.assign(whatsappUrl);
+    }, 1200);
+
+    return () => window.clearTimeout(redirect);
+  }, [whatsappUrl]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -70,25 +81,24 @@ export function CheckoutForm() {
 
   if (result) {
     return (
-      <div className="order-success">
-        <span>تم تسجيل الطلب داخل المتجر</span>
+      <div className="order-success" role="status" aria-live="polite">
+        <span>تم تسجيل طلبكم بنجاح</span>
         <h2 className="num">#{result.orderNumber}</h2>
-        <p>ظهر طلبك الآن في لوحة الإدارة وحُفظت بياناته برقم مرجعي. سنتواصل معك لتأكيد التوصيل.</p>
-        {result.whatsappNumber ? (
-          <a
-            href={waLink(result.whatsappNumber, result.whatsappMessage)}
-            className="btn btn-whatsapp"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <WhatsAppIcon /> إرسال رقم الطلب عبر واتساب (اختياري)
-          </a>
+        {whatsappUrl ? (
+          <>
+            <p>جارٍ فتح واتساب لإرسال تفاصيل الطلب وتأكيده.</p>
+            <a href={whatsappUrl} className="btn btn-whatsapp">
+              <WhatsAppIcon /> فتح واتساب الآن
+            </a>
+          </>
         ) : (
-          <p>سنتواصل معك على رقم الهاتف الذي أدخلته لتأكيد التفاصيل.</p>
+          <p>تم استلام طلبكم، وسنتواصل معكم لتأكيد التفاصيل.</p>
         )}
-        <button className="text-button" onClick={() => router.push("/shop")}>
-          العودة إلى المتجر
-        </button>
+        {!whatsappUrl && (
+          <button className="text-button" onClick={() => router.push("/shop")}>
+            العودة إلى المتجر
+          </button>
+        )}
       </div>
     );
   }

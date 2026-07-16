@@ -6,5 +6,5 @@ export function formatMRU(price: number, display: CurrencyDisplay = "mru"): stri
 }
 
 export function waLink(number: string, message: string): string {
-  return `https://wa.me/${number.replace(/^\+/, "")}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
 }
