@@ -17,7 +17,7 @@ export interface TestContext {
   db: AnyDb;
 }
 
-export async function createTestApp(): Promise<TestContext> {
+export async function createTestApp(envOverrides: Record<string, string | undefined> = {}): Promise<TestContext> {
   const { db } = await createTestDb();
   await seedCore(db as unknown as AnyDb);
   const env = loadApiEnv({
@@ -28,6 +28,7 @@ export async function createTestApp(): Promise<TestContext> {
     BOOTSTRAP_TOKEN,
     MEDIA_DIR: mkdtempSync(path.join(tmpdir(), "falcon-media-")),
     LOG_LEVEL: "fatal",
+    ...envOverrides,
   });
   const app = await buildApp({ env, db: db as unknown as AnyDb, disableRateLimit: true });
   await app.ready();

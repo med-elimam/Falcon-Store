@@ -21,11 +21,25 @@ import { writeAudit } from "../lib/audit.js";
 import { AppError, badRequest, notFound, tooMany, unauthorized } from "../lib/errors.js";
 import { requireAuth } from "../plugins/auth.js";
 
+function sessionCookieSecurity(app: FastifyInstance) {
+  /*
+   * Vercel and Railway use different sites, so a production host-only cookie
+   * must explicitly opt into cross-site requests. Partitioning keeps that
+   * cookie scoped to the storefront that created it on supporting browsers.
+   * A configured shared cookie domain keeps the stricter same-site policy.
+   */
+  const crossSite = app.env.NODE_ENV === "production" && !app.env.COOKIE_DOMAIN;
+  return {
+    secure: app.env.NODE_ENV === "production",
+    sameSite: crossSite ? ("none" as const) : ("lax" as const),
+    partitioned: crossSite || undefined,
+  };
+}
+
 function setSessionCookie(app: FastifyInstance, reply: FastifyReply, token: string): void {
   reply.setCookie(SESSION_COOKIE, token, {
     httpOnly: true,
-    secure: app.env.NODE_ENV === "production",
-    sameSite: "lax",
+    ...sessionCookieSecurity(app),
     path: "/",
     domain: app.env.COOKIE_DOMAIN || undefined,
     maxAge: app.env.SESSION_TTL_HOURS * 3600,
@@ -34,6 +48,7 @@ function setSessionCookie(app: FastifyInstance, reply: FastifyReply, token: stri
 
 function clearSessionCookie(app: FastifyInstance, reply: FastifyReply): void {
   reply.clearCookie(SESSION_COOKIE, {
+    ...sessionCookieSecurity(app),
     path: "/",
     domain: app.env.COOKIE_DOMAIN || undefined,
   });

@@ -88,6 +88,27 @@ describe("authentication & sessions", () => {
     expect(anon.statusCode).toBe(401);
   });
 
+  it("sets a secure partitioned cross-site session cookie for split production domains", async () => {
+    const prod = await createTestApp({ NODE_ENV: "production" });
+    try {
+      await bootstrapOwner(prod.app);
+      const res = await prod.app.inject({
+        method: "POST",
+        url: "/api/v1/auth/login",
+        headers: { origin: TEST_ORIGIN },
+        payload: { identifier: OWNER_EMAIL, password: OWNER_PASSWORD },
+      });
+      const setCookie = String(res.headers["set-cookie"]);
+
+      expect(res.statusCode).toBe(200);
+      expect(setCookie).toContain("Secure");
+      expect(setCookie).toContain("Partitioned");
+      expect(setCookie).toContain("SameSite=None");
+    } finally {
+      await prod.app.close();
+    }
+  });
+
   it("rejects mutating authenticated requests without a trusted origin (CSRF)", async () => {
     const cookie = await login(ctx.app);
     const res = await ctx.app.inject({
