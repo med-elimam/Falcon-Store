@@ -26,6 +26,9 @@ export default async function Home() {
   const whatsapp = settings?.contact.whatsapp ?? null;
   const authenticity = settings?.policies.authenticity ?? null;
   const address = settings?.contact.address ?? null;
+  const addressIsUrl = address ? /(?:https?:\/\/|www\.|maps\.app\.)/i.test(address) : false;
+  const addressLabel = address && !addressIsUrl ? address : null;
+  const mapUrl = settings?.contact.mapUrl ?? (addressIsUrl ? address : null);
   const hours = settings?.operations.hoursAr ?? null;
 
   /* شريط الثقة يُبنى فقط من معلومات مكتملة فعلاً */
@@ -166,16 +169,16 @@ export default async function Home() {
         </section>
       )}
 
-      {(whatsapp || address) && (
+      {(whatsapp || addressLabel || mapUrl) && (
         <section id="visit" className="visit-section">
           <div className="visit-image">
             <Image src="/images/storefront.jpg" alt="واجهة متجر فالكون ستور للعطور في نواكشوط" fill sizes="100vw" />
           </div>
-          <div className="shell visit-content">
+          <div className="visit-content">
             <Reveal>
               <span className="section-kicker">نواكشوط</span>
               <h2>من الخزنة إلى بابك</h2>
-              {address && <p>{address}</p>}
+              {addressLabel && <p>{addressLabel}</p>}
               {hours && <p>{hours}</p>}
               <div className="visit-actions">
                 {whatsapp && (
@@ -188,8 +191,8 @@ export default async function Home() {
                     <WhatsAppIcon /> تواصل عبر واتساب
                   </a>
                 )}
-                {settings?.contact.mapUrl && (
-                  <a href={settings.contact.mapUrl} className="btn btn-ghost" target="_blank" rel="noopener noreferrer">
+                {mapUrl && (
+                  <a href={mapUrl} className="btn btn-ghost" target="_blank" rel="noopener noreferrer">
                     موقع المتجر على الخريطة
                   </a>
                 )}
