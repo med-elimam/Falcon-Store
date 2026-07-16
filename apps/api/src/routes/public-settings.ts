@@ -7,7 +7,8 @@ import { getPublicSettings } from "../lib/settings.js";
 export async function registerPublicSettingsRoutes(app: FastifyInstance): Promise<void> {
   app.get(`${API_PREFIX}/public/settings`, async (_req, reply) => {
     const settings = await getPublicSettings(app.db);
-    reply.header("cache-control", "public, max-age=60, s-maxage=300, stale-while-revalidate=600");
+    // Checkout readiness must reflect admin changes immediately; stale zones lose real orders.
+    reply.header("cache-control", "no-store, max-age=0");
     return { settings };
   });
 

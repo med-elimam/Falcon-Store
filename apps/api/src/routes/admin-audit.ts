@@ -8,7 +8,23 @@ import { requirePermission } from "../plugins/auth.js";
 export async function registerAdminAuditRoutes(app: FastifyInstance): Promise<void> {
   app.get(`${API_PREFIX}/admin/audit`, { preHandler: requirePermission("audit.read") }, async (req) => {
     const q = paginationSchema.parse(req.query);
-    const where = q.q ? or(ilike(auditLogs.action, `%${q.q}%`), ilike(auditLogs.entity, `%${q.q}%`)) : undefined;
+    const aliases: Record<string, string> = {
+      "طلب": "order",
+      "منتج": "product",
+      "مخزون": "inventory",
+      "دخول": "auth.login",
+      "خروج": "auth.logout",
+      "صورة": "media",
+      "إعداد": "settings",
+      "توصيل": "delivery_zone",
+      "موظف": "staff",
+      "علامة": "brand",
+      "تصنيف": "category",
+    };
+    const search = q.q
+      ? Object.entries(aliases).find(([arabic]) => q.q!.includes(arabic))?.[1] ?? q.q
+      : null;
+    const where = search ? or(ilike(auditLogs.action, `%${search}%`), ilike(auditLogs.entity, `%${search}%`)) : undefined;
     const [rows, totalRows] = await Promise.all([
       app.db
         .select({

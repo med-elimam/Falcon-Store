@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { sql } from "drizzle-orm";
+import { mediaStorageMode } from "../lib/media-storage.js";
 
 export async function registerHealthRoutes(app: FastifyInstance): Promise<void> {
   app.get("/health", async (_req, reply) => {
@@ -13,6 +14,7 @@ export async function registerHealthRoutes(app: FastifyInstance): Promise<void> 
     return reply.status(status).send({
       status: dbStatus === "ok" ? "ok" : "degraded",
       db: dbStatus,
+      mediaStorage: mediaStorageMode(app.env),
       uptimeSeconds: Math.round(process.uptime()),
       timestamp: new Date().toISOString(),
     });

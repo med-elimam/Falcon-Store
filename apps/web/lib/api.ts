@@ -62,8 +62,18 @@ export async function getProductDetail(slug: string): Promise<ProductDetailDTO |
 }
 
 export async function getPublicSettings(): Promise<PublicSettingsDTO | null> {
-  const data = await serverFetch<{ settings: PublicSettingsDTO }>("/api/v1/public/settings", 300, ["settings"]);
-  return data?.settings ?? null;
+  try {
+    const res = await fetch(`${API_URL}/api/v1/public/settings`, {
+      cache: "no-store",
+      headers: { accept: "application/json", "cache-control": "no-cache" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { settings: PublicSettingsDTO };
+    return data.settings ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export async function getContentSections(): Promise<ContentSectionDTO[]> {

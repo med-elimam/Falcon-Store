@@ -41,8 +41,11 @@ function ThemeSwitch() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
-    const current = document.documentElement.dataset.theme;
-    setTheme(current === "light" ? "light" : "dark");
+    const frame = window.requestAnimationFrame(() => {
+      const current = document.documentElement.dataset.theme;
+      setTheme(current === "light" ? "light" : "dark");
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   function toggle() {

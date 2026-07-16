@@ -42,7 +42,7 @@ const NAV: { group: string; items: { href: string; label: string; perm?: string 
     group: "الأمان",
     items: [
       { href: "/manage/staff", label: "الموظفون والصلاحيات", perm: "staff.manage" },
-      { href: "/manage/audit", label: "سجل التدقيق", perm: "audit.read" },
+      { href: "/manage/audit", label: "سجل النشاط", perm: "audit.read" },
       { href: "/manage/security", label: "أمان الحساب" },
     ],
   },

@@ -25,7 +25,6 @@ export function CartDrawer() {
   if (!mounted) return null;
   const total = cartTotal(items);
   const display = settings?.commerce.currencyDisplay ?? "mru";
-  const checkoutReady = settings?.checkoutReady ?? false;
 
   return (
     <AnimatePresence>
@@ -93,15 +92,9 @@ export function CartDrawer() {
                     <span>الإجمالي المبدئي</span>
                     <strong className="num">{formatMRU(total, display)}</strong>
                   </div>
-                  {checkoutReady ? (
-                    <Link href="/checkout" className="btn btn-crimson btn-block" onClick={closeDrawer}>
-                      متابعة الطلب
-                    </Link>
-                  ) : (
-                    <Link href="/checkout" className="btn btn-ghost btn-block" onClick={closeDrawer}>
-                      تفاصيل إتمام الطلب
-                    </Link>
-                  )}
+                  <Link href="/checkout" className="btn btn-crimson btn-block" onClick={closeDrawer}>
+                    متابعة الطلب
+                  </Link>
                   <button className="text-button" onClick={closeDrawer}>
                     مواصلة التسوق
                   </button>

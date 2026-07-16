@@ -12,6 +12,7 @@ interface Overview {
   revenue30dMru: number;
   lowStockCount: number;
   stockTracked: boolean;
+  mediaStorage: "persistent" | "ephemeral" | "local";
   recentOrders: {
     id: string;
     orderNumber: string;
@@ -59,6 +60,15 @@ export default function OverviewPage() {
           <Link href="/manage/setup" className="btn btn-crimson">
             متابعة الإعداد
           </Link>
+        </div>
+      )}
+
+      {data.mediaStorage === "ephemeral" && (
+        <div className="setup-callout" data-tone="warning">
+          <div>
+            <b>صور المنتجات غير محمية بعد إعادة النشر</b>
+            <p>أضف Volume إلى خدمة Falcon-Store في Railway واربطه بالمسار /data/media. اشتراك Hobby وحده لا يضيفه تلقائيًا.</p>
+          </div>
         </div>
       )}
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { INVENTORY_REASON_LABELS, type InventoryReason } from "@falcon/shared";
+import type { InventoryReason } from "@falcon/shared";
 import { api, ApiError } from "@/lib/client-api";
 import {
   Chip,
@@ -32,14 +32,23 @@ interface LowStock {
   items: { variantId: string; size: string; stock: number; lowStockThreshold: number; nameAr: string | null; brandName: string | null }[];
 }
 
+type StockAction = "add" | "remove";
+
+function movementLabel(reason: InventoryReason, delta: number): string {
+  if (reason === "order") return "بيع من الموقع";
+  if (reason === "cancel") return "إلغاء طلب وإرجاع الكمية";
+  if (reason === "restock") return "إضافة بضاعة";
+  return delta > 0 ? "تصحيح بالزيادة" : "تصحيح بالنقصان";
+}
+
 export default function InventoryPage() {
   const products = useAdminData<{ products: AdminProduct[] }>("/api/v1/admin/products");
   const movements = useAdminData<{ movements: MovementRow[] }>("/api/v1/admin/inventory/movements?perPage=40");
   const lowStock = useAdminData<LowStock>("/api/v1/admin/inventory/low-stock");
   const toast = useToast();
   const [variantId, setVariantId] = useState("");
-  const [delta, setDelta] = useState("");
-  const [reason, setReason] = useState<InventoryReason>("restock");
+  const [quantity, setQuantity] = useState("");
+  const [action, setAction] = useState<StockAction>("add");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -63,7 +72,8 @@ export default function InventoryPage() {
         <section className="manage-card" style={{ marginBottom: 14 }}>
           <div className="manage-card-head">
             <div>
-              <h2>متغيرات قاربت على النفاد</h2>
+              <h2>منتجات قاربت على النفاد</h2>
+              <p>هذه المنتجات تحتاج إضافة كمية قريبًا.</p>
             </div>
           </div>
           <div className="manage-table-wrap">
@@ -89,11 +99,28 @@ export default function InventoryPage() {
       <section className="manage-card" style={{ marginBottom: 14 }}>
         <div className="manage-card-head">
           <div>
-            <h2>حركة مخزون جديدة</h2>
-            <p>كل تعديل يُسجَّل في دفتر الحركات وسجل التدقيق.</p>
+            <h2>تعديل كمية منتج</h2>
+            <p>اختر المنتج، ثم حدّد هل تريد إضافة كمية أم إنقاصها.</p>
           </div>
         </div>
         <div className="manage-form">
+          <fieldset className="inventory-action">
+            <legend>ماذا تريد أن تفعل؟</legend>
+            <label data-active={action === "add" ? "true" : undefined}>
+              <input type="radio" name="stock-action" checked={action === "add"} onChange={() => setAction("add")} />
+              <span>
+                <b>إضافة كمية</b>
+                <small>وصلت بضاعة جديدة إلى المتجر</small>
+              </span>
+            </label>
+            <label data-active={action === "remove" ? "true" : undefined}>
+              <input type="radio" name="stock-action" checked={action === "remove"} onChange={() => setAction("remove")} />
+              <span>
+                <b>إنقاص كمية</b>
+                <small>لتصحيح خطأ أو تسجيل تلف</small>
+              </span>
+            </label>
+          </fieldset>
           <div className="row">
             <label>
               الحجم
@@ -107,44 +134,47 @@ export default function InventoryPage() {
               </select>
             </label>
             <label>
-              التغيير (+ إضافة / − خصم)
+              الكمية
               <input
                 className="field num"
                 dir="ltr"
                 inputMode="numeric"
-                placeholder="+5 أو -2"
-                value={delta}
-                onChange={(e) => setDelta(e.target.value.replace(/[^\d+-]/g, ""))}
+                placeholder="مثال: 5"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value.replace(/[^\d]/g, ""))}
               />
             </label>
             <label>
-              السبب
-              <select className="field" value={reason} onChange={(e) => setReason(e.target.value as InventoryReason)}>
-                {(["restock", "adjustment", "correction"] as const).map((r) => (
-                  <option key={r} value={r}>
-                    {INVENTORY_REASON_LABELS[r]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
               ملاحظة (اختياري)
-              <input className="field" value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} />
+              <input
+                className="field"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                maxLength={300}
+                placeholder={action === "add" ? "مثال: وصلت دفعة جديدة" : "مثال: عبوة تالفة"}
+              />
             </label>
           </div>
           <div className="manage-form-foot">
             <button
               className="btn btn-crimson"
-              disabled={busy || !variantId || !delta || Number(delta) === 0 || Number.isNaN(Number(delta))}
+              disabled={busy || !variantId || !quantity || Number(quantity) <= 0 || !Number.isInteger(Number(quantity))}
               onClick={async () => {
                 setBusy(true);
                 try {
-                  await api("/api/v1/admin/inventory/adjust", {
+                  const amount = Number(quantity);
+                  const delta = action === "add" ? amount : -amount;
+                  const result = await api<{ stock: number }>("/api/v1/admin/inventory/adjust", {
                     method: "POST",
-                    body: { variantId, delta: Number(delta), reason, note: note.trim() || undefined },
+                    body: {
+                      variantId,
+                      delta,
+                      reason: action === "add" ? "restock" : "correction",
+                      note: note.trim() || undefined,
+                    },
                   });
-                  toast.push("سُجّلت الحركة.");
-                  setDelta("");
+                  toast.push(`تم تحديث المخزون. الكمية الحالية: ${result.stock}`);
+                  setQuantity("");
                   setNote("");
                   products.reload();
                   movements.reload();
@@ -156,7 +186,7 @@ export default function InventoryPage() {
                 }
               }}
             >
-              تسجيل الحركة
+              {busy ? "جارٍ الحفظ…" : action === "add" ? "إضافة الكمية" : "إنقاص الكمية"}
             </button>
           </div>
         </div>
@@ -180,8 +210,8 @@ export default function InventoryPage() {
               <thead>
                 <tr>
                   <th>المنتج</th>
-                  <th>التغيير</th>
-                  <th>السبب</th>
+                  <th>الكمية</th>
+                  <th>ما الذي حدث؟</th>
                   <th>ملاحظة</th>
                   <th>التاريخ</th>
                 </tr>
@@ -197,7 +227,7 @@ export default function InventoryPage() {
                         <span className="num">{m.movement.delta > 0 ? `+${m.movement.delta}` : m.movement.delta}</span>
                       </Chip>
                     </td>
-                    <td>{INVENTORY_REASON_LABELS[m.movement.reason]}</td>
+                    <td>{movementLabel(m.movement.reason, m.movement.delta)}</td>
                     <td>{m.movement.note ?? "—"}</td>
                     <td className="num">{new Date(m.movement.createdAt).toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" })}</td>
                   </tr>

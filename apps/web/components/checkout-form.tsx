@@ -35,7 +35,6 @@ export function CheckoutForm() {
   const zones = settings?.deliveryZones ?? [];
   const methods = settings?.paymentMethods ?? [];
   const checkoutReady = settings?.checkoutReady ?? false;
-  const whatsapp = settings?.contact.whatsapp ?? null;
   const [zoneId, setZoneId] = useState("");
   const selectedZone = zones.find((z) => z.id === zoneId) ?? null;
 
@@ -72,9 +71,9 @@ export function CheckoutForm() {
   if (result) {
     return (
       <div className="order-success">
-        <span>تم استلام الطلب</span>
+        <span>تم تسجيل الطلب داخل المتجر</span>
         <h2 className="num">#{result.orderNumber}</h2>
-        <p>حُفظ طلبك برقم مرجعي وسنراجعه فورًا.</p>
+        <p>ظهر طلبك الآن في لوحة الإدارة وحُفظت بياناته برقم مرجعي. سنتواصل معك لتأكيد التوصيل.</p>
         {result.whatsappNumber ? (
           <a
             href={waLink(result.whatsappNumber, result.whatsappMessage)}
@@ -82,7 +81,7 @@ export function CheckoutForm() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <WhatsAppIcon /> تأكيد عبر واتساب
+            <WhatsAppIcon /> إرسال رقم الطلب عبر واتساب (اختياري)
           </a>
         ) : (
           <p>سنتواصل معك على رقم الهاتف الذي أدخلته لتأكيد التفاصيل.</p>
@@ -121,33 +120,13 @@ export function CheckoutForm() {
   if (!checkoutReady) {
     return (
       <div className="empty-checkout">
-        {whatsapp ? (
-          <>
-            <h2>أكمل طلبك مباشرة عبر واتساب</h2>
-            <p>أرسل لنا اختياراتك وسنؤكد السعر والتوصيل معك فورًا. سلتك محفوظة على جهازك.</p>
-            <a
-              href={waLink(
-                whatsapp,
-                `السلام عليكم، أريد إتمام طلب من فالكون ستور:\n${items
-                  .map((i) => `${i.nameAr} — ${i.size} × ${i.qty}`)
-                  .join("\n")}`
-              )}
-              className="btn btn-whatsapp"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <WhatsAppIcon /> إرسال الطلب عبر واتساب
-            </a>
-          </>
-        ) : (
-          <>
-            <h2>الطلب عبر الموقع غير متاح في هذه اللحظة</h2>
-            <p>سلتك محفوظة على جهازك. أعد المحاولة بعد قليل.</p>
-            <button className="btn btn-ghost" onClick={() => router.refresh()}>
-              إعادة المحاولة
-            </button>
-          </>
-        )}
+        <h2>الطلب عبر الموقع متوقف مؤقتًا</h2>
+        <p>
+          لن نرسل طلبًا خارج النظام حتى لا تضيع بيانات العميل أو المخزون. حدّث الإعدادات، ثم أعد تحميل الصفحة.
+        </p>
+        <button className="btn btn-ghost" onClick={() => window.location.reload()}>
+          تحديث صفحة الطلب
+        </button>
       </div>
     );
   }

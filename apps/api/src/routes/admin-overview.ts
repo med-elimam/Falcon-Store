@@ -3,6 +3,7 @@ import { desc, gte, isNull, sql } from "drizzle-orm";
 import { API_PREFIX } from "@falcon/config";
 import { customers, orders, products, productVariants } from "@falcon/database";
 import { requirePermission } from "../plugins/auth.js";
+import { mediaStorageMode } from "../lib/media-storage.js";
 
 /** نظرة عامة مجمعة في طلب واحد لتقليل جولات الشبكة من لوحة الإدارة. */
 export async function registerAdminOverviewRoutes(app: FastifyInstance): Promise<void> {
@@ -39,6 +40,7 @@ export async function registerAdminOverviewRoutes(app: FastifyInstance): Promise
       revenue30dMru: revenue30[0]?.total ?? 0,
       lowStockCount,
       stockTracked: true,
+      mediaStorage: mediaStorageMode(app.env),
       recentOrders,
     };
   });
