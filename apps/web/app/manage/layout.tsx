@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import { type KeyboardEvent as ReactKeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { ROLE_LABELS } from "@falcon/shared";
 import { api } from "@/lib/client-api";
-import { FalconMark } from "@/components/icons";
+import { CloseIcon, FalconMark, MenuIcon } from "@/components/icons";
 import { LoginForm } from "@/components/login-form";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { LoadingBlock, MeProvider, ToastProvider, useMe } from "@/components/manage/ui";
@@ -52,6 +52,41 @@ function Shell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { status, user, refresh } = useMe();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const desktopViewport = window.matchMedia("(min-width: 761px)");
+    const closeOnDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) setMobileMenuOpen(false);
+    };
+
+    desktopViewport.addEventListener("change", closeOnDesktop);
+    return () => desktopViewport.removeEventListener("change", closeOnDesktop);
+  }, []);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const menuButton = menuButtonRef.current;
+    const focusFrame = requestAnimationFrame(() => closeButtonRef.current?.focus());
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileMenuOpen(false);
+    };
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      cancelAnimationFrame(focusFrame);
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", closeOnEscape);
+      menuButton?.focus();
+    };
+  }, [mobileMenuOpen]);
 
   if (status === "loading") {
     return (
@@ -73,15 +108,83 @@ function Shell({ children }: { children: ReactNode }) {
   }
 
   const can = (perm?: string) => !perm || user.permissions.includes(perm as never);
+  const activeItem = NAV.flatMap((group) => group.items).find((item) => item.href === pathname);
+
+  const closeMobileMenu = () => setMobileMenuOpen(false);
+
+  const keepFocusInSidebar = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Tab" || !mobileMenuOpen) return;
+
+    const focusable = sidebarRef.current?.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+    if (!focusable?.length) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
   return (
     <div className="manage-shell">
-      <aside className="manage-sidebar">
-        <ThemeSwitcher variant="panel" className="manage-theme" />
-        <Link href="/manage" className="manage-logo" aria-label="لوحة إدارة فالكون">
+      <header className="manage-mobile-bar">
+        <Link href="/manage" className="manage-mobile-brand" aria-label="لوحة إدارة فالكون">
           <FalconMark />
-          <b>FALCON — الإدارة</b>
+          <span>
+            <b>FALCON — الإدارة</b>
+            <small>{activeItem?.label ?? "لوحة الإدارة"}</small>
+          </span>
         </Link>
+        <button
+          ref={menuButtonRef}
+          type="button"
+          className="manage-menu-button"
+          aria-label="فتح قائمة الإدارة"
+          aria-controls="manage-navigation"
+          aria-expanded={mobileMenuOpen}
+          onClick={() => setMobileMenuOpen(true)}
+        >
+          <MenuIcon />
+        </button>
+      </header>
+      <button
+        type="button"
+        className="manage-menu-backdrop"
+        aria-label="إغلاق قائمة الإدارة"
+        tabIndex={-1}
+        data-open={mobileMenuOpen || undefined}
+        onClick={closeMobileMenu}
+      />
+      <aside
+        ref={sidebarRef}
+        id="manage-navigation"
+        className="manage-sidebar"
+        aria-label="قائمة الإدارة"
+        data-open={mobileMenuOpen || undefined}
+        onKeyDown={keepFocusInSidebar}
+      >
+        <div className="manage-sidebar-head">
+          <Link href="/manage" className="manage-logo" aria-label="لوحة إدارة فالكون" onClick={closeMobileMenu}>
+            <FalconMark />
+            <b>FALCON — الإدارة</b>
+          </Link>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            className="manage-sidebar-close"
+            aria-label="إغلاق قائمة الإدارة"
+            onClick={closeMobileMenu}
+          >
+            <CloseIcon />
+          </button>
+        </div>
+        <ThemeSwitcher variant="panel" className="manage-theme" />
         <nav className="manage-nav" aria-label="أقسام الإدارة">
           {NAV.map((group) => {
             const items = group.items.filter((i) => can(i.perm));
@@ -90,7 +193,13 @@ function Shell({ children }: { children: ReactNode }) {
               <div key={group.group}>
                 <div className="nav-group">{group.group}</div>
                 {items.map((item) => (
-                  <Link key={item.href} href={item.href} className={pathname === item.href ? "active" : ""}>
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={pathname === item.href ? "active" : ""}
+                    aria-current={pathname === item.href ? "page" : undefined}
+                    onClick={closeMobileMenu}
+                  >
                     {item.label}
                   </Link>
                 ))}
@@ -103,7 +212,7 @@ function Shell({ children }: { children: ReactNode }) {
             <b>{user.displayName}</b>
             <span>{user.roles.map((r) => ROLE_LABELS[r]).join("، ")}</span>
           </div>
-          <Link href="/">فتح المتجر ←</Link>
+          <Link href="/" onClick={closeMobileMenu}>فتح المتجر ←</Link>
           <button
             onClick={async () => {
               try {
@@ -118,7 +227,7 @@ function Shell({ children }: { children: ReactNode }) {
           </button>
         </div>
       </aside>
-      <div className="manage-main">{children}</div>
+      <div className="manage-main" inert={mobileMenuOpen ? true : undefined}>{children}</div>
     </div>
   );
 }
