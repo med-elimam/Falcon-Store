@@ -137,4 +137,32 @@ describe("price updates, stock updates and publish gating", () => {
     const audit = await ctx.app.inject({ method: "GET", url: "/api/v1/admin/audit?q=stock_changed", headers: authed(ownerCookie) });
     expect(audit.json().logs.length).toBeGreaterThan(0);
   });
+
+  it("updates a brand and rejects a duplicate identifier", async () => {
+    const before = await ctx.app.inject({ method: "GET", url: "/api/v1/admin/brands", headers: authed(ownerCookie) });
+    const brands = before.json().brands as { id: string; slug: string; name: string; nameAr: string | null }[];
+    const creed = brands.find((brand) => brand.slug === "creed")!;
+    const goldfield = brands.find((brand) => brand.slug === "goldfield-banks")!;
+
+    const updated = await ctx.app.inject({
+      method: "PATCH",
+      url: `/api/v1/admin/brands/${creed.id}`,
+      headers: authed(ownerCookie),
+      payload: { name: "Creed Paris", nameAr: "كريد باريس", slug: "creed-paris" },
+    });
+    expect(updated.statusCode).toBe(200);
+
+    const after = await ctx.app.inject({ method: "GET", url: "/api/v1/admin/brands", headers: authed(ownerCookie) });
+    expect(after.json().brands).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: creed.id, name: "Creed Paris", nameAr: "كريد باريس", slug: "creed-paris" })])
+    );
+
+    const duplicate = await ctx.app.inject({
+      method: "PATCH",
+      url: `/api/v1/admin/brands/${creed.id}`,
+      headers: authed(ownerCookie),
+      payload: { name: goldfield.name, slug: goldfield.slug },
+    });
+    expect(duplicate.statusCode).toBe(409);
+  });
 });

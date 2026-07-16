@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { asc, eq, isNull } from "drizzle-orm";
+import { and, asc, eq, isNull, ne } from "drizzle-orm";
 import { API_PREFIX } from "@falcon/config";
 import { brands, categories } from "@falcon/database";
 import { brandSchema, categorySchema, uuidSchema } from "@falcon/validation";
@@ -27,7 +27,19 @@ export async function registerAdminTaxonomyRoutes(app: FastifyInstance): Promise
   app.patch(B + "/:id", { preHandler: requirePermission("products.write") }, async (req) => {
     const id = uuidSchema.parse((req.params as { id: string }).id);
     const body = brandSchema.partial().parse(req.body);
-    const [row] = await app.db.update(brands).set(body).where(eq(brands.id, id)).returning({ id: brands.id });
+    if (body.slug) {
+      const duplicate = await app.db
+        .select({ id: brands.id })
+        .from(brands)
+        .where(and(eq(brands.slug, body.slug), ne(brands.id, id)))
+        .limit(1);
+      if (duplicate[0]) throw conflict("توجد علامة بنفس المعرّف.");
+    }
+    const [row] = await app.db
+      .update(brands)
+      .set(body)
+      .where(eq(brands.id, id))
+      .returning({ id: brands.id });
     if (!row) throw notFound("العلامة غير موجودة.");
     await writeAudit(app.db, req, { action: "brand.updated", entity: "brand", entityId: id });
     return { ok: true };
