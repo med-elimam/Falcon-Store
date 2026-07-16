@@ -49,17 +49,25 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
-  colorScheme: "dark light",
+  colorScheme: "light dark",
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const settings = await getPublicSettings();
   return (
-    <html lang="ar" dir="rtl" suppressHydrationWarning className={`${alexandria.variable} ${bodoni.variable} ${inter.variable}`}>
+    <html
+      lang="ar"
+      dir="rtl"
+      data-theme="light"
+      data-theme-mode="light"
+      suppressHydrationWarning
+      className={`${alexandria.variable} ${bodoni.variable} ${inter.variable}`}
+      style={{ colorScheme: "light" }}
+    >
       <head>
-        <meta name="theme-color" content="#0b090a" data-falcon-theme="true" />
+        <meta name="theme-color" content="#f6f3f4" data-falcon-theme="true" />
         <Script id="falcon-theme" strategy="beforeInteractive">
-          {`try{var t=localStorage.getItem('falcon-theme');var m=t==='light'||t==='dark'||t==='system'?t:'system';var r=m==='light'||m==='dark'?m:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');var d=document.documentElement;d.dataset.theme=r;d.dataset.themeMode=m;d.style.colorScheme=r;var c=document.querySelector('meta[name="theme-color"][data-falcon-theme]');if(c)c.content=r==='light'?'#f6f3f4':'#0b090a';}catch(e){}`}
+          {`try{var t=localStorage.getItem('falcon-theme');var m=t==='light'||t==='dark'||t==='system'?t:'light';var r=m==='light'||m==='dark'?m:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');var d=document.documentElement;d.dataset.theme=r;d.dataset.themeMode=m;d.style.colorScheme=r;var c=document.querySelector('meta[name="theme-color"][data-falcon-theme]');if(c)c.content=r==='light'?'#f6f3f4':'#0b090a';}catch(e){}`}
         </Script>
       </head>
       <body>

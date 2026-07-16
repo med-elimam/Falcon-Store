@@ -38,7 +38,7 @@ function OpeningMedia() {
 }
 
 function ThemeSwitch() {
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
