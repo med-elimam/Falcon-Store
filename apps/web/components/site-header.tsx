@@ -8,6 +8,7 @@ import { useCart } from "@/lib/cart";
 import { api } from "@/lib/client-api";
 import { CartIcon, FalconMark, ShieldIcon } from "./icons";
 import { LoginModal } from "./login-modal";
+import { ThemeSwitcher } from "./theme-switcher";
 import { useHydrated } from "./use-hydrated";
 
 const links = [
@@ -97,7 +98,11 @@ export function SiteHeader() {
   }, [router]);
 
   return (
-    <header className="site-header" data-scrolled={scrolled || undefined}>
+    <header
+      className="site-header"
+      data-scrolled={scrolled || undefined}
+      data-overlay={pathname === "/" || undefined}
+    >
       <div className="shell header-inner">
         <button
           ref={menuButtonRef}
@@ -130,6 +135,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="header-actions">
+          <ThemeSwitcher variant="compact" className="header-theme desktop-only" />
           <button
             className="icon-button desktop-only admin-entry"
             onClick={openAdmin}
@@ -174,6 +180,7 @@ export function SiteHeader() {
               <div className="mobile-menu-mark">
                 <FalconMark />
               </div>
+              <ThemeSwitcher variant="panel" className="mobile-theme-switcher" />
               {links.map((link) => (
                 <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}>
                   {link.label}

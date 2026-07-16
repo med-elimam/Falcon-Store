@@ -7,6 +7,7 @@ import { ROLE_LABELS } from "@falcon/shared";
 import { api } from "@/lib/client-api";
 import { FalconMark } from "@/components/icons";
 import { LoginForm } from "@/components/login-form";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import { LoadingBlock, MeProvider, ToastProvider, useMe } from "@/components/manage/ui";
 
 const NAV: { group: string; items: { href: string; label: string; perm?: string }[] }[] = [
@@ -64,6 +65,7 @@ function Shell({ children }: { children: ReactNode }) {
     return (
       <div className="manage-shell" style={{ gridTemplateColumns: "1fr", placeItems: "center" }}>
         <div className="manage-card" style={{ width: "min(94vw, 430px)", margin: "60px 0" }}>
+          <ThemeSwitcher variant="panel" className="manage-login-theme" />
           <LoginForm onSuccess={refresh} />
         </div>
       </div>
@@ -75,6 +77,7 @@ function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="manage-shell">
       <aside className="manage-sidebar">
+        <ThemeSwitcher variant="panel" className="manage-theme" />
         <Link href="/manage" className="manage-logo" aria-label="لوحة إدارة فالكون">
           <FalconMark />
           <b>FALCON — الإدارة</b>
