@@ -107,7 +107,8 @@ html[data-theme="light"] {
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; background: var(--obsidian); }
-body { margin: 0; background: var(--obsidian); color: var(--ivory); font-family: var(--font-alexandria), "Segoe UI", Tahoma, Arial, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: clip; }
+body { margin: 0; background: var(--obsidian); color: var(--ivory); font-family: var(--font-alexandria), "Segoe UI", Tahoma, Arial, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: clip; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+#main { flex: 1 0 auto; }
 html[data-theme-ready] body { transition: background-color .22s var(--ease), color .18s var(--ease); }
 body:has(.manage-shell) .site-header, body:has(.manage-shell) .site-footer { display: none; }
 body:has(.manage-shell) main { min-height: 100vh; }
@@ -638,12 +639,9 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
 
 /* ── قسم تواصل ودفع ── */
 .footer-connect { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0; border: 1px solid var(--line); margin-bottom: 0; }
-.footer-connect > div { padding: 22px 28px; }
+.footer-connect > div { padding: 14px 20px; }
 .footer-connect > div + div { border-inline-start: 1px solid var(--line); }
-.footer-connect-label { display: block; font-size: .68rem; font-weight: 700; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
-.footer-wa-number { display: inline-flex; align-items: center; gap: 10px; color: var(--ivory); font-size: .94rem; font-weight: 600; transition: color .2s; }
-.footer-wa-number svg { width: 20px; height: 20px; color: #1ca454; flex-shrink: 0; }
-.footer-wa-number:hover { color: var(--crimson-hot); }
+.footer-connect-label { display: block; font-size: .68rem; font-weight: 700; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
 .footer-social-circles { display: flex; gap: 10px; flex-wrap: wrap; }
 .social-circle { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--control-border-strong); display: grid; place-items: center; color: var(--silver); background: transparent; transition: border-color .22s var(--ease), color .22s var(--ease), background-color .22s var(--ease), transform .22s var(--ease); }
 .social-circle svg { width: 17px; height: 17px; }
@@ -684,7 +682,9 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
   .product-page { padding-top: 66px; }.product-detail-hero { min-height: auto; grid-template-columns: 1fr; padding-top: 14px; }.gallery-main { aspect-ratio: 1 / 1.05; margin-inline: -14px; border-inline: 0; }.gallery-thumbs { overflow-x: auto; }.product-buy { padding-bottom: 48px; }.product-buy h1 { font-size: clamp(3.2rem, 17vw, 5rem); }.buy-actions { grid-template-columns: 1fr; }.facts-grid { grid-template-columns: 1fr 1fr; }.facts-grid > div:not(:nth-child(3n+1)) { border-inline-start: 0; padding-inline-start: 0; }.facts-grid > div:nth-child(even) { border-inline-start: 1px solid var(--line); padding-inline-start: 14px; }.notes-layout { grid-template-columns: 1fr; gap: 38px; }.notes-layout > div:first-child { position: static; }.note-stack article { grid-template-columns: 58px 1fr; min-height: 126px; }.note-stack strong { font-size: .95rem; }
   .checkout-grid { grid-template-columns: 1fr; }.form-grid { grid-template-columns: 1fr; }.order-summary { position: static; grid-row: 1; }.checkout-section { padding-top: 30px; }.order-success h2 { font-size: 2.8rem; }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 38px 24px; }.footer-brand { grid-column: 1 / -1; }.footer-note { grid-column: 1 / -1; }.footer-bottom { font-size: .6rem; gap: 6px; flex-wrap: wrap; }
-  .footer-connect { grid-template-columns: 1fr; margin-top: 0; }.footer-connect > div + div { border-inline-start: 0; border-top: 1px solid var(--line); }
+  .footer-connect { grid-template-columns: 1fr; margin-top: 0; }
+  .footer-connect > div { padding: 12px 16px; }
+  .footer-connect > div + div { border-inline-start: 0; border-top: 1px solid var(--line); }
   .manage-shell { display: block; }
   .manage-mobile-bar { position: sticky; top: 0; z-index: var(--z-header); min-height: 68px; padding: max(10px, env(safe-area-inset-top)) 14px 10px; display: flex; align-items: center; justify-content: space-between; gap: 14px; background: var(--graphite); border-bottom: 1px solid var(--line); }
   .manage-mobile-brand { min-width: 0; display: flex; align-items: center; gap: 9px; color: var(--crimson-hot); }

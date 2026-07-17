@@ -70,39 +70,13 @@ export function Footer({ settings }: { settings: PublicSettingsDTO | null }) {
         {/* ملاحظة التشغيل */}
         <div className="footer-note">
           <span>نواكشوط · موريتانيا</span>
-          <p>
-            {settings?.commerce.currencyDisplay === "ouguiya_ancienne"
-              ? "الأسعار معروضة بالأوقية القديمة."
-              : "الأسعار بالأوقية الجديدة MRU."}{" "}
-            يتم تأكيد التوفر وموعد التوصيل قبل إتمام الطلب.
-          </p>
         </div>
       </div>
 
       {/* ── قسم التواصل والدفع — يظهر فقط عند توفر بيانات ── */}
-      {(contact?.whatsapp || socialLinks.length > 0 || paymentMethods.length > 0) && (
+      {(socialLinks.length > 0 || paymentMethods.length > 0) && (
         <div className="shell">
           <div className="footer-connect">
-            {/* واتساب */}
-            {contact?.whatsapp && (
-              <div className="footer-connect-wa">
-                <span className="footer-connect-label">واتساب</span>
-                <a
-                  href={waLink(
-                    contact.whatsapp,
-                    "السلام عليكم، أريد الاستفسار عن عطور فالكون ستور."
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="footer-wa-number"
-                  dir="ltr"
-                >
-                  <WhatsAppIcon />
-                  {contact.whatsapp}
-                </a>
-              </div>
-            )}
-
             {/* روابط التواصل — دوائر */}
             {socialLinks.length > 0 && (
               <div className="footer-connect-social">
