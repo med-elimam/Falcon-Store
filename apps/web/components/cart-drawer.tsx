@@ -51,10 +51,10 @@ export function CartDrawer() {
             {items.length === 0 ? (
               <div className="empty-cart">
                 <span className="empty-cart-mark">F</span>
-                <h3>السلة بانتظار اختيارك</h3>
-                <p>اختر عطرًا من المجموعة أو جرّب تعبئة 10ml.</p>
+                <h3>سلتك فارغة</h3>
+                <p>أضف عطرًا لتبدأ طلبك.</p>
                 <Link href="/shop" className="btn btn-crimson" onClick={closeDrawer}>
-                  استكشف العطور
+                  تصفح العطور
                 </Link>
               </div>
             ) : (

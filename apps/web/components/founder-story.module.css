@@ -64,9 +64,9 @@
 .content h2 {
   max-width: 660px;
   margin-bottom: 24px;
-  font-size: clamp(2.5rem, 4vw, 4.2rem);
-  line-height: 1.1;
-  letter-spacing: -0.03em;
+  font-size: clamp(2.6rem, 4.4vw, 4.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.038em;
 }
 
 .copy {
@@ -142,7 +142,8 @@
   }
 
   .content h2 {
-    font-size: clamp(2.35rem, 11vw, 3.25rem);
+    font-size: clamp(2.5rem, 11vw, 3.5rem);
+    letter-spacing: -0.038em;
     line-height: 1.12;
   }
 

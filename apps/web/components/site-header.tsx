@@ -8,7 +8,7 @@ import { useCart } from "@/lib/cart";
 import { api } from "@/lib/client-api";
 import { CartIcon, FalconMark, ShieldIcon } from "./icons";
 import { LoginModal } from "./login-modal";
-import { ThemeSwitcher } from "./theme-switcher";
+import { ThemeToggle } from "./theme-switcher";
 import { useHydrated } from "./use-hydrated";
 
 /* صفحات حقيقية دائمة — القائمة لا تتغير ولا تختفي عناصرها حسب البيانات */
@@ -123,7 +123,7 @@ export function SiteHeader() {
           <FalconMark className="brand-mark" />
           <span>
             <strong>FALCON STORE</strong>
-            <small>THE SCENT VAULT</small>
+            <small>عطور أصلية مختارة بعناية</small>
           </span>
         </Link>
 
@@ -136,7 +136,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="header-actions">
-          <ThemeSwitcher variant="compact" className="header-theme desktop-only" />
+          <ThemeToggle />
           <button
             className="icon-button desktop-only admin-entry"
             onClick={openAdmin}
@@ -181,7 +181,7 @@ export function SiteHeader() {
                 </button>
                 <div className="mobile-menu-brand" aria-hidden="true">
                   <FalconMark />
-                  <span>THE SCENT VAULT</span>
+                  <span>عطور أصلية مختارة بعناية</span>
                 </div>
               </div>
               <div className="mobile-menu-links">
@@ -203,10 +203,6 @@ export function SiteHeader() {
                 ))}
               </div>
               <div className="mobile-menu-foot">
-                <div className="mobile-menu-theme">
-                  <span>مظهر التصفح</span>
-                  <ThemeSwitcher variant="panel" />
-                </div>
                 <button className="admin-link" onClick={openAdmin}>
                   <ShieldIcon /> دخول الإدارة
                 </button>

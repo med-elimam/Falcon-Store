@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ShopCatalog } from "@/components/shop-catalog";
+import { CatalogSkeleton } from "@/components/catalog-skeleton";
 import { getCatalog, getPublicSettings } from "@/lib/api";
 
 export const revalidate = 300;
@@ -16,19 +17,19 @@ export default async function ShopPage() {
     <div className="page-shell">
       <section className="shop-hero">
         <div className="shell">
-          <span className="section-kicker">مجموعة فالكون</span>
-          <h1>خزنة الروائح</h1>
-          <p>اختر حسب العلامة أو الطابع، وشاهد السعر والتوفر قبل الطلب.</p>
+          <span className="section-kicker">المتجر</span>
+          <h1>جميع العطور</h1>
+          <p>اختر حسب العلامة أو نوع الرائحة، وشاهد السعر والتوفر قبل الطلب.</p>
         </div>
       </section>
       <section className="shell shop-section">
         {products === null ? (
           <div className="no-results">
-            <strong>تعذر تحميل المجموعة مؤقتًا</strong>
+            <strong>تعذّر تحميل العطور مؤقتًا</strong>
             <p>نعمل على إعادة الاتصال. حدّث الصفحة بعد قليل.</p>
           </div>
         ) : (
-          <Suspense fallback={<div className="catalog-loading">جارٍ فتح الخزنة…</div>}>
+          <Suspense fallback={<CatalogSkeleton />}>
             <ShopCatalog products={products} display={display} />
           </Suspense>
         )}

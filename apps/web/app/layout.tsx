@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Alexandria, Bodoni_Moda, Inter } from "next/font/google";
+import { Alexandria, Bodoni_Moda, Manrope } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { CartDrawer } from "@/components/cart-drawer";
@@ -14,7 +14,7 @@ import { getPublicSettings } from "@/lib/api";
 
 const alexandria = Alexandria({
   subsets: ["arabic", "latin"],
-  weight: ["300", "400", "500", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-alexandria",
   display: "swap",
 });
@@ -26,9 +26,10 @@ const bodoni = Bodoni_Moda({
   display: "swap",
 });
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-manrope",
   display: "swap",
 });
 
@@ -69,7 +70,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       data-theme={ssrResolved}
       data-theme-mode={defaultTheme}
       suppressHydrationWarning
-      className={`${alexandria.variable} ${bodoni.variable} ${inter.variable}`}
+      className={`${alexandria.variable} ${bodoni.variable} ${manrope.variable}`}
       style={htmlStyle}
     >
       <head>

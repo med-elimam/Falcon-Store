@@ -154,8 +154,8 @@ export async function seedCore(db: AnyDb): Promise<void> {
     .values({
       key: "hero",
       type: "hero",
-      titleAr: "روائح تصنع حضورك.",
-      bodyAr: "اختيارات نيش ومصممين، مع تعبئة دقيقة بحجم 10ml من الزجاجة الأصلية.",
+      titleAr: "عطور أصلية مختارة بعناية",
+      bodyAr: "اكتشف عطور النيش والمصممين، وجرّب أحجام 10ml قبل شراء الزجاجة الكاملة.",
       enabled: true,
       sortOrder: 0,
     })
@@ -165,8 +165,8 @@ export async function seedCore(db: AnyDb): Promise<void> {
     .values({
       key: "decants",
       type: "section",
-      titleAr: "جرّب الفخامة قبل اقتناء الزجاجة",
-      bodyAr: "اختر عطرك المفضل بحجم عملي. تعبئة دقيقة من الزجاجة الأصلية، مناسبة للتجربة أو الاستخدام اليومي والسفر.",
+      titleAr: "جرّب العطر قبل شراء الحجم الكامل",
+      bodyAr: "اختر عطرك المفضل بحجم عملي. تعبئة بعناية من الزجاجة الأصلية، مناسبة للتجربة أو الاستخدام اليومي والسفر.",
       enabled: true,
       sortOrder: 1,
     })

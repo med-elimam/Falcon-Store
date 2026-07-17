@@ -6,6 +6,7 @@ export interface HeroContent {
   titleAr: string;
   bodyAr: string | null;
   showDecantCta: boolean;
+  trust: string[];
 }
 
 export function Hero({ content }: { content: HeroContent }) {
@@ -15,24 +16,31 @@ export function Hero({ content }: { content: HeroContent }) {
         <div className="hero-copy">
           <div className="hero-signature">
             <FalconMark />
-            <span>THE SCENT VAULT · NOUAKCHOTT</span>
+            <span>عطور أصلية مختارة بعناية · نواكشوط</span>
           </div>
           <h1>{content.titleAr}</h1>
           {content.bodyAr && <p>{content.bodyAr}</p>}
           <div className="hero-actions">
             <Link href="/shop" className="btn btn-crimson">
-              تسوّق الآن <ArrowLeft />
+              تصفح العطور <ArrowLeft />
             </Link>
             {content.showDecantCta && (
-              <Link href="#decants" className="btn btn-ghost">
-                مجموعة 10ml
+              <Link href="/shop?size=10ml" className="btn btn-ghost">
+                اكتشف أحجام 10ml
               </Link>
             )}
           </div>
+          {content.trust.length > 0 && (
+            <ul className="hero-trust">
+              {content.trust.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          )}
         </div>
         <div className="hero-visual">
           <Hero3D />
-          <span className="hero-visual-caption">عطور أصلية · تعبئة دقيقة · مخزون فعلي</span>
+          <span className="hero-visual-caption">عطور أصلية مختارة بعناية</span>
         </div>
       </div>
     </section>

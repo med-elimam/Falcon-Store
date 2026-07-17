@@ -28,7 +28,16 @@ interface Section {
 const KEY_LABELS: Record<string, string> = {
   hero: "الواجهة الرئيسية (Hero)",
   decants: "قسم تعبئة 10ml",
+  story: "قسم «قصتنا»",
 };
+
+/* الأقسام المفردة القابلة للتحرير — تظهر دائمًا حتى لو لم تُنشأ بعد،
+   ويُنشئها الحفظ تلقائيًا (upsert بالمفتاح). «قصتنا» تبقى مخفية للزبائن حتى تُكتب وتُفعّل. */
+const EDITABLE_KEYS = [
+  { key: "hero", sortOrder: 0 },
+  { key: "decants", sortOrder: 10 },
+  { key: "story", sortOrder: 40 },
+] as const;
 
 /* مدير عام لأقسام من نوع واحد (أسئلة شائعة / آراء عملاء): إنشاء + تفعيل + حذف */
 function ContentTypeManager({
@@ -188,7 +197,23 @@ export default function ContentPage() {
   if (loading) return <LoadingBlock />;
   if (error || !data) return <ErrorBlock message={error ?? "تعذر التحميل"} onRetry={reload} />;
 
-  const sections = data.sections.filter((s) => !["offer", "faq", "testimonial"].includes(s.type));
+  /* لكل مفتاح قابل للتحرير: القسم الموجود أو نموذج فارغ يُنشأ عند أول حفظ */
+  const editableSections: Section[] = EDITABLE_KEYS.map(({ key, sortOrder }) => {
+    const existing = data.sections.find((s) => s.key === key);
+    return (
+      existing ?? {
+        id: `stub-${key}`,
+        key,
+        type: key === "story" ? "section" : key,
+        titleAr: null,
+        bodyAr: null,
+        titleFr: null,
+        bodyFr: null,
+        enabled: false,
+        sortOrder,
+      }
+    );
+  });
 
   return (
     <>
@@ -205,7 +230,7 @@ export default function ContentPage() {
             <p>الأقسام المعطلة لا تظهر للزبائن إطلاقًا.</p>
           </div>
         </div>
-        {sections.length === 0 ? (
+        {editableSections.length === 0 ? (
           <EmptyBlock title="لا توجد أقسام محتوى" />
         ) : (
           <div className="manage-table-wrap">
@@ -219,7 +244,7 @@ export default function ContentPage() {
                 </tr>
               </thead>
               <tbody>
-                {sections.map((s) => (
+                {editableSections.map((s) => (
                   <tr key={s.id}>
                     <td>{KEY_LABELS[s.key] ?? s.key}</td>
                     <td>{s.titleAr ?? "—"}</td>

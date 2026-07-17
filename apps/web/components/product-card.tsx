@@ -11,8 +11,8 @@ import { ArrowLeft } from "./icons";
 
 const STOCK_LABELS = {
   available: "متوفر",
-  low_stock: "كمية محدودة",
-  out_of_stock: "غير متوفر",
+  low_stock: "بقي القليل",
+  out_of_stock: "نفد مؤقتًا",
 } as const;
 
 export function ProductCard({
@@ -79,8 +79,10 @@ export function ProductCard({
         <div className={`card-stock ${selected.availability}`}>
           <span aria-hidden="true" />
           {STOCK_LABELS[selected.availability]}
-          {selected.availability !== "out_of_stock" && (
-            <small>الكمية المتاحة: <b className="num">{selected.stockQuantity}</b></small>
+          {selected.availability === "low_stock" && selected.stockQuantity > 0 && selected.stockQuantity <= 2 && (
+            <small>
+              (بقي <b className="num">{selected.stockQuantity}</b>)
+            </small>
           )}
         </div>
       )}

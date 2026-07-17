@@ -142,6 +142,37 @@ const OPTIONS: { mode: ThemeMode; label: string; icon: typeof SunIcon }[] = [
   { mode: "dark", label: "داكن", icon: MoonIcon },
 ];
 
+/* الوضع المعروض فعلاً (فاتح/داكن) مقروءًا من الجذر، ويتابع أي تغيير */
+function useResolvedTheme(): ResolvedTheme {
+  const [resolved, setResolved] = useState<ResolvedTheme>("light");
+  useEffect(() => {
+    const read = () => setResolved(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => observer.disconnect();
+  }, []);
+  return resolved;
+}
+
+/* زر واحد يبدّل بين الفاتح والداكن — أنسب للواجهة العامة، خاصة على الهاتف */
+export function ThemeToggle({ className = "" }: { className?: string }) {
+  const { setMode } = useTheme();
+  const resolved = useResolvedTheme();
+  const next = resolved === "dark" ? "light" : "dark";
+  return (
+    <button
+      type="button"
+      className={`theme-toggle ${className}`.trim()}
+      onClick={() => setMode(next)}
+      aria-label={resolved === "dark" ? "التبديل إلى الوضع الفاتح" : "التبديل إلى الوضع الداكن"}
+      title={resolved === "dark" ? "الوضع الفاتح" : "الوضع الداكن"}
+    >
+      {resolved === "dark" ? <MoonIcon /> : <SunIcon />}
+    </button>
+  );
+}
+
 export function ThemeSwitcher({
   variant = "compact",
   className = "",

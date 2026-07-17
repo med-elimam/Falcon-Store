@@ -137,3 +137,30 @@ export function WhatsAppIcon({ className, ...props }: IconProps) {
     </svg>
   );
 }
+
+export function FacebookIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} {...props}>
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+    </svg>
+  );
+}
+
+export function InstagramIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} {...props}>
+      <rect x="2" y="2" width="20" height="20" rx="5" />
+      <circle cx="12" cy="12" r="4.5" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function TikTokIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} {...props}>
+      <path d="M19.6 8.6A6.4 6.4 0 0 1 14 3.2V3h-3.4v13.1a3 3 0 1 1-2.1-2.86V9.7a6.4 6.4 0 0 0-.9-.07A6.4 6.4 0 0 0 1.2 16a6.4 6.4 0 0 0 6.4 6 6.4 6.4 0 0 0 6.4-6.4V9.82a9.76 9.76 0 0 0 5.6 1.78V8.16a6.42 6.42 0 0 1-0-.01z" />
+    </svg>
+  );
+}
+

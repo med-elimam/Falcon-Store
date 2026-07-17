@@ -2,11 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import type { CurrencyDisplay, Family, ProductCardDTO } from "@falcon/shared";
-import { FAMILY_LABELS } from "@falcon/shared";
+import type { CurrencyDisplay, Family, ProductCardDTO, TimeTag } from "@falcon/shared";
+import { FAMILY_LABELS, TIME_LABELS } from "@falcon/shared";
 import { ProductCard } from "./product-card";
 
 type Sort = "featured" | "low" | "high" | "name";
+
+const isFamily = (v: string | null): v is Family => v !== null && v in FAMILY_LABELS;
+const isTime = (v: string | null): v is TimeTag => v !== null && v in TIME_LABELS;
 
 export function ShopCatalog({
   products,
@@ -16,9 +19,12 @@ export function ShopCatalog({
   display: CurrencyDisplay;
 }) {
   const params = useSearchParams();
+  const familyParam = params.get("family");
+  const timeParam = params.get("time");
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState("all");
-  const [family, setFamily] = useState<Family | "all">("all");
+  const [family, setFamily] = useState<Family | "all">(isFamily(familyParam) ? familyParam : "all");
+  const [time, setTime] = useState<TimeTag | "all">(isTime(timeParam) ? timeParam : "all");
   const [decantOnly, setDecantOnly] = useState(params.get("size") === "10ml");
   const [inStockOnly, setInStockOnly] = useState(false);
   const [sort, setSort] = useState<Sort>("featured");
@@ -33,6 +39,7 @@ export function ShopCatalog({
             (!needle || `${p.nameAr} ${p.nameFr ?? ""} ${p.brandName}`.toLocaleLowerCase().includes(needle)) &&
             (brand === "all" || p.brandName === brand) &&
             (family === "all" || p.families.includes(family)) &&
+            (time === "all" || p.times.includes(time)) &&
             (!decantOnly || p.hasDecant) &&
             (!inStockOnly || p.inStock)
           );
@@ -43,14 +50,14 @@ export function ShopCatalog({
           if (sort === "name") return a.nameAr.localeCompare(b.nameAr, "ar");
           return Number(b.featured) - Number(a.featured);
         }),
-    [products, query, brand, family, decantOnly, inStockOnly, sort]
+    [products, query, brand, family, time, decantOnly, inStockOnly, sort]
   );
 
   return (
     <div className="shop-layout">
       <aside className="filters" aria-label="فلاتر العطور">
         <div className="filter-block">
-          <label htmlFor="search">ابحث في الخزنة</label>
+          <label htmlFor="search">ابحث بالاسم أو العلامة</label>
           <input
             id="search"
             className="field"
@@ -86,6 +93,22 @@ export function ShopCatalog({
             ))}
           </select>
         </div>
+        <div className="filter-block">
+          <label htmlFor="time">وقت الاستخدام</label>
+          <select
+            id="time"
+            className="field"
+            value={time}
+            onChange={(e) => setTime(e.target.value as TimeTag | "all")}
+          >
+            <option value="all">كل الأوقات</option>
+            {Object.entries(TIME_LABELS).map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
         <label className="check-row">
           <input type="checkbox" checked={decantOnly} onChange={(e) => setDecantOnly(e.target.checked)} />
           <span>متوفر بحجم 10ml</span>
@@ -100,6 +123,7 @@ export function ShopCatalog({
             setQuery("");
             setBrand("all");
             setFamily("all");
+            setTime("all");
             setDecantOnly(false);
             setInStockOnly(false);
           }}

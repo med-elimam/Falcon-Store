@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BrandIntro } from "@/components/brand-intro";
 import { Hero } from "@/components/hero";
 import { ProductCard } from "@/components/product-card";
 import { Reveal } from "@/components/reveal";
 import { FragranceFinder } from "@/components/fragrance-finder";
 import { FounderStory } from "@/components/founder-story";
-import { ArrowLeft, DropIcon, ShieldIcon, StoreIcon, TruckIcon, WalletIcon, WhatsAppIcon } from "@/components/icons";
+import { ArrowLeft, DropIcon, ShieldIcon, TruckIcon, WalletIcon, WhatsAppIcon } from "@/components/icons";
 import { getCatalog, getContentSections, getPublicSettings } from "@/lib/api";
 import { waLink } from "@/lib/format";
 
@@ -20,10 +19,11 @@ export default async function Home() {
   ]);
 
   const display = settings?.commerce.currencyDisplay ?? "mru";
-  const featured = (products ?? []).filter((p) => p.featured);
+  const featured = (products ?? []).filter((p) => p.featured).slice(0, 4);
   const hasDecants = (products ?? []).some((p) => p.hasDecant);
   const heroSection = sections.find((s) => s.key === "hero");
   const decantsSection = sections.find((s) => s.key === "decants");
+  const storySection = sections.find((s) => s.key === "story" && s.bodyAr);
   const offers = sections.filter((s) => s.type === "offer");
   const whatsapp = settings?.contact.whatsapp ?? null;
   const authenticity = settings?.policies.authenticity ?? null;
@@ -32,42 +32,48 @@ export default async function Home() {
   const addressLabel = address && !addressIsUrl ? address : null;
   const mapUrl = settings?.contact.mapUrl ?? (addressIsUrl ? address : null);
   const hours = settings?.operations.hoursAr ?? null;
+  const hasDelivery = (settings?.deliveryZones.length ?? 0) > 0;
+  const hasPayments = (settings?.paymentMethods.length ?? 0) > 0;
 
-  /* «لماذا فالكون» يُبنى فقط من معلومات مكتملة فعلاً — لا ادعاءات فارغة */
+  /* نقاط ثقة قصيرة تحت العنوان — من بيانات المتجر الحقيقية فقط */
+  const heroTrust = [
+    hasDelivery ? "توصيل داخل نواكشوط" : null,
+    whatsapp ? "طلب مباشر عبر واتساب" : null,
+    hasDecants ? "أحجام 10ml للتجربة" : null,
+  ].filter((t): t is string => t !== null);
+
+  /* «لماذا فالكون» — أربع مزايا كحد أقصى، من بيانات مكتملة فعلاً */
   const whyItems = [
     authenticity ? { key: "auth", icon: <ShieldIcon />, title: "عطور أصلية", body: "سياسة أصالة معلنة لكل زجاجة" } : null,
-    (settings?.deliveryZones.length ?? 0) > 0
-      ? { key: "delivery", icon: <TruckIcon />, title: "توصيل داخل نواكشوط", body: "رسوم معلنة لكل منطقة قبل تأكيد الطلب" }
-      : null,
-    (settings?.paymentMethods.length ?? 0) > 0
-      ? { key: "payment", icon: <WalletIcon />, title: "دفع محلي مألوف", body: settings!.paymentMethods.map((m) => m.labelAr).join(" · ") }
-      : null,
-    hasDecants ? { key: "decant", icon: <DropIcon />, title: "تعبئة 10ml دقيقة", body: "جرّب العطر قبل اقتناء الزجاجة" } : null,
-    whatsapp ? { key: "wa", icon: <WhatsAppIcon />, title: "دعم عبر واتساب", body: "استشارة مباشرة قبل الطلب وبعده" } : null,
-    settings?.commerce.pickupAvailable
-      ? { key: "pickup", icon: <StoreIcon />, title: "الاستلام من المتجر", body: "استلم طلبك بنفسك متى ناسبك" }
-      : null,
-  ].filter((item) => item !== null);
+    hasDecants ? { key: "decant", icon: <DropIcon />, title: "تعبئة 10ml بعناية", body: "جرّب العطر قبل شراء الحجم الكامل" } : null,
+    hasDelivery ? { key: "delivery", icon: <TruckIcon />, title: "توصيل داخل نواكشوط", body: "رسوم معلنة لكل منطقة قبل التأكيد" } : null,
+    whatsapp
+      ? { key: "wa", icon: <WhatsAppIcon />, title: "طلب ودعم عبر واتساب", body: "استشارة مباشرة قبل الطلب وبعده" }
+      : hasPayments
+        ? { key: "pay", icon: <WalletIcon />, title: "دفع محلي مألوف", body: settings!.paymentMethods.map((m) => m.labelAr).join(" · ") }
+        : null,
+  ]
+    .filter((item) => item !== null)
+    .slice(0, 4);
 
-  /* آراء العملاء والأسئلة الشائعة: محتوى حقيقي يُدخله صاحب المتجر من لوحة التحكم */
   const testimonials = sections.filter((s) => s.type === "testimonial" && s.bodyAr);
   const faqs = sections.filter((s) => s.type === "faq" && s.titleAr && s.bodyAr);
 
   return (
     <>
-      <BrandIntro />
       <Hero
         content={{
-          titleAr: heroSection?.titleAr ?? "روائح تصنع حضورك.",
-          bodyAr: heroSection?.bodyAr ?? null,
+          titleAr: heroSection?.titleAr ?? "عطور أصلية مختارة بعناية",
+          bodyAr: heroSection?.bodyAr ?? "اكتشف عطور النيش والمصممين، وجرّب أحجام 10ml قبل شراء الزجاجة الكاملة.",
           showDecantCta: hasDecants,
+          trust: heroTrust,
         }}
       />
 
       {products === null && (
         <section className="shell section-pad">
           <div className="no-results">
-            <strong>تعذر تحميل المجموعة مؤقتًا</strong>
+            <strong>تعذّر تحميل العطور مؤقتًا</strong>
             <p>نعمل على إعادة الاتصال. حدّث الصفحة بعد قليل.</p>
           </div>
         </section>
@@ -77,11 +83,11 @@ export default async function Home() {
         <section className="featured-section section-pad">
           <div className="shell section-heading">
             <div>
-              <span className="section-kicker">مختارات فالكون</span>
-              <h2>اختيارات تستحق التجربة</h2>
+              <span className="section-kicker">الأكثر طلبًا</span>
+              <h2>عطور نوصي بتجربتها</h2>
             </div>
             <Link href="/shop" className="text-link">
-              عرض المجموعة <ArrowLeft />
+              عرض جميع العطور <ArrowLeft />
             </Link>
           </div>
           <div className="product-rail">
@@ -104,29 +110,29 @@ export default async function Home() {
           </div>
           <div className="shell decant-layout">
             <Reveal className="decant-copy">
-              <span className="section-kicker">تجربة 10ml</span>
-              <h2>{decantsSection?.titleAr ?? "جرّب الفخامة قبل اقتناء الزجاجة"}</h2>
+              <span className="section-kicker">جرّب حجم 10ml</span>
+              <h2>{decantsSection?.titleAr ?? "جرّب العطر قبل شراء الحجم الكامل"}</h2>
               {decantsSection?.bodyAr && <p>{decantsSection.bodyAr}</p>}
-              <div className="decant-steps">
-                <span>
-                  <b className="num">01</b> اختيار العطر
-                </span>
-                <span>
-                  <b className="num">02</b> تعبئة دقيقة
-                </span>
-                <span>
-                  <b className="num">03</b> استلام الطلب
-                </span>
-              </div>
+              <ul className="decant-points">
+                <li>
+                  <DropIcon /> تعبئة من الزجاجة الأصلية
+                </li>
+                <li>
+                  <ShieldIcon /> حجم مناسب للتجربة والسفر
+                </li>
+                <li>
+                  <TruckIcon /> توصيل داخل نواكشوط
+                </li>
+              </ul>
               <Link href="/shop?size=10ml" className="btn btn-crimson">
-                استكشف عطور 10ml <ArrowLeft />
+                عرض عطور 10ml <ArrowLeft />
               </Link>
             </Reveal>
           </div>
         </section>
       )}
 
-      {products !== null && products.length > 0 && <FragranceFinder products={products} display={display} />}
+      {products !== null && products.length > 0 && <FragranceFinder products={products} />}
 
       {offers.length > 0 && (
         <section className="selected-collections section-pad">
@@ -148,39 +154,13 @@ export default async function Home() {
         </section>
       )}
 
-      {authenticity && (
-        <section className="authenticity section-pad">
-          <div className="shell authenticity-grid">
-            <Reveal className="auth-copy">
-              <span className="section-kicker">الثقة بالتفاصيل</span>
-              <h2>الأصالة ليست وعداً جانبياً</h2>
-              <p>{authenticity}</p>
-              <ul>
-                <li>صور المنتج والعلبة</li>
-                <li>بلد المنشأ والتركيز</li>
-                <li>حالة التوفر الفعلية</li>
-                <li>تأكيد الطلب قبل الدفع</li>
-              </ul>
-            </Reveal>
-            <Reveal className="auth-image" delay={0.12}>
-              <Image
-                src="/images/vault-boxes.jpg"
-                alt="عبوات وعُلب عطور من مخزون فالكون ستور"
-                fill
-                sizes="(max-width: 800px) 100vw, 50vw"
-              />
-            </Reveal>
-          </div>
-        </section>
-      )}
-
       {whyItems.length >= 3 && (
-        <section className="why-section section-pad" aria-label="لماذا فالكون ستور">
+        <section className="why-section section-pad" aria-label="لماذا تختار فالكون ستور">
           <div className="shell">
             <div className="section-heading">
               <div>
-                <span className="section-kicker">لماذا فالكون</span>
-                <h2>تفاصيل تصنع الثقة</h2>
+                <span className="section-kicker">لماذا تختار Falcon Store؟</span>
+                <h2>خدمة واضحة من الطلب حتى الاستلام</h2>
               </div>
             </div>
             <div className="why-grid">
@@ -196,7 +176,9 @@ export default async function Home() {
         </section>
       )}
 
-      <FounderStory whatsapp={whatsapp} />
+      {storySection && (
+        <FounderStory titleAr={storySection.titleAr} bodyAr={storySection.bodyAr!} whatsapp={whatsapp} />
+      )}
 
       {testimonials.length > 0 && (
         <section className="testimonials-section section-pad">
@@ -252,7 +234,7 @@ export default async function Home() {
           <div className="visit-content">
             <Reveal>
               <span className="section-kicker">نواكشوط</span>
-              <h2>من الخزنة إلى بابك</h2>
+              <h2>اطلب عطرك واستلمه أينما كنت</h2>
               {addressLabel && <p>{addressLabel}</p>}
               {hours && <p>{hours}</p>}
               <div className="visit-actions">
@@ -271,8 +253,8 @@ export default async function Home() {
                     موقع المتجر على الخريطة
                   </a>
                 )}
-                <Link href="/checkout" className="btn btn-ghost">
-                  ابدأ طلباً
+                <Link href="/shop" className="btn btn-ghost">
+                  تصفح العطور
                 </Link>
               </div>
             </Reveal>
