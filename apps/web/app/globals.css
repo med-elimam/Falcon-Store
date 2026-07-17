@@ -632,8 +632,8 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
 .recovery-codes code { font-family: var(--font-manrope), monospace; direction: ltr; text-align: center; font-size: .85rem; }
 
 /* Footer & 404 */
-.site-footer { border-top: 1px solid var(--line); padding-top: 72px; background: var(--footer-surface); }
-.footer-grid { display: grid; grid-template-columns: 1.5fr .65fr .65fr 1fr; gap: 60px; padding-bottom: 52px; }
+.site-footer { border-top: 1px solid var(--line); padding-top: clamp(40px, 5vw, 60px); background: var(--footer-surface); }
+.footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 60px; padding-bottom: 36px; }
 .footer-brand svg { width: 62px; color: var(--crimson-hot); display: block; margin-bottom: 15px; }.footer-brand strong { font-family: var(--font-bodoni), Georgia, serif; letter-spacing: .12em; }.footer-brand p, .footer-note p { color: var(--silver); font-size: .78rem; line-height: 1.8; margin-top: 14px; }
 .footer-grid > div:not(:first-child) { display: flex; flex-direction: column; gap: 11px; }.footer-grid h3 { font-size: .82rem; margin-bottom: 8px; }.footer-grid a, .footer-note span { color: var(--silver); font-size: .76rem; }.footer-grid a:hover { color: var(--ivory); }
 
@@ -648,7 +648,7 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
 .social-circle:hover { color: white; background: var(--crimson); border-color: var(--crimson); transform: translateY(-2px); }
 .footer-pay-methods { margin: 0; color: var(--silver); font-size: .82rem; line-height: 1.9; }
 
-.footer-bottom { border-top: 1px solid var(--line); min-height: 64px; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .68rem; }
+.footer-bottom { border-top: 1px solid var(--line); min-height: 48px; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .68rem; padding-block: 10px; }
 .footer-bottom-brand { font-family: var(--font-manrope), sans-serif; letter-spacing: .08em; }
 .not-found { min-height: 82vh; padding: 120px 20px 50px; display: grid; place-content: center; justify-items: center; text-align: center; }.not-found svg { width: 110px; color: var(--crimson-hot); }.not-found > span { color: var(--silver); letter-spacing: .2em; }.not-found h1 { font-size: clamp(2rem, 6vw, 4.5rem); margin: 12px 0; }.not-found p { color: var(--silver); }
 
@@ -681,7 +681,7 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
   .shop-hero, .checkout-hero { padding: 125px 0 50px; }.shop-section { padding-top: 30px; }.filters { grid-template-columns: 1fr; padding-bottom: 18px; border-bottom: 1px solid var(--line); }.catalog-toolbar { align-items: start; gap: 10px; flex-direction: column; }.catalog-toolbar label { width: 100%; justify-content: space-between; }
   .product-page { padding-top: 66px; }.product-detail-hero { min-height: auto; grid-template-columns: 1fr; padding-top: 14px; }.gallery-main { aspect-ratio: 1 / 1.05; margin-inline: -14px; border-inline: 0; }.gallery-thumbs { overflow-x: auto; }.product-buy { padding-bottom: 48px; }.product-buy h1 { font-size: clamp(3.2rem, 17vw, 5rem); }.buy-actions { grid-template-columns: 1fr; }.facts-grid { grid-template-columns: 1fr 1fr; }.facts-grid > div:not(:nth-child(3n+1)) { border-inline-start: 0; padding-inline-start: 0; }.facts-grid > div:nth-child(even) { border-inline-start: 1px solid var(--line); padding-inline-start: 14px; }.notes-layout { grid-template-columns: 1fr; gap: 38px; }.notes-layout > div:first-child { position: static; }.note-stack article { grid-template-columns: 58px 1fr; min-height: 126px; }.note-stack strong { font-size: .95rem; }
   .checkout-grid { grid-template-columns: 1fr; }.form-grid { grid-template-columns: 1fr; }.order-summary { position: static; grid-row: 1; }.checkout-section { padding-top: 30px; }.order-success h2 { font-size: 2.8rem; }
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 38px 24px; }.footer-brand { grid-column: 1 / -1; }.footer-note { grid-column: 1 / -1; }.footer-bottom { font-size: .6rem; gap: 6px; flex-wrap: wrap; }
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px 20px; }.footer-brand { grid-column: 1 / -1; }.footer-bottom { font-size: .6rem; gap: 6px; flex-wrap: wrap; min-height: 40px; padding-block: 8px; }
   .footer-connect { grid-template-columns: 1fr; margin-top: 0; }
   .footer-connect > div { padding: 12px 16px; }
   .footer-connect > div + div { border-inline-start: 0; border-top: 1px solid var(--line); }

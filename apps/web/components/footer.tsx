@@ -66,11 +66,6 @@ export function Footer({ settings }: { settings: PublicSettingsDTO | null }) {
           <Link href="/checkout">إتمام الطلب</Link>
           {contact?.address && <Link href="/#visit">الموقع والساعات</Link>}
         </div>
-
-        {/* ملاحظة التشغيل */}
-        <div className="footer-note">
-          <span>نواكشوط · موريتانيا</span>
-        </div>
       </div>
 
       {/* ── قسم التواصل والدفع — يظهر فقط عند توفر بيانات ── */}
