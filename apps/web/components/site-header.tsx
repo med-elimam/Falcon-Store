@@ -6,25 +6,22 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useCart } from "@/lib/cart";
 import { api } from "@/lib/client-api";
-import { waLink } from "@/lib/format";
 import { CartIcon, FalconMark, ShieldIcon } from "./icons";
 import { LoginModal } from "./login-modal";
-import { usePublicSettings } from "./settings-context";
 import { ThemeSwitcher } from "./theme-switcher";
 import { useHydrated } from "./use-hydrated";
 
+/* صفحات حقيقية دائمة — القائمة لا تتغير ولا تختفي عناصرها حسب البيانات */
 const links = [
   { href: "/", label: "الرئيسية" },
   { href: "/shop", label: "العطور" },
+  { href: "/faq", label: "الأسئلة الشائعة" },
+  { href: "/contact", label: "تواصل معنا" },
 ];
-
-const WA_GREETING = "السلام عليكم، أريد الاستفسار عن عطور فالكون ستور.";
 
 export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const settings = usePublicSettings();
-  const whatsapp = settings?.contact.whatsapp ?? null;
   const [menuOpen, setMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -136,11 +133,6 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
-          {whatsapp && (
-            <a href={waLink(whatsapp, WA_GREETING)} target="_blank" rel="noopener noreferrer">
-              تواصل معنا
-            </a>
-          )}
         </nav>
 
         <div className="header-actions">
@@ -209,22 +201,6 @@ export function SiteHeader() {
                     </Link>
                   </motion.div>
                 ))}
-                {whatsapp && (
-                  <motion.div
-                    initial={reducedMotion ? false : { opacity: 0, x: 26 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.08 + links.length * 0.055, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <a
-                      href={waLink(whatsapp, WA_GREETING)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      تواصل معنا
-                    </a>
-                  </motion.div>
-                )}
               </div>
               <div className="mobile-menu-foot">
                 <div className="mobile-menu-theme">

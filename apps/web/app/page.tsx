@@ -228,9 +228,12 @@ export default async function Home() {
             <div>
               <span className="section-kicker">أسئلة شائعة</span>
               <h2>كل ما تريد معرفته</h2>
+              <Link href="/faq" className="text-link">
+                كل الأسئلة والسياسات <ArrowLeft />
+              </Link>
             </div>
             <div className="faq-list">
-              {faqs.map((f) => (
+              {faqs.slice(0, 4).map((f) => (
                 <details key={f.key} className="faq-item">
                   <summary>{f.titleAr}</summary>
                   <p>{f.bodyAr}</p>

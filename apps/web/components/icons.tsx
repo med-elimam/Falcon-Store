@@ -94,6 +94,41 @@ export function StoreIcon({ className, ...props }: IconProps) {
   );
 }
 
+export function PhoneIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} {...props}>
+      <path d="M5 4h3.5l1.5 4-2 1.5a12.5 12.5 0 0 0 6.5 6.5L16 14l4 1.5V19a1.9 1.9 0 0 1-2 2C10.5 20.5 3.5 13.5 3 6a1.9 1.9 0 0 1 2-2Z" />
+    </svg>
+  );
+}
+
+export function MailIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} {...props}>
+      <rect x="3.5" y="5.5" width="17" height="13" rx="1.5" />
+      <path d="m4.5 7 7.5 6 7.5-6" />
+    </svg>
+  );
+}
+
+export function ClockIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2.5" />
+    </svg>
+  );
+}
+
+export function PinIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} {...props}>
+      <path d="M12 21s-6.5-5.6-6.5-10.4A6.4 6.4 0 0 1 12 4a6.4 6.4 0 0 1 6.5 6.6C18.5 15.4 12 21 12 21Z" />
+      <circle cx="12" cy="10.5" r="2.2" />
+    </svg>
+  );
+}
+
 export function WhatsAppIcon({ className, ...props }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} {...props}>

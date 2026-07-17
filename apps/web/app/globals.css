@@ -270,7 +270,23 @@ p { text-wrap: pretty; }
 .faq-item summary::-webkit-details-marker { display: none; }
 .faq-item summary::after { content: "+"; flex-shrink: 0; font-size: 1.5rem; font-weight: 400; color: var(--crimson-hot); transition: transform .25s var(--ease); }
 .faq-item[open] summary::after { transform: rotate(45deg); }
-.faq-item > p { margin: 0; padding: 0 0 18px; color: var(--body-copy); line-height: 1.9; }
+.faq-item > p { margin: 0; padding: 0 0 18px; color: var(--body-copy); line-height: 1.9; white-space: pre-line; }
+
+/* صفحة المساعدة وصفحة التواصل */
+.help-columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: clamp(24px, 4vw, 56px); align-items: start; }
+.help-block h2 { font-size: 1.5rem; margin-bottom: 18px; }
+.help-cta { margin-top: 44px; padding: 26px; border: 1px solid var(--line); background: var(--surface-soft); display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.help-cta p { margin: 0; font-weight: 600; }
+.contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.contact-card { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 26px 22px; border: 1px solid var(--line); background: var(--surface-soft); color: inherit; transition: border-color .2s var(--ease), transform .2s var(--ease); }
+a.contact-card:hover { border-color: var(--accent-border); transform: translateY(-2px); }
+.contact-card.is-primary { border-color: rgb(22 136 68 / .5); }
+.contact-card svg { width: 28px; height: 28px; color: var(--crimson-hot); margin-bottom: 8px; }
+.contact-card.is-primary svg { color: #1ca454; }
+.contact-card b { font-size: 1.05rem; }
+.contact-card p { margin: 0; color: var(--muted); font-size: .88rem; line-height: 1.75; }
+.contact-card-action { margin-top: 10px; color: var(--crimson-hot); font-size: .84rem; font-weight: 700; }
+.contact-card.is-primary .contact-card-action { color: #1ca454; }
 
 /* زر واتساب العائم — يظهر فقط عندما يُدخل صاحب المتجر رقمه */
 .wa-fab { position: fixed; bottom: 18px; inset-inline-end: 18px; z-index: calc(var(--z-header) - 1); width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; color: white; background: #168844; box-shadow: 0 10px 26px rgb(0 0 0 / .3); transition: background-color .2s var(--ease), transform .2s var(--ease); }

@@ -7,6 +7,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
   grid-template-areas: "media content";
+  direction: ltr;
   min-height: 610px;
   overflow: hidden;
   background: var(--graphite);
@@ -26,9 +27,10 @@
 
 .content {
   grid-area: content;
+  direction: rtl;
   align-self: center;
   min-width: 0;
-  padding: clamp(42px, 6vw, 86px);
+  padding: clamp(40px, 5vw, 72px);
 }
 
 .brandLine {
@@ -62,8 +64,8 @@
 .content h2 {
   max-width: 660px;
   margin-bottom: 24px;
-  font-size: clamp(2.5rem, 4.6vw, 4.8rem);
-  line-height: 1.08;
+  font-size: clamp(2.5rem, 4vw, 4.2rem);
+  line-height: 1.1;
   letter-spacing: -0.03em;
 }
 
