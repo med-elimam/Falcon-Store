@@ -10,7 +10,7 @@ const EMPTY_DEFAULTS: Record<SettingsGroup, Record<string, unknown>> = {
   policies: { authenticity: null, returns: null, privacy: null, terms: null },
   social: { instagram: null, facebook: null, tiktok: null, other: null },
   operations: { orderNotifyWhatsapp: null, defaultStockBehavior: "deduct", lowStockThreshold: 3, hoursAr: null },
-  appearance: { defaultTheme: "light" },
+  appearance: { defaultTheme: "light", accent: "#9a002e" },
 };
 
 export async function getSettingsGroup<G extends SettingsGroup>(

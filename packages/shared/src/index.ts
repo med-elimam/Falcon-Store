@@ -213,6 +213,7 @@ export interface PublicSettingsDTO {
   };
   appearance: {
     defaultTheme: SiteTheme;
+    accent: string;
   };
   contact: {
     whatsapp: string | null;

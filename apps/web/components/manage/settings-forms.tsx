@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { api, ApiError } from "@/lib/client-api";
 import { formatMRU } from "@/lib/format";
+import { ACCENT_PRESETS, accentVars, normalizeAccent } from "@/lib/accent";
 import { useToast } from "./ui";
 
 /* ── نماذج مجموعات الإعدادات — تُستخدم في صفحة الإعدادات وفي معالج الإعداد ── */
@@ -380,6 +381,12 @@ export function AppearanceForm({ initial, onSaved }: { initial: Record<string, u
   const [theme, setTheme] = useState<string>(
     stored === "dark" || stored === "system" ? (stored as string) : "light"
   );
+  const [accent, setAccent] = useState<string>(normalizeAccent(initial.accent as string));
+
+  /* معاينة اللون حيّة قبل الحفظ: نطبّق متغيّرات اللون على حاوية المعاينة فقط */
+  const previewVars = accentVars(accent) as React.CSSProperties;
+  const isPreset = ACCENT_PRESETS.some((p) => p.value === accent);
+
   return (
     <div className="manage-form">
       <div className="setup-callout">
@@ -428,9 +435,79 @@ export function AppearanceForm({ initial, onSaved }: { initial: Record<string, u
           </span>
         </label>
       ))}
+
+      <div className="setup-callout" style={{ marginTop: 8 }}>
+        <div>
+          <b>لون العلامة</b>
+          <p>اللون الأساسي للأزرار والعناوين والروابط والأنيميشن. اختر من اللوحات الجاهزة أو حدّد لونًا مخصّصًا — كل شيء يتلوّن به فورًا، وزجاجة الأنيميشن تتناغم معه تلقائيًا.</p>
+        </div>
+      </div>
+
+      <div className="accent-swatches" role="group" aria-label="ألوان جاهزة">
+        {ACCENT_PRESETS.map((p) => (
+          <button
+            key={p.value}
+            type="button"
+            className="accent-swatch"
+            data-active={accent === p.value || undefined}
+            style={{ background: p.value }}
+            onClick={() => setAccent(p.value)}
+            aria-label={p.label}
+            title={p.label}
+          >
+            {accent === p.value && <span aria-hidden="true">✓</span>}
+          </button>
+        ))}
+      </div>
+
+      <div className="row">
+        <label>
+          لون مخصّص
+          <span className="accent-custom">
+            <input
+              type="color"
+              value={accent}
+              onChange={(e) => setAccent(e.target.value)}
+              aria-label="اختيار لون مخصّص"
+            />
+            <input
+              className="field num"
+              dir="ltr"
+              value={accent}
+              maxLength={7}
+              onChange={(e) => {
+                const v = e.target.value.startsWith("#") ? e.target.value : `#${e.target.value}`;
+                setAccent(v);
+                if (/^#[0-9a-fA-F]{6}$/.test(v)) setAccent(v.toLowerCase());
+              }}
+            />
+          </span>
+        </label>
+        <label>
+          نوع اللون
+          <input className="field" readOnly value={isPreset ? "لوحة جاهزة" : "لون مخصّص"} />
+        </label>
+      </div>
+
+      <div className="accent-preview" style={previewVars}>
+        <span className="section-kicker">مختارات فالكون</span>
+        <h3 style={{ margin: "0 0 14px" }}>معاينة اللون</h3>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <span className="btn btn-crimson">تسوّق الآن</span>
+          <span className="btn btn-ghost">زر ثانوي</span>
+          <a className="text-link" style={{ color: "var(--crimson-hot)" }}>
+            رابط
+          </a>
+        </div>
+      </div>
+
       <div className="manage-form-foot">
-        <button className="btn btn-crimson" disabled={busy} onClick={() => save("appearance", { defaultTheme: theme })}>
-          حفظ المظهر
+        <button
+          className="btn btn-crimson"
+          disabled={busy || !/^#[0-9a-fA-F]{6}$/.test(accent)}
+          onClick={() => save("appearance", { defaultTheme: theme, accent: normalizeAccent(accent) })}
+        >
+          حفظ المظهر واللون
         </button>
       </div>
     </div>

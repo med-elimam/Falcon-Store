@@ -8,6 +8,8 @@ import { Footer } from "@/components/footer";
 import { SettingsProvider } from "@/components/settings-context";
 import { ThemeProvider } from "@/components/theme-switcher";
 import { WhatsAppFab } from "@/components/whatsapp-fab";
+import { BrandAccent } from "@/components/brand-accent";
+import { accentVars } from "@/lib/accent";
 import { getPublicSettings } from "@/lib/api";
 
 const alexandria = Alexandria({
@@ -58,6 +60,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   /* المظهر الافتراضي يحدده الأدمن من الإعدادات؛ اختيار الزائر المحفوظ محلياً يتقدم عليه */
   const defaultTheme = settings?.appearance?.defaultTheme ?? "light";
   const ssrResolved = defaultTheme === "dark" ? "dark" : "light";
+  /* لون العلامة يُحقن سطرياً على <html> فيتقدّم على globals.css بلا وميض */
+  const htmlStyle = { colorScheme: ssrResolved, ...accentVars(settings?.appearance?.accent) } as React.CSSProperties;
   return (
     <html
       lang="ar"
@@ -66,7 +70,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       data-theme-mode={defaultTheme}
       suppressHydrationWarning
       className={`${alexandria.variable} ${bodoni.variable} ${inter.variable}`}
-      style={{ colorScheme: ssrResolved }}
+      style={htmlStyle}
     >
       <head>
         <meta name="theme-color" content={ssrResolved === "dark" ? "#0b090a" : "#f6f3f4"} data-falcon-theme="true" />
@@ -77,6 +81,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body>
         <ThemeProvider defaultMode={defaultTheme}>
           <SettingsProvider value={settings}>
+            <BrandAccent />
             <a href="#main" className="skip-link">
               انتقل إلى المحتوى
             </a>

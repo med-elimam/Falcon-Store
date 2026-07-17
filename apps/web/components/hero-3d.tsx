@@ -10,14 +10,21 @@ export function Hero3D() {
   const [ready, setReady] = useState(false);
   const [themeKey, setThemeKey] = useState(0);
 
-  /* عند تبديل الثيم (فاتح/داكن) يُعاد بناء المشهد بألوان الثيم الجديد */
+  /* يُعاد بناء المشهد عند تبديل الثيم (فاتح/داكن) أو عند تغيير لون العلامة،
+     فيلتقط الألوان الجديدة فورًا بلا تنافر ولا مربعات */
   useEffect(() => {
-    const observer = new MutationObserver((mutations) => {
-      if (mutations.some((m) => m.attributeName === "data-theme")) {
+    const root = document.documentElement;
+    const readKey = () =>
+      `${root.dataset.theme ?? ""}|${getComputedStyle(root).getPropertyValue("--brand-accent").trim()}`;
+    let lastKey = readKey();
+    const observer = new MutationObserver(() => {
+      const key = readKey();
+      if (key !== lastKey) {
+        lastKey = key;
         setThemeKey((k) => k + 1);
       }
     });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    observer.observe(root, { attributes: true, attributeFilter: ["data-theme", "style"] });
     return () => observer.disconnect();
   }, []);
 

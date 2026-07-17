@@ -6,7 +6,6 @@ export interface HeroSceneHandle {
   dispose(): void;
 }
 
-const CRIMSON_HOT = 0xc81743;
 const GOLD = 0xcaa35f;
 
 /* يحوّل أي لون CSS (بما فيه oklch) إلى RGB عبر كانفاس 2D */
@@ -148,9 +147,19 @@ export function createHeroScene(
 
   /* الألوان تُقرأ من ثيم الصفحة الفعلي (فاتح/داكن) حتى يندمج المشهد بلا أي حواف */
   const heroEl = container.closest<HTMLElement>(".hero") ?? document.body;
-  const [bgR, bgG, bgB] = cssColorToRGB(getComputedStyle(heroEl).backgroundColor);
+  const heroStyle = getComputedStyle(heroEl);
+  const [bgR, bgG, bgB] = cssColorToRGB(heroStyle.backgroundColor);
   const bgCss = `rgb(${bgR}, ${bgG}, ${bgB})`;
   const isLight = (0.2126 * bgR + 0.7152 * bgG + 0.0722 * bgB) / 255 > 0.5;
+
+  /* لون العلامة الذي يختاره الأدمن — يلوّن السائل والإضاءة فيتناغم المشهد
+     مع أي لون بلا تنافر ولا مربعات. السائل نسخة عميقة منه، والإضاءة نسخة أنصع. */
+  const accentCss = heroStyle.getPropertyValue("--brand-accent").trim();
+  const [acR, acG, acB] = accentCss ? cssColorToRGB(accentCss) : [200, 23, 67];
+  const accent = new THREE.Color().setRGB(acR / 255, acG / 255, acB / 255, THREE.SRGBColorSpace);
+  const accentLight = accent.clone().lerp(new THREE.Color(0xffffff), 0.16);
+  const liquidColor = accent.clone().lerp(new THREE.Color(0x000000), 0.42);
+  const liquidEmissive = accent.clone().lerp(new THREE.Color(0x000000), 0.82);
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(bgCss);
@@ -163,8 +172,8 @@ export function createHeroScene(
   camera.position.set(0, 1.55, 7.2);
   camera.lookAt(0, 1.3, 0);
 
-  /* إضاءة استوديو طبيعية: مفتاح أبيض دافئ، تعبئة ذهبية ناعمة، ولمسة قرمزية خفيفة على الحافة */
-  const crimsonLight = new THREE.PointLight(CRIMSON_HOT, 22, 0, 2);
+  /* إضاءة استوديو طبيعية: مفتاح أبيض دافئ، تعبئة ذهبية ناعمة، ولمسة من لون العلامة على الحافة */
+  const crimsonLight = new THREE.PointLight(accentLight, 22, 0, 2);
   crimsonLight.position.set(-4.5, 2.2, 1.5);
   const goldLight = new THREE.PointLight(0xffe2b8, 40, 0, 2);
   goldLight.position.set(4.2, 3.2, 3);
@@ -225,10 +234,10 @@ export function createHeroScene(
       [0.63, 1.2], [0.61, 1.52], [0.58, 1.58], [0.001, 1.58],
     ]),
     new THREE.MeshPhysicalMaterial({
-      color: 0x570a1d,
+      color: liquidColor,
       roughness: 0.12,
       clearcoat: 0.8,
-      emissive: 0x24040b,
+      emissive: liquidEmissive,
       emissiveIntensity: 0.45,
     })
   );

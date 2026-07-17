@@ -600,6 +600,16 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
 .wizard-steps button.active[data-done]::before { color: white; }
 .setup-callout { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--accent-soft); border: 1px solid var(--accent-border); padding: 16px 20px; margin-bottom: 20px; }
 .setup-callout p { margin: 4px 0 0; color: var(--silver); font-size: .8rem; }
+/* منتقي لون العلامة في لوحة التحكم */
+.accent-swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+.accent-swatch { width: 42px; height: 42px; border-radius: 10px; border: 2px solid var(--control-border); cursor: pointer; display: grid; place-items: center; color: #fff; font-size: .9rem; transition: transform .15s var(--ease), border-color .15s var(--ease); }
+.accent-swatch:hover { transform: translateY(-2px); }
+.accent-swatch[data-active] { border-color: var(--ivory); box-shadow: 0 0 0 2px var(--graphite), 0 0 0 4px currentColor; }
+.accent-custom { display: flex; align-items: center; gap: 8px; }
+.accent-custom input[type="color"] { width: 46px; height: 46px; padding: 0; border: 1px solid var(--control-border); border-radius: 8px; background: none; cursor: pointer; }
+.accent-custom .field { flex: 1; text-transform: uppercase; }
+.accent-preview { margin-top: 4px; padding: 22px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); }
+.accent-preview h3 { font-size: 1.05rem; }
 .setup-callout[data-tone="warning"] { background: var(--warning-soft); border-color: color-mix(in oklch, var(--warning) 50%, transparent); }
 .recovery-codes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; padding: 16px; background: var(--surface-soft); border: 1px dashed var(--control-border-strong); }
 .recovery-codes code { font-family: var(--font-inter), monospace; direction: ltr; text-align: center; font-size: .85rem; }

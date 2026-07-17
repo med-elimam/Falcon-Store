@@ -278,6 +278,12 @@ export const settingsOperationsSchema = z.object({
 
 export const settingsAppearanceSchema = z.object({
   defaultTheme: z.enum(["light", "dark", "system"]).default("light"),
+  /* اللون الأساسي للعلامة (hex) — يُشتق منه كل تدرّجات اللون في الموقع والأنيميشن */
+  accent: z
+    .string()
+    .trim()
+    .regex(/^#[0-9a-fA-F]{6}$/, "لون غير صالح — استخدم صيغة #RRGGBB")
+    .default("#9a002e"),
 });
 
 export const SETTINGS_SCHEMAS = {
