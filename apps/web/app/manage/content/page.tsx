@@ -4,6 +4,7 @@ import { useState } from "react";
 import { api, ApiError } from "@/lib/client-api";
 import {
   Chip,
+  ConfirmButton,
   DrawerForm,
   EmptyBlock,
   ErrorBlock,
@@ -29,6 +30,154 @@ const KEY_LABELS: Record<string, string> = {
   decants: "قسم تعبئة 10ml",
 };
 
+/* مدير عام لأقسام من نوع واحد (أسئلة شائعة / آراء عملاء): إنشاء + تفعيل + حذف */
+function ContentTypeManager({
+  type,
+  keyPrefix,
+  heading,
+  hint,
+  titleLabel,
+  bodyLabel,
+  emptyTitle,
+  sections,
+  sortOrder,
+  reload,
+}: {
+  type: string;
+  keyPrefix: string;
+  heading: string;
+  hint: string;
+  titleLabel: string;
+  bodyLabel: string;
+  emptyTitle: string;
+  sections: Section[];
+  sortOrder: number;
+  reload: () => void;
+}) {
+  const toast = useToast();
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  return (
+    <section className="manage-card" style={{ marginTop: 14 }}>
+      <div className="manage-card-head">
+        <div>
+          <h2>
+            {heading} ({sections.length})
+          </h2>
+          <p>{hint}</p>
+        </div>
+      </div>
+      <div className="manage-form" style={{ marginBottom: sections.length ? 18 : 0 }}>
+        <div className="row">
+          <label>
+            {titleLabel}
+            <input className="field" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} />
+          </label>
+        </div>
+        <label>
+          {bodyLabel}
+          <textarea className="field" value={body} onChange={(e) => setBody(e.target.value)} maxLength={2000} />
+        </label>
+        <div className="manage-form-foot">
+          <button
+            className="btn btn-crimson"
+            disabled={busy || !title.trim() || !body.trim()}
+            onClick={async () => {
+              setBusy(true);
+              try {
+                await api(`/api/v1/admin/content/${keyPrefix}-${Date.now()}`, {
+                  method: "PUT",
+                  body: { type, titleAr: title.trim(), bodyAr: body.trim(), enabled: false, sortOrder },
+                });
+                toast.push("حُفظ كمسودة. فعّله ليظهر للزبائن.");
+                setTitle("");
+                setBody("");
+                reload();
+              } catch (err) {
+                toast.push(err instanceof ApiError ? err.message : "تعذر الحفظ.", "error");
+              } finally {
+                setBusy(false);
+              }
+            }}
+          >
+            إضافة
+          </button>
+        </div>
+      </div>
+      {sections.length === 0 ? (
+        <EmptyBlock title={emptyTitle} />
+      ) : (
+        <div className="manage-table-wrap">
+          <table className="manage-table">
+            <thead>
+              <tr>
+                <th>{titleLabel}</th>
+                <th>الحالة</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sections.map((s) => (
+                <tr key={s.id}>
+                  <td>
+                    <strong>{s.titleAr}</strong>
+                    {s.bodyAr && (
+                      <div style={{ color: "var(--silver)", fontSize: ".72rem", maxWidth: 380 }}>{s.bodyAr}</div>
+                    )}
+                  </td>
+                  <td>{s.enabled ? <Chip tone="good">ظاهر للزبائن</Chip> : <Chip>مسودة</Chip>}</td>
+                  <td>
+                    <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                      <button
+                        className="btn btn-ghost"
+                        onClick={async () => {
+                          try {
+                            await api(`/api/v1/admin/content/${s.key}`, {
+                              method: "PUT",
+                              body: {
+                                type,
+                                titleAr: s.titleAr,
+                                bodyAr: s.bodyAr,
+                                enabled: !s.enabled,
+                                sortOrder: s.sortOrder,
+                              },
+                            });
+                            toast.push(s.enabled ? "أُخفي العنصر." : "أصبح ظاهراً للزبائن.");
+                            reload();
+                          } catch (err) {
+                            toast.push(err instanceof ApiError ? err.message : "تعذر التنفيذ.", "error");
+                          }
+                        }}
+                      >
+                        {s.enabled ? "إخفاء" : "تفعيل"}
+                      </button>
+                      <ConfirmButton
+                        label="حذف"
+                        confirmLabel="تأكيد الحذف"
+                        onConfirm={async () => {
+                          try {
+                            await api(`/api/v1/admin/content/${s.key}`, { method: "DELETE" });
+                            toast.push("حُذف العنصر.");
+                            reload();
+                          } catch (err) {
+                            toast.push(err instanceof ApiError ? err.message : "تعذر الحذف.", "error");
+                          }
+                        }}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function ContentPage() {
   const { data, error, loading, reload } = useAdminData<{ sections: Section[] }>("/api/v1/admin/content");
   const toast = useToast();
@@ -39,7 +188,7 @@ export default function ContentPage() {
   if (loading) return <LoadingBlock />;
   if (error || !data) return <ErrorBlock message={error ?? "تعذر التحميل"} onRetry={reload} />;
 
-  const sections = data.sections.filter((s) => s.type !== "offer");
+  const sections = data.sections.filter((s) => !["offer", "faq", "testimonial"].includes(s.type));
 
   return (
     <>
@@ -99,6 +248,32 @@ export default function ContentPage() {
           </div>
         )}
       </section>
+
+      <ContentTypeManager
+        type="faq"
+        keyPrefix="faq"
+        heading="الأسئلة الشائعة"
+        hint="تظهر في الصفحة الرئيسية بقسم «أسئلة شائعة». اكتب السؤال كما يسأله الزبون فعلاً وجواباً صادقاً ومباشراً."
+        titleLabel="السؤال"
+        bodyLabel="الإجابة"
+        emptyTitle="لا توجد أسئلة بعد"
+        sections={data.sections.filter((s) => s.type === "faq")}
+        sortOrder={60}
+        reload={reload}
+      />
+
+      <ContentTypeManager
+        type="testimonial"
+        keyPrefix="testimonial"
+        heading="آراء العملاء"
+        hint="انقل آراء عملاء حقيقيين فقط (بإذنهم). تظهر في الصفحة الرئيسية بقسم «قالوا عن فالكون»."
+        titleLabel="اسم العميل (كما سيظهر)"
+        bodyLabel="نص الرأي"
+        emptyTitle="لا توجد آراء بعد"
+        sections={data.sections.filter((s) => s.type === "testimonial")}
+        sortOrder={70}
+        reload={reload}
+      />
 
       {editing && (
         <DrawerForm title={`تحرير: ${KEY_LABELS[editing.key] ?? editing.key}`} onClose={() => setEditing(null)}>

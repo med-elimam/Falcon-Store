@@ -14,8 +14,7 @@ import { useHydrated } from "./use-hydrated";
 const links = [
   { href: "/", label: "الرئيسية" },
   { href: "/shop", label: "العطور" },
-  { href: "/#decants", label: "تعبئة 10ml" },
-  { href: "/#finder", label: "اختر عطرك" },
+  { href: "/shop?size=10ml", label: "تعبئة 10ml" },
 ];
 
 export function SiteHeader() {
@@ -167,28 +166,50 @@ export function SiteHeader() {
               exit={reducedMotion ? undefined : { x: "100%" }}
               transition={{ duration: reducedMotion ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
             >
-              <button
-                className="menu-button in-drawer"
-                onClick={() => setMenuOpen(false)}
-                aria-label="إغلاق القائمة"
-                data-open="true"
-              >
-                <span />
-                <span />
-                <span />
-              </button>
-              <div className="mobile-menu-mark">
-                <FalconMark />
+              <div className="mobile-menu-top">
+                <button
+                  className="menu-button in-drawer"
+                  onClick={() => setMenuOpen(false)}
+                  aria-label="إغلاق القائمة"
+                  data-open="true"
+                >
+                  <span />
+                  <span />
+                  <span />
+                </button>
+                <div className="mobile-menu-brand" aria-hidden="true">
+                  <FalconMark />
+                  <span>THE SCENT VAULT</span>
+                </div>
               </div>
-              <ThemeSwitcher variant="panel" className="mobile-theme-switcher" />
-              {links.map((link) => (
-                <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}>
-                  {link.label}
-                </Link>
-              ))}
-              <button className="admin-link" onClick={openAdmin}>
-                <ShieldIcon /> دخول الإدارة
-              </button>
+              <div className="mobile-menu-links">
+                {links.map((link, i) => (
+                  <motion.div
+                    key={link.href}
+                    initial={reducedMotion ? false : { opacity: 0, x: 26 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.08 + i * 0.055, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    <Link
+                      href={link.href}
+                      onClick={() => setMenuOpen(false)}
+                      data-active={pathname === link.href || undefined}
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+              <div className="mobile-menu-foot">
+                <div className="mobile-menu-theme">
+                  <span>مظهر التصفح</span>
+                  <ThemeSwitcher variant="panel" />
+                </div>
+                <button className="admin-link" onClick={openAdmin}>
+                  <ShieldIcon /> دخول الإدارة
+                </button>
+              </div>
+              <FalconMark className="mobile-menu-watermark" />
             </motion.nav>
           </motion.div>
         )}

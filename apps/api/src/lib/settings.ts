@@ -10,6 +10,7 @@ const EMPTY_DEFAULTS: Record<SettingsGroup, Record<string, unknown>> = {
   policies: { authenticity: null, returns: null, privacy: null, terms: null },
   social: { instagram: null, facebook: null, tiktok: null, other: null },
   operations: { orderNotifyWhatsapp: null, defaultStockBehavior: "deduct", lowStockThreshold: 3, hoursAr: null },
+  appearance: { defaultTheme: "light" },
 };
 
 export async function getSettingsGroup<G extends SettingsGroup>(
@@ -73,6 +74,7 @@ export async function getPublicSettings(db: AnyDb): Promise<PublicSettingsDTO> {
   const contact = all.contact as PublicSettingsDTO["contact"];
   const value: PublicSettingsDTO = {
     identity: all.identity as PublicSettingsDTO["identity"],
+    appearance: all.appearance as PublicSettingsDTO["appearance"],
     contact,
     commerce: all.commerce as PublicSettingsDTO["commerce"],
     policies: all.policies as PublicSettingsDTO["policies"],

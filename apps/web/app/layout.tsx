@@ -7,6 +7,7 @@ import { CartDrawer } from "@/components/cart-drawer";
 import { Footer } from "@/components/footer";
 import { SettingsProvider } from "@/components/settings-context";
 import { ThemeProvider } from "@/components/theme-switcher";
+import { WhatsAppFab } from "@/components/whatsapp-fab";
 import { getPublicSettings } from "@/lib/api";
 
 const alexandria = Alexandria({
@@ -54,24 +55,27 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const settings = await getPublicSettings();
+  /* المظهر الافتراضي يحدده الأدمن من الإعدادات؛ اختيار الزائر المحفوظ محلياً يتقدم عليه */
+  const defaultTheme = settings?.appearance?.defaultTheme ?? "light";
+  const ssrResolved = defaultTheme === "dark" ? "dark" : "light";
   return (
     <html
       lang="ar"
       dir="rtl"
-      data-theme="light"
-      data-theme-mode="light"
+      data-theme={ssrResolved}
+      data-theme-mode={defaultTheme}
       suppressHydrationWarning
       className={`${alexandria.variable} ${bodoni.variable} ${inter.variable}`}
-      style={{ colorScheme: "light" }}
+      style={{ colorScheme: ssrResolved }}
     >
       <head>
-        <meta name="theme-color" content="#f6f3f4" data-falcon-theme="true" />
+        <meta name="theme-color" content={ssrResolved === "dark" ? "#0b090a" : "#f6f3f4"} data-falcon-theme="true" />
         <Script id="falcon-theme" strategy="beforeInteractive">
-          {`try{var t=localStorage.getItem('falcon-theme');var m=t==='light'||t==='dark'||t==='system'?t:'light';var r=m==='light'||m==='dark'?m:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');var d=document.documentElement;d.dataset.theme=r;d.dataset.themeMode=m;d.style.colorScheme=r;var c=document.querySelector('meta[name="theme-color"][data-falcon-theme]');if(c)c.content=r==='light'?'#f6f3f4':'#0b090a';}catch(e){}`}
+          {`try{var t=localStorage.getItem('falcon-theme');var m=t==='light'||t==='dark'||t==='system'?t:'${defaultTheme}';var r=m==='light'||m==='dark'?m:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');var d=document.documentElement;d.dataset.theme=r;d.dataset.themeMode=m;d.style.colorScheme=r;var c=document.querySelector('meta[name="theme-color"][data-falcon-theme]');if(c)c.content=r==='light'?'#f6f3f4':'#0b090a';}catch(e){}`}
         </Script>
       </head>
       <body>
-        <ThemeProvider>
+        <ThemeProvider defaultMode={defaultTheme}>
           <SettingsProvider value={settings}>
             <a href="#main" className="skip-link">
               انتقل إلى المحتوى
@@ -79,6 +83,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <SiteHeader />
             <main id="main">{children}</main>
             <Footer settings={settings} />
+            <WhatsAppFab />
             <CartDrawer />
           </SettingsProvider>
         </ThemeProvider>

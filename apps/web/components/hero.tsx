@@ -1,27 +1,11 @@
 import Link from "next/link";
-import { getImageProps } from "next/image";
 import { ArrowLeft, FalconMark } from "./icons";
+import { Hero3D } from "./hero-3d";
 
 export interface HeroContent {
   titleAr: string;
   bodyAr: string | null;
   showDecantCta: boolean;
-}
-
-function HeroMedia() {
-  const common = { alt: "", sizes: "(max-width: 760px) 100vw, 58vw", priority: true, quality: 82 } as const;
-  const desktop = getImageProps({ ...common, src: "/images/hero-wide.jpg", width: 1672, height: 941 });
-  const mobile = getImageProps({ ...common, src: "/images/hero-tall.jpg", width: 941, height: 1672 });
-
-  return (
-    <picture>
-      <source media="(max-width: 760px)" srcSet={mobile.props.srcSet} sizes="100vw" />
-      <img
-        {...desktop.props}
-        alt="مجموعة مختارة من عطور فالكون ستور"
-      />
-    </picture>
-  );
 }
 
 export function Hero({ content }: { content: HeroContent }) {
@@ -47,7 +31,7 @@ export function Hero({ content }: { content: HeroContent }) {
           </div>
         </div>
         <div className="hero-visual">
-          <HeroMedia />
+          <Hero3D />
           <span className="hero-visual-caption">عطور أصلية · تعبئة دقيقة · مخزون فعلي</span>
         </div>
       </div>

@@ -276,6 +276,10 @@ export const settingsOperationsSchema = z.object({
   hoursAr: optionalText(300),
 });
 
+export const settingsAppearanceSchema = z.object({
+  defaultTheme: z.enum(["light", "dark", "system"]).default("light"),
+});
+
 export const SETTINGS_SCHEMAS = {
   identity: settingsIdentitySchema,
   contact: settingsContactSchema,
@@ -283,6 +287,7 @@ export const SETTINGS_SCHEMAS = {
   policies: settingsPoliciesSchema,
   social: settingsSocialSchema,
   operations: settingsOperationsSchema,
+  appearance: settingsAppearanceSchema,
 } as const;
 export type SettingsGroup = keyof typeof SETTINGS_SCHEMAS;
 export const SETTINGS_GROUPS = Object.keys(SETTINGS_SCHEMAS) as SettingsGroup[];
@@ -311,7 +316,7 @@ export const paymentMethodSchema = z.object({
 
 export const contentSectionSchema = z.object({
   key: slugSchema,
-  type: z.enum(["hero", "section", "offer", "banner"]).default("section"),
+  type: z.enum(["hero", "section", "offer", "banner", "faq", "testimonial"]).default("section"),
   titleAr: optionalText(200),
   bodyAr: optionalText(2000),
   titleFr: optionalText(200),

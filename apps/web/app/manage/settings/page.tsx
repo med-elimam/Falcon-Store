@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ErrorBlock, LoadingBlock, useAdminData } from "@/components/manage/ui";
 import {
+  AppearanceForm,
   CommerceForm,
   ContactForm,
   DeliveryZonesEditor,
@@ -16,6 +17,7 @@ import {
 
 const TABS = [
   { key: "identity", label: "الهوية" },
+  { key: "appearance", label: "المظهر" },
   { key: "contact", label: "التواصل" },
   { key: "commerce", label: "البيع والأسعار" },
   { key: "delivery", label: "مناطق التوصيل" },
@@ -49,6 +51,7 @@ export default function SettingsPage() {
       </div>
       <section className="manage-card">
         {tab === "identity" && <IdentityForm initial={data.settings.identity ?? {}} onSaved={reload} />}
+        {tab === "appearance" && <AppearanceForm initial={data.settings.appearance ?? {}} onSaved={reload} />}
         {tab === "contact" && <ContactForm initial={data.settings.contact ?? {}} onSaved={reload} />}
         {tab === "commerce" && <CommerceForm initial={data.settings.commerce ?? {}} onSaved={reload} />}
         {tab === "delivery" && <DeliveryZonesEditor zones={data.deliveryZones} onSaved={reload} />}

@@ -353,6 +353,90 @@ export function OperationsForm({ initial, onSaved }: { initial: Record<string, u
   );
 }
 
+const THEME_CHOICES = [
+  {
+    value: "light",
+    label: "فاتح — بسيط ومريح للعين",
+    hint: "خلفية فاتحة ونصوص داكنة، مثل المتاجر البسيطة. يُنصح به للقراءة النهارية.",
+    swatch: { bg: "#f6f1f2", ink: "#2b2224", accent: "#a01f35" },
+  },
+  {
+    value: "dark",
+    label: "داكن — فخم وسينمائي",
+    hint: "خلفية داكنة تُبرز صور العطور والأنيميشن. الطابع الأصلي للمتجر.",
+    swatch: { bg: "#0b090a", ink: "#f3efe8", accent: "#c81743" },
+  },
+  {
+    value: "system",
+    label: "تلقائي — حسب جهاز الزائر",
+    hint: "يتبع إعداد نظام الزائر (فاتح نهاراً أو داكن ليلاً).",
+    swatch: { bg: "linear-gradient(135deg, #f6f1f2 50%, #0b090a 50%)", ink: "#8a8286", accent: "#b3183c" },
+  },
+] as const;
+
+export function AppearanceForm({ initial, onSaved }: { initial: Record<string, unknown>; onSaved?: () => void }) {
+  const { save, busy } = useGroupSaver(onSaved);
+  const stored = initial.defaultTheme;
+  const [theme, setTheme] = useState<string>(
+    stored === "dark" || stored === "system" ? (stored as string) : "light"
+  );
+  return (
+    <div className="manage-form">
+      <div className="setup-callout">
+        <div>
+          <b>المظهر الافتراضي للموقع</b>
+          <p>هذا ما يراه الزائر أول مرة في كل الصفحات وخاصة الواجهة الرئيسية. يبقى بإمكان الزائر تغييره من زر المظهر أعلى الموقع، ويُحفظ اختياره على جهازه.</p>
+        </div>
+      </div>
+      {THEME_CHOICES.map((c) => (
+        <label
+          key={c.value}
+          className="inline-check"
+          style={{
+            alignItems: "flex-start",
+            gap: 14,
+            padding: "14px 16px",
+            border: `1px solid ${theme === c.value ? "var(--accent-border)" : "var(--control-border)"}`,
+            background: theme === c.value ? "var(--accent-soft)" : "transparent",
+            cursor: "pointer",
+          }}
+        >
+          <input
+            type="radio"
+            name="defaultTheme"
+            checked={theme === c.value}
+            onChange={() => setTheme(c.value)}
+          />
+          <span
+            aria-hidden="true"
+            style={{
+              flexShrink: 0,
+              width: 54,
+              height: 38,
+              borderRadius: 6,
+              border: "1px solid var(--control-border)",
+              background: c.swatch.bg,
+              display: "grid",
+              placeItems: "center",
+            }}
+          >
+            <span style={{ width: 22, height: 6, borderRadius: 3, background: c.swatch.accent, boxShadow: `0 -9px 0 ${c.swatch.ink}` }} />
+          </span>
+          <span>
+            <b style={{ display: "block", marginBottom: 4 }}>{c.label}</b>
+            <span style={{ fontSize: ".82rem", color: "var(--muted)" }}>{c.hint}</span>
+          </span>
+        </label>
+      ))}
+      <div className="manage-form-foot">
+        <button className="btn btn-crimson" disabled={busy} onClick={() => save("appearance", { defaultTheme: theme })}>
+          حفظ المظهر
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function PaymentMethodsEditor({ methods, onSaved }: { methods: PaymentMethod[]; onSaved: () => void }) {
   const toast = useToast();
   return (

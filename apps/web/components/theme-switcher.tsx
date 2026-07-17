@@ -47,8 +47,14 @@ function applyTheme(mode: ThemeMode): ResolvedTheme {
   return resolved;
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<ThemeMode>("light");
+export function ThemeProvider({
+  children,
+  defaultMode = "light",
+}: {
+  children: ReactNode;
+  defaultMode?: ThemeMode;
+}) {
+  const [mode, setModeState] = useState<ThemeMode>(defaultMode);
 
   const setMode = useCallback((nextMode: ThemeMode) => {
     try {
@@ -67,7 +73,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } catch {
       // Private browsing can make localStorage unavailable.
     }
-    const initialMode = isThemeMode(saved) ? saved : "light";
+    const initialMode = isThemeMode(saved) ? saved : defaultMode;
     applyTheme(initialMode);
 
     const readyFrame = requestAnimationFrame(() => {
@@ -84,7 +90,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       cancelAnimationFrame(readyFrame);
       window.removeEventListener("storage", onStorage);
     };
-  }, []);
+  }, [defaultMode]);
 
   useEffect(() => {
     if (mode !== "system") return;

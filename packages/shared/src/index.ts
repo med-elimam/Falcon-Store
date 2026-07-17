@@ -99,7 +99,7 @@ export type TimeTag = (typeof TIME_TAGS)[number];
 export const TIME_LABELS: Record<TimeTag, string> = {
   day: "للنهار",
   evening: "للمساء",
-  work: "للعمل",
+  work: "يومي",
   occasion: "للمناسبات",
 };
 
@@ -202,12 +202,17 @@ export interface PublicDeliveryZoneDTO {
   etaAr: string | null;
 }
 
+export type SiteTheme = "light" | "dark" | "system";
+
 export interface PublicSettingsDTO {
   identity: {
     nameAr: string | null;
     nameLatin: string | null;
     description: string | null;
     logoUrl: string | null;
+  };
+  appearance: {
+    defaultTheme: SiteTheme;
   };
   contact: {
     whatsapp: string | null;

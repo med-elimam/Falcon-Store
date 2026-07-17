@@ -59,6 +59,41 @@ export function ShieldIcon({ className, ...props }: IconProps) {
   );
 }
 
+export function TruckIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} {...props}>
+      <path d="M3 6h11v10H3zM14 9h4l3 3v4h-7" />
+      <circle cx="7" cy="18" r="1.6" /><circle cx="17.5" cy="18" r="1.6" />
+    </svg>
+  );
+}
+
+export function WalletIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} {...props}>
+      <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H18v2.5H6.8M4 7.5V17a2 2 0 0 0 2 2h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 19 8H6.8" />
+      <circle cx="16.5" cy="13.7" r="1.1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function DropIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} {...props}>
+      <path d="M12 3.5c3.2 4 5.5 7 5.5 10a5.5 5.5 0 0 1-11 0c0-3 2.3-6 5.5-10Z" />
+      <path d="M9.5 13.5a2.6 2.6 0 0 0 2 2.6" />
+    </svg>
+  );
+}
+
+export function StoreIcon({ className, ...props }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} {...props}>
+      <path d="M4 9 5.4 4h13.2L20 9M4 9v11h16V9M4 9h16M10 20v-6h4v6" />
+    </svg>
+  );
+}
+
 export function WhatsAppIcon({ className, ...props }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className={className} {...props}>

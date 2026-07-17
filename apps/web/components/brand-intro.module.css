@@ -1,0 +1,467 @@
+.intro {
+  --intro-ivory: #f7f5f0;
+  --intro-ink: #070707;
+  --intro-mineral: #8d8a84;
+  --intro-stone: #d8d0c4;
+  --intro-crimson: #a20f35;
+  --intro-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  pointer-events: auto;
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+:global(html[data-falcon-intro="visible"]) .intro {
+  display: grid;
+}
+
+.curtain {
+  position: absolute;
+  inset-block: 0;
+  width: calc(50% + 1px);
+  z-index: -1;
+  background: var(--intro-ivory);
+  will-change: transform;
+}
+
+.curtain::after {
+  position: absolute;
+  top: 12%;
+  bottom: 12%;
+  width: 1px;
+  content: "";
+  background: color-mix(in srgb, var(--intro-ink) 16%, transparent);
+  opacity: 0;
+  animation: seamReveal 220ms var(--intro-ease) 20ms both;
+}
+
+.curtainLeft {
+  left: 0;
+  animation: curtainLeftRelease 1450ms var(--intro-ease) both;
+}
+
+.curtainLeft::after {
+  right: 0;
+}
+
+.curtainRight {
+  right: 0;
+  animation: curtainRightRelease 1450ms var(--intro-ease) both;
+}
+
+.curtainRight::after {
+  left: 0;
+}
+
+.stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: min(76vw, 560px);
+  min-height: 310px;
+  place-items: center;
+  align-content: center;
+  gap: clamp(20px, 3vh, 30px);
+  color: var(--intro-ink);
+  animation: stageLifecycle 1450ms var(--intro-ease) both;
+  will-change: transform, opacity, filter;
+}
+
+.apertureLine {
+  position: absolute;
+  left: 50%;
+  top: 4%;
+  bottom: 4%;
+  width: 1px;
+  background: var(--intro-ink);
+  transform-origin: center;
+  animation: aperture 460ms var(--intro-ease) both;
+}
+
+.markAssembly {
+  position: relative;
+  display: grid;
+  width: clamp(116px, 13vw, 168px);
+  aspect-ratio: 4 / 3;
+  place-items: center;
+}
+
+.mark {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  color: var(--intro-ink);
+  opacity: 0;
+  filter: drop-shadow(0 12px 22px color-mix(in srgb, var(--intro-ink) 10%, transparent));
+  animation: markLock 360ms var(--intro-ease) 150ms both;
+}
+
+.mark path {
+  stroke-dasharray: 330;
+  stroke-dashoffset: 330;
+  animation: markDraw 380ms var(--intro-ease) 110ms both;
+}
+
+.core {
+  position: absolute;
+  z-index: 3;
+  top: 43.5%;
+  left: 50%;
+  width: 13px;
+  height: 13px;
+  background: var(--intro-crimson);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  opacity: 0;
+  animation: coreLock 180ms var(--intro-ease) 300ms both;
+}
+
+.shards {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.shard {
+  --x: 0px;
+  --y: 0px;
+  --start-x: 0vw;
+  --rotation: 0deg;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(58px, 8vw, 104px);
+  height: clamp(8px, 1vw, 13px);
+  background: var(--intro-ink);
+  clip-path: polygon(0 48%, 100% 0, 84% 100%);
+  opacity: 0;
+  animation: shardAssemble 520ms var(--intro-ease) var(--delay, 35ms) both;
+}
+
+.leftTop {
+  --x: -112px;
+  --y: -42px;
+  --start-x: -46vw;
+  --rotation: 16deg;
+  --delay: 20ms;
+  background: var(--intro-mineral);
+}
+
+.leftMiddle {
+  --x: -119px;
+  --y: -12px;
+  --start-x: -52vw;
+  --rotation: 4deg;
+  --delay: 45ms;
+}
+
+.leftBottom {
+  --x: -108px;
+  --y: 20px;
+  --start-x: -48vw;
+  --rotation: -12deg;
+  --delay: 70ms;
+  background: var(--intro-stone);
+}
+
+.rightTop,
+.rightMiddle,
+.rightBottom {
+  clip-path: polygon(0 0, 100% 48%, 16% 100%);
+}
+
+.rightTop {
+  --x: 8px;
+  --y: -42px;
+  --start-x: 46vw;
+  --rotation: -16deg;
+  --delay: 20ms;
+  background: var(--intro-mineral);
+}
+
+.rightMiddle {
+  --x: 15px;
+  --y: -12px;
+  --start-x: 52vw;
+  --rotation: -4deg;
+  --delay: 45ms;
+}
+
+.rightBottom {
+  --x: 4px;
+  --y: 20px;
+  --start-x: 48vw;
+  --rotation: 12deg;
+  --delay: 70ms;
+  background: var(--intro-stone);
+}
+
+.identity {
+  display: grid;
+  place-items: center;
+  color: var(--intro-ink);
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  animation: identityReveal 240ms var(--intro-ease) 300ms both;
+}
+
+.identity strong {
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-size: clamp(1.55rem, 4.2vw, 2.45rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+
+.identity span {
+  margin-top: 10px;
+  font-family: var(--font-inter), sans-serif;
+  font-size: clamp(0.54rem, 1.4vw, 0.7rem);
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  white-space: nowrap;
+}
+
+.identity i {
+  width: 38px;
+  height: 1px;
+  margin-top: 18px;
+  background: var(--intro-crimson);
+  transform-origin: center;
+  animation: accentLine 160ms var(--intro-ease) 440ms both;
+}
+
+@media (max-width: 520px) {
+  .stage {
+    width: min(88vw, 390px);
+    min-height: 280px;
+    gap: 18px;
+  }
+
+  .markAssembly {
+    width: 112px;
+  }
+
+  .shard {
+    width: 68px;
+    height: 9px;
+  }
+
+  .leftTop {
+    --x: -78px;
+    --y: -35px;
+  }
+
+  .leftMiddle {
+    --x: -83px;
+    --y: -11px;
+  }
+
+  .leftBottom {
+    --x: -76px;
+    --y: 15px;
+  }
+
+  .rightTop {
+    --x: 10px;
+    --y: -35px;
+  }
+
+  .rightMiddle {
+    --x: 15px;
+    --y: -11px;
+  }
+
+  .rightBottom {
+    --x: 8px;
+    --y: 15px;
+  }
+
+  .identity strong {
+    letter-spacing: 0.11em;
+  }
+
+}
+
+:global(html[data-theme="dark"]) .curtain {
+  background: #12100f;
+}
+
+:global(html[data-theme="dark"]) .stage,
+:global(html[data-theme="dark"]) .identity,
+:global(html[data-theme="dark"]) .mark {
+  color: var(--intro-ivory);
+}
+
+:global(html[data-theme="dark"]) .curtain::after,
+:global(html[data-theme="dark"]) .apertureLine {
+  background: color-mix(in srgb, var(--intro-ivory) 22%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .curtain::after,
+  .apertureLine,
+  .mark,
+  .mark path,
+  .core,
+  .shard,
+  .identity,
+  .identity i {
+    animation: none;
+  }
+
+  .mark,
+  .core,
+  .identity {
+    opacity: 1;
+    transform: none;
+  }
+
+  .apertureLine,
+  .shards {
+    display: none;
+  }
+
+  .curtainLeft,
+  .curtainRight,
+  .stage {
+    animation: none;
+  }
+}
+
+@keyframes seamReveal {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes curtainLeftRelease {
+  0%,
+  84% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-101%, 0, 0);
+  }
+}
+
+@keyframes curtainRightRelease {
+  0%,
+  84% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(101%, 0, 0);
+  }
+}
+
+@keyframes stageLifecycle {
+  0%,
+  84% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98);
+    filter: blur(2px);
+  }
+}
+
+@keyframes aperture {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.08);
+  }
+  24% {
+    opacity: 0.9;
+    transform: scaleY(1);
+  }
+  72% {
+    opacity: 0.9;
+    transform: scaleY(0.28);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0.02);
+  }
+}
+
+@keyframes shardAssemble {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--start-x), var(--y), 0) rotate(var(--rotation));
+  }
+  52% {
+    opacity: 0.92;
+  }
+  72% {
+    opacity: 0.92;
+    transform: translate3d(var(--x), var(--y), 0) rotate(var(--rotation));
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--x), var(--y), 0) rotate(var(--rotation)) scaleX(0.72);
+  }
+}
+
+@keyframes markLock {
+  0% {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+  68% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes markDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes coreLock {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3) rotate(45deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotate(0);
+  }
+}
+
+@keyframes identityReveal {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes accentLine {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
