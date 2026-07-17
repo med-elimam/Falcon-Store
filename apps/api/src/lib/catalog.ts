@@ -2,6 +2,7 @@ import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import type { Family, ProductCardDTO, ProductDetailDTO, TimeTag, VariantDTO, VariantType } from "@falcon/shared";
 import {
   brands,
+  categories,
   productImages,
   products,
   productTranslations,
@@ -14,10 +15,12 @@ type VariantRow = typeof productVariants.$inferSelect;
 type ImageRow = typeof productImages.$inferSelect;
 type TranslationRow = typeof productTranslations.$inferSelect;
 type BrandRow = typeof brands.$inferSelect;
+type CategoryRow = typeof categories.$inferSelect;
 
 export interface LoadedProduct {
   product: ProductRow;
   brand: BrandRow | null;
+  category: CategoryRow | null;
   translations: TranslationRow[];
   variants: VariantRow[];
   images: ImageRow[];
@@ -25,9 +28,10 @@ export interface LoadedProduct {
 
 export async function loadProducts(db: AnyDb, ids?: string[]): Promise<LoadedProduct[]> {
   const base = await db
-    .select({ product: products, brand: brands })
+    .select({ product: products, brand: brands, category: categories })
     .from(products)
     .leftJoin(brands, eq(brands.id, products.brandId))
+    .leftJoin(categories, eq(categories.id, products.categoryId))
     .where(and(isNull(products.deletedAt), ids && ids.length ? inArray(products.id, ids) : undefined))
     .orderBy(asc(products.sortOrder), asc(products.createdAt));
   if (base.length === 0) return [];
@@ -48,6 +52,7 @@ export async function loadProducts(db: AnyDb, ids?: string[]): Promise<LoadedPro
   return base.map((r) => ({
     product: r.product,
     brand: r.brand,
+    category: r.category,
     translations: trs.filter((t) => t.productId === r.product.id),
     variants: vars.filter((v) => v.productId === r.product.id),
     images: imgs.filter((i) => i.productId === r.product.id),
@@ -98,6 +103,8 @@ export function toCardDTO(p: LoadedProduct): ProductCardDTO {
     hasDecant: variants.some((v) => v.type === "decant"),
     inStock,
     variants,
+    gender: p.product.gender,
+    categorySlug: p.category?.slug ?? null,
   };
 }
 

@@ -15,6 +15,7 @@ import { useHydrated } from "./use-hydrated";
 const links = [
   { href: "/", label: "الرئيسية" },
   { href: "/shop", label: "العطور" },
+  { href: "/track", label: "تتبع الطلب" },
   { href: "/faq", label: "الأسئلة الشائعة" },
   { href: "/contact", label: "تواصل معنا" },
 ];

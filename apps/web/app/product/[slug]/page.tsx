@@ -42,6 +42,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const display = settings?.commerce.currencyDisplay ?? "mru";
   const related = (catalog ?? [])
     .filter((p) => p.slug !== product.slug && p.families.some((f) => product.families.includes(f)))
+    .sort((a, b) => (a.inStock === b.inStock ? 0 : a.inStock ? -1 : 1))
     .slice(0, 3);
 
   return (
@@ -51,7 +52,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         <div className="shell">
           <div className="facts-intro">
             <span className="section-kicker">هوية الرائحة</span>
-            <h2>تفاصيل بلا مبالغة</h2>
+            <h2>تفاصيل العطر</h2>
           </div>
           <div className="facts-grid">
             {product.families.length > 0 && (
@@ -139,7 +140,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <div className="section-heading">
               <div>
                 <span className="section-kicker">قد يعجبك أيضاً</span>
-                <h2>روائح من العائلة نفسها</h2>
+                <h2>عطور مشابهة</h2>
               </div>
             </div>
             <div className="product-grid">

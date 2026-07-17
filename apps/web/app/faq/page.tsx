@@ -29,7 +29,7 @@ export default async function FaqPage() {
         <div className="shell">
           <span className="section-kicker">المساعدة</span>
           <h1>أسئلة وأجوبة واضحة</h1>
-          <p>كل ما يهمك عن الأصالة والتوصيل والدفع والإرجاع، بلا مصطلحات ملتوية.</p>
+          <p>معلومات واضحة عن الأصالة، التوصيل، الدفع والاستبدال.</p>
         </div>
       </section>
 

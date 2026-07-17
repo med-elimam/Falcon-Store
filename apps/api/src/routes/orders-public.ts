@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, sql } from "drizzle-orm";
 import { API_PREFIX } from "@falcon/config";
 import { waMessageForOrder, type CurrencyDisplay } from "@falcon/shared";
 import {
@@ -205,6 +205,83 @@ export async function registerOrderPublicRoutes(app: FastifyInstance): Promise<v
 
       const response = await buildResponse(app, orderId);
       return reply.status(201).send(response);
+    }
+  );
+
+  app.get(
+    `${API_PREFIX}/orders/track`,
+    { config: { rateLimit: { max: 30, timeWindow: "1 minute" } } },
+    async (req, reply) => {
+      const query = req.query as { orderNumber: string; phone: string };
+      if (!query.orderNumber || !query.phone) {
+        throw badRequest("رقم الطلب ورقم الهاتف مطلوبان.");
+      }
+
+      const normalizedPhone = query.phone.replace(/\D/g, "");
+      if (!normalizedPhone) {
+        throw badRequest("رقم هاتف غير صالح.");
+      }
+
+      const [order] = await app.db
+        .select()
+        .from(orders)
+        .where(eq(orders.orderNumber, query.orderNumber.trim().toUpperCase()))
+        .limit(1);
+
+      if (!order) {
+        throw notFound("لم نعثر على طلب بهذا الرقم. يرجى التأكد من الرقم.");
+      }
+
+      const orderPhoneClean = order.phone.replace(/\D/g, "");
+      if (!orderPhoneClean.includes(normalizedPhone) && !normalizedPhone.includes(orderPhoneClean)) {
+        throw badRequest("رقم الهاتف المدخل لا يتطابق مع رقم الهاتف المسجل في الطلب.");
+      }
+
+      const items = await app.db
+        .select()
+        .from(orderItems)
+        .where(eq(orderItems.orderId, order.id));
+
+      const history = await app.db
+        .select()
+        .from(orderStatusHistory)
+        .where(eq(orderStatusHistory.orderId, order.id))
+        .orderBy(asc(orderStatusHistory.createdAt));
+
+      const contact = await getSettingsGroup(app.db, "contact");
+
+      return {
+        order: {
+          id: order.id,
+          orderNumber: order.orderNumber,
+          status: order.status,
+          createdAt: order.createdAt,
+          customerName: order.customerName,
+          phone: order.phone,
+          area: order.area,
+          deliveryFeeMru: order.deliveryFeeMru,
+          subtotalMru: order.subtotalMru,
+          totalMru: order.totalMru,
+        },
+        items: items.map((i) => ({
+          id: i.id,
+          nameAr: i.nameAr,
+          brandName: i.brandName,
+          size: i.size,
+          qty: i.qty,
+          unitPriceMru: i.unitPriceMru,
+          lineTotalMru: i.lineTotalMru,
+        })),
+        history: history.map((h) => ({
+          status: h.toStatus,
+          createdAt: h.createdAt,
+          note: h.note,
+        })),
+        support: {
+          whatsapp: contact.whatsapp as string | null,
+          phone: contact.phone as string | null,
+        }
+      };
     }
   );
 }

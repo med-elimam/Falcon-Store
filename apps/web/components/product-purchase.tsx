@@ -99,7 +99,7 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
         {product.descriptionAr && <p className="product-description">{product.descriptionAr}</p>}
 
         <fieldset className="size-picker">
-          <legend>الحجم المختار</legend>
+          <legend>اختر الحجم</legend>
           <div>
             {variants.map((variant) => (
               <button
@@ -127,7 +127,6 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
             </div>
 
             <div className="live-price">
-              <small>السعر الحقيقي من قاعدة البيانات</small>
               <strong className="num">{formatMRU(selected.priceMru, display)}</strong>
               {selected.compareAtPriceMru && (
                 <del className="num">{formatMRU(selected.compareAtPriceMru, display)}</del>

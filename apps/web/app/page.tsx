@@ -70,6 +70,52 @@ export default async function Home() {
         }}
       />
 
+      <section className="categories-section">
+        <div className="shell">
+          <div className="categories-grid">
+            <Link href="/shop?category=niche" className="category-card card-niche">
+              <div className="category-card-bg" />
+              <div className="category-card-content">
+                <span className="kicker">مجموعات خاصة</span>
+                <h3>عطور نيش</h3>
+                <p>إصدارات نادرة لعشاق التميز</p>
+                <span className="arrow-btn">←</span>
+              </div>
+            </Link>
+            
+            <Link href="/shop?category=designer" className="category-card card-designer">
+              <div className="category-card-bg" />
+              <div className="category-card-content">
+                <span className="kicker">دور الأزياء العالمية</span>
+                <h3>عطور ديزاينر</h3>
+                <p>روائح أيقونية تناسب كل يوم</p>
+                <span className="arrow-btn">←</span>
+              </div>
+            </Link>
+            
+            <Link href="/shop?family=oriental" className="category-card card-arabic">
+              <div className="category-card-bg" />
+              <div className="category-card-content">
+                <span className="kicker">أصالة الشرق</span>
+                <h3>عطور عربية</h3>
+                <p>فخامة العود والمسك والعنبر</p>
+                <span className="arrow-btn">←</span>
+              </div>
+            </Link>
+            
+            <Link href="/shop?size=10ml" className="category-card card-decants">
+              <div className="category-card-bg" />
+              <div className="category-card-content">
+                <span className="kicker">جرّب بذكاء</span>
+                <h3>عينات 10ml</h3>
+                <p>تعبئة دقيقة لتجربة سهلة وسفر مريح</p>
+                <span className="arrow-btn">←</span>
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {products === null && (
         <section className="shell section-pad">
           <div className="no-results">

@@ -63,6 +63,7 @@ export function Footer({ settings }: { settings: PublicSettingsDTO | null }) {
           <h3>خدمة العملاء</h3>
           <Link href="/faq">الأسئلة الشائعة</Link>
           <Link href="/contact">تواصل معنا</Link>
+          <Link href="/track">تتبع طلبك</Link>
           <Link href="/checkout">إتمام الطلب</Link>
           {contact?.address && <Link href="/#visit">الموقع والساعات</Link>}
         </div>

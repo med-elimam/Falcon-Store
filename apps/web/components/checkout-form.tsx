@@ -106,8 +106,8 @@ export function CheckoutForm() {
   if (!items.length) {
     return (
       <div className="empty-checkout">
-        <h2>لا توجد منتجات في الطلب</h2>
-        <p>ابدأ بإضافة عطر من المجموعة.</p>
+        <h2>سلتك فارغة</h2>
+        <p>أضف عطرًا إلى السلة لإتمام الطلب.</p>
         <button className="btn btn-crimson" onClick={() => router.push("/shop")}>
           تصفّح العطور
         </button>

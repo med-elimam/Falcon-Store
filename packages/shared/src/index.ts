@@ -172,6 +172,8 @@ export interface ProductCardDTO {
   hasDecant: boolean;
   inStock: boolean;
   variants: VariantDTO[];
+  gender: string | null;
+  categorySlug: string | null;
 }
 
 export interface ProductDetailDTO extends ProductCardDTO {
