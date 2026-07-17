@@ -24,7 +24,8 @@ export function Hero3D() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    /* مع «تقليل الحركة» نعرض إطاراً ثابتاً بدل إلغاء المشهد — الزجاجة تظهر للجميع */
+    const staticMode = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const probe = document.createElement("canvas");
     if (!probe.getContext("webgl2") && !probe.getContext("webgl")) return;
 
@@ -41,7 +42,7 @@ export function Hero3D() {
 
     import("./hero-3d-scene").then(({ createHeroScene }) => {
       if (disposed) return;
-      handle = createHeroScene(el, () => setReady(true));
+      handle = createHeroScene(el, () => setReady(true), { staticMode });
       io = new IntersectionObserver(([entry]) => {
         inView = entry.isIntersecting;
         sync();

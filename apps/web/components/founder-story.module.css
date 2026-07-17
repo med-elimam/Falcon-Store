@@ -1,0 +1,155 @@
+.section {
+  width: min(100% - clamp(28px, 5vw, 72px), 1360px);
+  margin: 0 auto clamp(68px, 8vw, 112px);
+}
+
+.frame {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  grid-template-areas: "media content";
+  min-height: 610px;
+  overflow: hidden;
+  background: var(--graphite);
+  border-block: 1px solid var(--line);
+}
+
+.media {
+  grid-area: media;
+  position: relative;
+  min-height: 610px;
+  overflow: hidden;
+}
+
+.media img {
+  object-position: 35% center;
+}
+
+.content {
+  grid-area: content;
+  align-self: center;
+  min-width: 0;
+  padding: clamp(42px, 6vw, 86px);
+}
+
+.brandLine {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(100%, 320px);
+  margin-bottom: 25px;
+  color: var(--crimson-hot);
+}
+
+.brandLine svg {
+  width: 34px;
+  flex: 0 0 34px;
+}
+
+.brandLine span {
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.72;
+}
+
+.label {
+  margin-bottom: 12px;
+  color: var(--crimson-hot);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.content h2 {
+  max-width: 660px;
+  margin-bottom: 24px;
+  font-size: clamp(2.5rem, 4.6vw, 4.8rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.copy {
+  max-width: 54ch;
+  margin-bottom: 30px;
+  color: var(--body-copy);
+  font-size: 1rem;
+  line-height: 1.95;
+}
+
+.signature {
+  display: grid;
+  gap: 5px;
+  width: min(100%, 320px);
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.signature strong {
+  font-family: var(--font-bodoni), Georgia, serif;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+}
+
+.signature span {
+  color: var(--silver);
+  font-size: 0.72rem;
+}
+
+.cta {
+  width: max-content;
+  margin-top: 28px;
+}
+
+@media (max-width: 900px) {
+  .frame {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "media"
+      "content";
+    min-height: 0;
+  }
+
+  .media {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+
+  .content {
+    padding: clamp(34px, 7vw, 58px);
+  }
+}
+
+@media (max-width: 760px) {
+  .section {
+    margin-bottom: 64px;
+  }
+
+  .media {
+    aspect-ratio: 4 / 3.25;
+  }
+
+  .media img {
+    object-position: 33% center;
+  }
+
+  .content {
+    padding: 34px 20px 38px;
+  }
+
+  .brandLine {
+    margin-bottom: 20px;
+  }
+
+  .content h2 {
+    font-size: clamp(2.35rem, 11vw, 3.25rem);
+    line-height: 1.12;
+  }
+
+  .copy {
+    font-size: 0.92rem;
+    line-height: 1.8;
+  }
+
+  .cta {
+    width: 100%;
+  }
+}

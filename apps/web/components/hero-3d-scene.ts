@@ -122,7 +122,13 @@ function lathe(points: [number, number][], segments = 48): THREE.LatheGeometry {
   );
 }
 
-export function createHeroScene(container: HTMLElement, onReady: () => void): HeroSceneHandle {
+export function createHeroScene(
+  container: HTMLElement,
+  onReady: () => void,
+  opts?: { staticMode?: boolean }
+): HeroSceneHandle {
+  /* staticMode: لمن يفضّلون تقليل الحركة — إطار واحد ثابت بلا دوران ولا جزيئات متحركة */
+  const staticMode = opts?.staticMode === true;
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -277,6 +283,8 @@ export function createHeroScene(container: HTMLElement, onReady: () => void): He
   );
   root.add(dust);
 
+  const renderOnce = () => renderer.render(scene, camera);
+
   const resize = () => {
     const w = container.clientWidth || 1;
     const h = container.clientHeight || 1;
@@ -284,6 +292,7 @@ export function createHeroScene(container: HTMLElement, onReady: () => void): He
     camera.position.z = camera.aspect < 0.9 ? 8.8 : 7.2;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h, false);
+    if (staticMode) renderOnce();
   };
   resize();
   const ro = new ResizeObserver(resize);
@@ -308,6 +317,7 @@ export function createHeroScene(container: HTMLElement, onReady: () => void): He
     lastX = e.clientX;
     bottle.rotation.y += dx * 0.007;
     dragVel = dx * 0.007 * 60;
+    if (staticMode) renderOnce();
   };
   const onUp = (e: PointerEvent) => {
     dragging = false;
@@ -354,12 +364,17 @@ export function createHeroScene(container: HTMLElement, onReady: () => void): He
       onReady();
     }
   };
-  renderer.setAnimationLoop(frame);
+  if (staticMode) {
+    renderOnce();
+    onReady();
+  } else {
+    renderer.setAnimationLoop(frame);
+  }
 
   let disposed = false;
   return {
     setPaused(paused: boolean) {
-      if (disposed) return;
+      if (disposed || staticMode) return;
       renderer.setAnimationLoop(paused ? null : frame);
       if (!paused) clock.getDelta();
     },

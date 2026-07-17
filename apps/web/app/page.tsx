@@ -5,6 +5,7 @@ import { Hero } from "@/components/hero";
 import { ProductCard } from "@/components/product-card";
 import { Reveal } from "@/components/reveal";
 import { FragranceFinder } from "@/components/fragrance-finder";
+import { FounderStory } from "@/components/founder-story";
 import { ArrowLeft, DropIcon, ShieldIcon, StoreIcon, TruckIcon, WalletIcon, WhatsAppIcon } from "@/components/icons";
 import { getCatalog, getContentSections, getPublicSettings } from "@/lib/api";
 import { waLink } from "@/lib/format";
@@ -194,6 +195,8 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      <FounderStory whatsapp={whatsapp} />
 
       {testimonials.length > 0 && (
         <section className="testimonials-section section-pad">
