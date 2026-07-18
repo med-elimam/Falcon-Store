@@ -172,7 +172,7 @@ export default function OrdersPage() {
 
             {/* Items — compact 2-col table */}
             <div className="manage-table-wrap" style={{ marginTop: 4 }}>
-              <table className="manage-table" style={{ fontSize: ".78rem" }}>
+              <table className="manage-table" style={{ fontSize: ".78rem", minWidth: "auto" }}>
                 <thead>
                   <tr>
                     <th>المنتج / الحجم</th>

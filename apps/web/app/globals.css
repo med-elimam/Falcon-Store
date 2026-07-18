@@ -695,18 +695,17 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
 
 @media (max-width: 1024px) {
   .desktop-nav, .header-theme, .admin-entry { display: none !important; }.mobile-only { display: inline-flex !important; }
-  .header-inner { display: grid; grid-template-columns: 100px 1fr 100px; }
+  .header-inner { display: grid; grid-template-columns: auto 1fr auto; }
   .menu-button.mobile-only { justify-self: start; }
   .brand-lockup { justify-self: center; gap: 6px; }
-  .header-actions { justify-self: end; gap: 12px; }
+  .header-actions { justify-self: end; gap: 8px; display: flex; align-items: center; flex-wrap: nowrap; }
   .cart-button {
     width: 44px;
     height: 44px;
     min-width: 44px;
     min-height: 44px;
-    border: 1px solid var(--header-control-border);
-    border-radius: 10px;
-    background: var(--header-control);
+    border: none;
+    background: transparent;
     color: var(--header-ink);
     padding: 0;
     justify-content: center;
@@ -714,8 +713,8 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
   }
   .cart-button b {
     position: absolute;
-    top: -5px;
-    right: -5px;
+    top: 2px;
+    right: 2px;
     z-index: 2;
   }
   .hero-grid { grid-template-columns: minmax(330px, .85fr) minmax(0, 1.15fr); gap: 28px; }.hero-visual { min-height: 540px; }
@@ -742,7 +741,7 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
 }
 
 @media (max-width: 760px) {
-  .shell { width: min(100% - 28px, 1320px); }.desktop-only { display: none !important; }.header-inner { height: 68px; grid-template-columns: 100px 1fr 100px; }.brand-lockup { gap: 6px; }.brand-lockup span small { display: none; }.brand-lockup strong { font-size: .78rem; }.brand-mark { width: 37px; }.cart-button svg { width: 22px; }
+  .shell { width: min(100% - 28px, 1320px); }.desktop-only { display: none !important; }.header-inner { height: 68px; grid-template-columns: auto 1fr auto; }.brand-lockup { gap: 6px; }.brand-lockup span small { display: none; }.brand-lockup strong { font-size: .78rem; }.brand-mark { width: 37px; }.cart-button svg { width: 22px; }
   .hero { min-height: auto; padding-top: 68px; }.hero-grid { grid-template-columns: 1fr; gap: 24px; padding-block: 0 34px; }.hero-visual { order: -1; min-height: 0; height: min(96vw, 430px); margin-inline: -14px; }.hero-visual:not(:has(.hero-3d-canvas)) { display: none; }.hero-visual-caption { inset: auto 16px 12px; }.hero-copy { width: 100%; padding: 0; }.hero-signature { margin-bottom: 15px; }.hero-signature svg { width: 34px; }.hero-signature span { font-size: .52rem; }.hero h1 { font-size: clamp(2.5rem, 10vw, 3.4rem); margin-bottom: 18px; }.hero-copy > p { font-size: .9rem; line-height: 1.75; }.hero-actions { display: grid; grid-template-columns: 1fr; margin-top: 24px; }
   .faq-layout { grid-template-columns: 1fr; gap: 22px; }
   .section-pad { padding-block: 82px; }.section-heading { align-items: start; flex-direction: column; margin-bottom: 28px; }.section-heading h2, .finder-head h2, .auth-copy h2, .decant-copy h2, .visit-content h2, .notes-layout h2, .facts-intro h2 { font-size: clamp(2.25rem, 11vw, 3.4rem); }
