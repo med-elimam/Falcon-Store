@@ -152,87 +152,85 @@ export default function OrdersPage() {
           ) : detail.error || !detail.data ? (
             <ErrorBlock message={detail.error ?? "تعذر التحميل"} onRetry={detail.reload} />
           ) : (
-            <div className="manage-form">
-              <div className="row">
-                <div>
-                  <b className="num">{detail.data.order.orderNumber}</b>
-                  <div style={{ color: "var(--silver)", fontSize: ".75rem" }}>
-                    {detail.data.order.customerName} · <span className="num">{detail.data.order.phone}</span>
-                  </div>
-                  <div style={{ color: "var(--silver)", fontSize: ".75rem" }}>
-                    {detail.data.order.area} · {detail.data.order.paymentMethodLabel}
-                  </div>
-                  {detail.data.order.deliveryNote && (
-                    <div style={{ color: "var(--silver)", fontSize: ".75rem" }}>ملاحظة: {detail.data.order.deliveryNote}</div>
-                  )}
+          <div className="manage-form" style={{ padding: "14px 16px", gap: 10 }}>
+            {/* Order header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
+              <div>
+                <b className="num" style={{ fontSize: "1.05rem" }}>{detail.data.order.orderNumber}</b>
+                <div style={{ color: "var(--silver)", fontSize: ".73rem", marginTop: 3 }}>
+                  {detail.data.order.customerName} &middot; <span className="num">{detail.data.order.phone}</span>
                 </div>
-                <div>
-                  <Chip tone={statusTone(detail.data.order.status)}>{ORDER_STATUS_LABELS[detail.data.order.status]}</Chip>
+                <div style={{ color: "var(--silver)", fontSize: ".73rem" }}>
+                  {detail.data.order.area} &middot; {detail.data.order.paymentMethodLabel}
                 </div>
+                {detail.data.order.deliveryNote && (
+                  <div style={{ color: "var(--silver)", fontSize: ".73rem" }}>ملاحظة: {detail.data.order.deliveryNote}</div>
+                )}
               </div>
+              <Chip tone={statusTone(detail.data.order.status)}>{ORDER_STATUS_LABELS[detail.data.order.status]}</Chip>
+            </div>
 
-              <table className="manage-table">
+            {/* Items — compact 2-col table */}
+            <div className="manage-table-wrap" style={{ marginTop: 4 }}>
+              <table className="manage-table" style={{ fontSize: ".78rem" }}>
                 <thead>
                   <tr>
-                    <th>المنتج</th>
-                    <th>الحجم</th>
-                    <th>الكمية</th>
-                    <th>الإجمالي</th>
+                    <th>المنتج / الحجم</th>
+                    <th style={{ textAlign: "left" }}>كمية × إجمالي</th>
                   </tr>
                 </thead>
                 <tbody>
                   {detail.data.items.map((i) => (
                     <tr key={i.id}>
                       <td>
-                        {i.nameAr}
-                        {i.brandName && <div style={{ color: "var(--silver)", fontSize: ".68rem" }}>{i.brandName}</div>}
+                        <span style={{ fontWeight: 600 }}>{i.nameAr}</span>
+                        {i.brandName && <span style={{ color: "var(--silver)", fontSize: ".68rem" }}> · {i.brandName}</span>}
+                        <span style={{ color: "var(--silver)", fontSize: ".7rem", display: "block" }}>{i.size}</span>
                       </td>
-                      <td className="num">{i.size}</td>
-                      <td className="num">{i.qty}</td>
-                      <td className="num">{i.lineTotalMru !== null ? formatMRU(i.lineTotalMru) : "—"}</td>
+                      <td className="num" style={{ whiteSpace: "nowrap", textAlign: "left" }}>
+                        {i.qty} × {i.lineTotalMru !== null ? formatMRU(Math.round(i.lineTotalMru / i.qty)) : "—"}
+                        <div style={{ fontWeight: 700 }}>{i.lineTotalMru !== null ? formatMRU(i.lineTotalMru) : "—"}</div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <div className="row">
-                <div>
-                  المنتجات: <b className="num">{formatMRU(detail.data.order.subtotalMru)}</b>
-                </div>
-                <div>
-                  التوصيل:{" "}
-                  <b className="num">
-                    {detail.data.order.deliveryFeeMru !== null ? formatMRU(detail.data.order.deliveryFeeMru) : "يُحدد عند التأكيد"}
-                  </b>
-                </div>
-                <div>
-                  الإجمالي: <b className="num">{formatMRU(detail.data.order.totalMru)}</b>
-                </div>
-              </div>
-
-              <label>
-                ملاحظة على تغيير الحالة (اختياري)
-                <input className="field" value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} />
-              </label>
-              <div className="manage-form-foot">
-                {ORDER_STATUSES.filter((s) => s !== detail.data!.order.status).map((s) => (
-                  <button key={s} className="btn btn-ghost" disabled={busy} onClick={() => setStatus(detail.data!.order.id, s)}>
-                    {ORDER_STATUS_LABELS[s]}
-                  </button>
-                ))}
-              </div>
-
-              <div>
-                <b>سجل الحالة</b>
-                {detail.data.history.map((h) => (
-                  <div key={h.id} style={{ color: "var(--silver)", fontSize: ".74rem", padding: "6px 0", borderBottom: "1px solid var(--line)" }}>
-                    <span className="num">{new Date(h.createdAt).toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" })}</span> —{" "}
-                    {h.fromStatus ? `${ORDER_STATUS_LABELS[h.fromStatus as OrderStatus]} ← ` : ""}
-                    {ORDER_STATUS_LABELS[h.toStatus]}
-                    {h.note ? ` (${h.note})` : ""}
-                  </div>
-                ))}
-              </div>
             </div>
+
+            {/* Totals */}
+            <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: ".8rem", padding: "8px 0", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
+              <span>المنتجات: <b className="num">{formatMRU(detail.data.order.subtotalMru)}</b></span>
+              <span>التوصيل: <b className="num">{detail.data.order.deliveryFeeMru !== null ? formatMRU(detail.data.order.deliveryFeeMru) : "يُحدد عند التأكيد"}</b></span>
+              <span style={{ fontWeight: 800 }}>الإجمالي: <b className="num">{formatMRU(detail.data.order.totalMru)}</b></span>
+            </div>
+
+            {/* Status change */}
+            <label style={{ fontSize: ".78rem", fontWeight: 700, display: "grid", gap: 5 }}>
+              ملاحظة على تغيير الحالة (اختياري)
+              <input className="field" value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} />
+            </label>
+            <div className="manage-form-foot" style={{ gap: 8 }}>
+              {ORDER_STATUSES.filter((s) => s !== detail.data!.order.status).map((s) => (
+                <button key={s} className="btn btn-ghost" disabled={busy} onClick={() => setStatus(detail.data!.order.id, s)}
+                  style={{ fontSize: ".8rem", padding: "7px 12px", minHeight: 38 }}>
+                  {ORDER_STATUS_LABELS[s]}
+                </button>
+              ))}
+            </div>
+
+            {/* History */}
+            <div style={{ borderTop: "1px solid var(--line)", paddingTop: 8 }}>
+              <b style={{ fontSize: ".78rem" }}>سجل الحالة</b>
+              {detail.data.history.map((h) => (
+                <div key={h.id} style={{ color: "var(--silver)", fontSize: ".72rem", padding: "5px 0", borderBottom: "1px solid var(--line)" }}>
+                  <span className="num">{new Date(h.createdAt).toLocaleString("en-GB", { dateStyle: "short", timeStyle: "short" })}</span>{" — "}
+                  {h.fromStatus ? `${ORDER_STATUS_LABELS[h.fromStatus as OrderStatus]} ← ` : ""}
+                  {ORDER_STATUS_LABELS[h.toStatus]}
+                  {h.note ? ` (${h.note})` : ""}
+                </div>
+              ))}
+            </div>
+          </div>
           )}
         </DrawerForm>
       )}

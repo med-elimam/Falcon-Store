@@ -77,8 +77,8 @@ export default async function Home() {
         <div className="shell">
           <div className="categories-grid">
             <Link href="/shop?category=niche" className="category-card card-niche">
-              <div className="category-card-bg">
-                <Image src="/images/vault-boxes.jpg" alt="عطور نيش" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" priority />
+              <div className="category-card-bg" style={{ position: "absolute", inset: 0 }}>
+                <Image src="/images/vault-boxes.jpg" alt="عطور نيش" fill sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" priority />
               </div>
               <div className="category-card-content">
                 <span className="kicker">مجموعات خاصة</span>
@@ -89,8 +89,8 @@ export default async function Home() {
             </Link>
             
             <Link href="/shop?category=designer" className="category-card card-designer">
-              <div className="category-card-bg">
-                <Image src="/images/collection.jpg" alt="عطور ديزاينر" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
+              <div className="category-card-bg" style={{ position: "absolute", inset: 0 }}>
+                <Image src="/images/collection.jpg" alt="عطور ديزاينر" fill sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" />
               </div>
               <div className="category-card-content">
                 <span className="kicker">دور الأزياء العالمية</span>
@@ -101,8 +101,8 @@ export default async function Home() {
             </Link>
             
             <Link href="/shop?family=oriental" className="category-card card-arabic">
-              <div className="category-card-bg">
-                <Image src="/images/uniquee-duo.jpg" alt="عطور عربية" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
+              <div className="category-card-bg" style={{ position: "absolute", inset: 0 }}>
+                <Image src="/images/uniquee-duo.jpg" alt="عطور عربية" fill sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" />
               </div>
               <div className="category-card-content">
                 <span className="kicker">أصالة الشرق</span>
@@ -113,8 +113,8 @@ export default async function Home() {
             </Link>
             
             <Link href="/shop?size=10ml" className="category-card card-decants">
-              <div className="category-card-bg">
-                <Image src="/images/decants.jpg" alt="عينات 10ml" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
+              <div className="category-card-bg" style={{ position: "absolute", inset: 0 }}>
+                <Image src="/images/decants.jpg" alt="عينات 10ml" fill sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" />
               </div>
               <div className="category-card-content">
                 <span className="kicker">جرّب بذكاء</span>

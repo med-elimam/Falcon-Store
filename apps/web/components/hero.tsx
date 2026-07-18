@@ -16,7 +16,6 @@ export function Hero({ content }: { content: HeroContent }) {
         <div className="hero-copy">
           <div className="hero-signature">
             <FalconMark />
-            <span>عطور أصلية مختارة بعناية · نواكشوط</span>
           </div>
           <h1>{content.titleAr}</h1>
           {content.bodyAr && <p>{content.bodyAr}</p>}
@@ -40,7 +39,7 @@ export function Hero({ content }: { content: HeroContent }) {
         </div>
         <div className="hero-visual">
           <Hero3D />
-          <span className="hero-visual-caption">عطور أصلية مختارة بعناية</span>
+          <span className="hero-visual-caption"><em>إما العظمة</em> أو لا شيء</span>
         </div>
       </div>
     </section>

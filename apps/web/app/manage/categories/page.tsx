@@ -27,8 +27,47 @@ export default function CategoriesPage() {
   const [nameFr, setNameFr] = useState("");
   const [busy, setBusy] = useState(false);
 
+  // Edit state
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editNameAr, setEditNameAr] = useState("");
+  const [editNameFr, setEditNameFr] = useState("");
+  const [editBusy, setEditBusy] = useState(false);
+
   if (loading) return <LoadingBlock />;
   if (error || !data) return <ErrorBlock message={error ?? "تعذر التحميل"} onRetry={reload} />;
+
+  function startEdit(c: Category) {
+    setEditId(c.id);
+    setEditNameAr(c.nameAr);
+    setEditNameFr(c.nameFr ?? "");
+  }
+
+  function cancelEdit() {
+    setEditId(null);
+    setEditNameAr("");
+    setEditNameFr("");
+  }
+
+  async function saveEdit(id: string) {
+    if (!editNameAr.trim()) { toast.push("الاسم العربي مطلوب.", "error"); return; }
+    setEditBusy(true);
+    try {
+      await api(`/api/v1/admin/categories/${id}`, {
+        method: "PATCH",
+        body: {
+          nameAr: editNameAr.trim(),
+          nameFr: editNameFr.trim() || null,
+        },
+      });
+      toast.push("حُدّث التصنيف.");
+      cancelEdit();
+      reload();
+    } catch (err) {
+      toast.push(err instanceof ApiError ? err.message : "تعذر التحديث.", "error");
+    } finally {
+      setEditBusy(false);
+    }
+  }
 
   return (
     <>
@@ -92,24 +131,69 @@ export default function CategoriesPage() {
               <tbody>
                 {data.categories.map((c) => (
                   <tr key={c.id}>
-                    <td>{c.nameAr}</td>
-                    <td>{c.nameFr ?? "—"}</td>
-                    <td className="num">{c.slug}</td>
-                    <td>
-                      <ConfirmButton
-                        label="حذف"
-                        confirmLabel="تأكيد الحذف"
-                        onConfirm={async () => {
-                          try {
-                            await api(`/api/v1/admin/categories/${c.id}`, { method: "DELETE" });
-                            toast.push("حُذف التصنيف.");
-                            reload();
-                          } catch (err) {
-                            toast.push(err instanceof ApiError ? err.message : "تعذر الحذف.", "error");
-                          }
-                        }}
-                      />
-                    </td>
+                    {editId === c.id ? (
+                      <>
+                        <td>
+                          <input
+                            className="field"
+                            value={editNameAr}
+                            onChange={(e) => setEditNameAr(e.target.value)}
+                            placeholder="الاسم العربي"
+                            autoFocus
+                          />
+                        </td>
+                        <td>
+                          <input
+                            className="field"
+                            dir="ltr"
+                            value={editNameFr}
+                            onChange={(e) => setEditNameFr(e.target.value)}
+                            placeholder="الاسم الفرنسي (اختياري)"
+                          />
+                        </td>
+                        <td className="num">{c.slug}</td>
+                        <td>
+                          <div className="table-actions">
+                            <button
+                              className="btn btn-crimson"
+                              disabled={editBusy || !editNameAr.trim()}
+                              onClick={() => saveEdit(c.id)}
+                            >
+                              حفظ
+                            </button>
+                            <button className="btn btn-ghost" onClick={cancelEdit}>
+                              إلغاء
+                            </button>
+                          </div>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td>{c.nameAr}</td>
+                        <td>{c.nameFr ?? "—"}</td>
+                        <td className="num">{c.slug}</td>
+                        <td>
+                          <div className="table-actions">
+                            <button className="btn btn-ghost" onClick={() => startEdit(c)}>
+                              تعديل
+                            </button>
+                            <ConfirmButton
+                              label="حذف"
+                              confirmLabel="تأكيد الحذف"
+                              onConfirm={async () => {
+                                try {
+                                  await api(`/api/v1/admin/categories/${c.id}`, { method: "DELETE" });
+                                  toast.push("حُذف التصنيف.");
+                                  reload();
+                                } catch (err) {
+                                  toast.push(err instanceof ApiError ? err.message : "تعذر الحذف.", "error");
+                                }
+                              }}
+                            />
+                          </div>
+                        </td>
+                      </>
+                    )}
                   </tr>
                 ))}
               </tbody>

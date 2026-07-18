@@ -51,7 +51,7 @@ export function ShopCatalog({
     return products.reduce((max, p) => {
       const price = p.startingPriceMru ?? 0;
       return price > max ? price : max;
-    }, 1000);
+    }, 10000);
   }, [products]);
 
   const [priceRange, setPriceRange] = useState(maxProductPrice);
@@ -378,7 +378,7 @@ export function ShopCatalog({
               className="mobile-filter-trigger-btn"
               onClick={() => setIsDrawerOpen(true)}
             >
-              الفلترة والترتيب
+              الفلاتر
               {activeFiltersCount > 0 && (
                 <span style={{
                   background: "var(--crimson)",
@@ -393,15 +393,18 @@ export function ShopCatalog({
                 </span>
               )}
             </button>
-            <label>
-              ترتيب{" "}
-              <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
-                <option value="featured">المميزة أولاً</option>
-                <option value="low">السعر من الأقل</option>
-                <option value="high">السعر من الأعلى</option>
-                <option value="name">الاسم</option>
-              </select>
-            </label>
+            <select
+              className="field"
+              style={{ minWidth: 140 }}
+              value={sort}
+              onChange={(e) => setSort(e.target.value as Sort)}
+              aria-label="ترتيب النتائج"
+            >
+              <option value="featured">المميزة أولاً</option>
+              <option value="low">السعر من الأقل</option>
+              <option value="high">السعر من الأعلى</option>
+              <option value="name">الاسم</option>
+            </select>
           </div>
         </div>
         
