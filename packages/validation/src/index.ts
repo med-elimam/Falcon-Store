@@ -21,10 +21,23 @@ export const passwordSchema = z
   );
 
 export const emailSchema = z.string().trim().toLowerCase().email("بريد إلكتروني غير صالح").max(190);
+/* تطبيع الرقم الموريتاني إلى صيغة موحّدة "222" + 8 أرقام.
+   يقبل: 8 أرقام محلية، أو مسبوقة بـ 222 / +222 / 00222، مع أي فواصل أو مسافات. */
+export function normalizeMauritanianPhone(value: string): string | null {
+  let clean = value.replace(/\D/g, "");
+  if (clean.startsWith("00")) clean = clean.slice(2); // 00222… → 222…
+  if (clean.length === 11 && clean.startsWith("222")) clean = clean.slice(3); // 222######## → محلي
+  if (clean.length === 8) return "222" + clean;
+  return null;
+}
+
 export const phoneSchema = z
   .string()
   .trim()
-  .regex(/^\+?\d{8,15}$/, "رقم هاتف غير صالح");
+  .refine((v) => normalizeMauritanianPhone(v) !== null, {
+    message: "رقم الهاتف غير صالح. أدخل 8 أرقام (مع رمز 222 اختياريًا).",
+  })
+  .transform((v) => normalizeMauritanianPhone(v)!);
 export const uuidSchema = z.string().uuid();
 export const slugSchema = z
   .string()

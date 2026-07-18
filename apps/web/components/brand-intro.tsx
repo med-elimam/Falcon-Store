@@ -4,7 +4,7 @@ import styles from "./brand-intro.module.css";
 const INTRO_DURATION_MS = 1450;
 const REDUCED_MOTION_DURATION_MS = 80;
 
-const INTRO_BOOTSTRAP = `(function(){var d=document.documentElement;var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;d.dataset.falconIntro='visible';if(reduced)d.dataset.falconIntroReduced='true';setTimeout(function(){d.dataset.falconIntro='hidden';delete d.dataset.falconIntroReduced;},reduced?${REDUCED_MOTION_DURATION_MS}:${INTRO_DURATION_MS});})();`;
+const INTRO_BOOTSTRAP = `(function(){var d=document.documentElement;var played=sessionStorage.getItem('falcon-intro-played');var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(played||reduced){d.dataset.falconIntro='hidden';return;}d.dataset.falconIntro='visible';sessionStorage.setItem('falcon-intro-played','true');setTimeout(function(){d.dataset.falconIntro='hidden';},1450);})();`;
 
 export function BrandIntro() {
   return (

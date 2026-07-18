@@ -11,6 +11,7 @@ import {
   LoadingBlock,
   useAdminData,
   useToast,
+  ConfirmButton,
 } from "@/components/manage/ui";
 
 interface StaffRow {
@@ -106,20 +107,37 @@ export default function StaffPage() {
                               </option>
                             ))}
                           </select>
-                          <button
-                            className="btn btn-ghost"
-                            onClick={async () => {
-                              try {
-                                await api(`/api/v1/admin/staff/${u.id}`, { method: "PATCH", body: { isActive: !u.isActive } });
-                                toast.push(u.isActive ? "عُطّل الحساب وأُنهيت جلساته." : "أُعيد تفعيل الحساب.");
-                                reload();
-                              } catch (err) {
-                                toast.push(err instanceof ApiError ? err.message : "تعذر التنفيذ.", "error");
-                              }
-                            }}
-                          >
-                            {u.isActive ? "تعطيل" : "تفعيل"}
-                          </button>
+                          {u.isActive ? (
+                            <ConfirmButton
+                              label="تعطيل"
+                              confirmLabel="تأكيد تعطيل الحساب؟"
+                              className="btn btn-ghost"
+                              onConfirm={async () => {
+                                try {
+                                  await api(`/api/v1/admin/staff/${u.id}`, { method: "PATCH", body: { isActive: false } });
+                                  toast.push("عُطّل الحساب وأُنهيت جلساته.");
+                                  reload();
+                                } catch (err) {
+                                  toast.push(err instanceof ApiError ? err.message : "تعذر التنفيذ.", "error");
+                                }
+                              }}
+                            />
+                          ) : (
+                            <button
+                              className="btn btn-ghost"
+                              onClick={async () => {
+                                try {
+                                  await api(`/api/v1/admin/staff/${u.id}`, { method: "PATCH", body: { isActive: true } });
+                                  toast.push("أُعيد تفعيل الحساب.");
+                                  reload();
+                                } catch (err) {
+                                  toast.push(err instanceof ApiError ? err.message : "تعذر التنفيذ.", "error");
+                                }
+                              }}
+                            >
+                              تفعيل
+                            </button>
+                          )}
                           <button
                             className="btn btn-ghost"
                             onClick={() => {
@@ -211,10 +229,12 @@ export default function StaffPage() {
             </label>
             <p style={{ color: "var(--silver)", fontSize: ".78rem" }}>ستُنهى كل جلسات الموظف الحالية وسيُلزم بتغيير الكلمة عند أول دخول.</p>
             <div className="manage-form-foot">
-              <button
+              <ConfirmButton
+                label="إعادة تعيين الكلمة"
+                confirmLabel="تأكيد التغيير؟"
                 className="btn btn-crimson"
                 disabled={busy || resetPassword.length < 12}
-                onClick={async () => {
+                onConfirm={async () => {
                   setBusy(true);
                   try {
                     await api("/api/v1/admin/staff/reset-password", {
@@ -230,9 +250,7 @@ export default function StaffPage() {
                     setBusy(false);
                   }
                 }}
-              >
-                تأكيد
-              </button>
+              />
               <button className="text-button" onClick={() => setResetFor(null)}>
                 إلغاء
               </button>

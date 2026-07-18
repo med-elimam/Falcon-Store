@@ -4,6 +4,10 @@ import { ProductPurchase } from "@/components/product-purchase";
 import { ProductCard } from "@/components/product-card";
 import { FAMILY_LABELS, type Family } from "@falcon/shared";
 import { getCatalog, getProductDetail, getPublicSettings } from "@/lib/api";
+import { mediaSrc } from "@/lib/media";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const absolute = (path: string) => (path.startsWith("http") ? path : `${SITE_URL}${path.startsWith("/") ? "" : "/"}${path}`);
 
 export const revalidate = 300;
 
@@ -45,8 +49,48 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     .sort((a, b) => (a.inStock === b.inStock ? 0 : a.inStock ? -1 : 1))
     .slice(0, 3);
 
+  /* بيانات منظمة (JSON-LD): Product + مسار التنقل — تُحسّن ظهور المنتج في نتائج البحث */
+  const pricedVariants = product.variants.filter((v) => v.priceMru !== null);
+  const prices = pricedVariants.map((v) => v.priceMru as number);
+  const anyAvailable = product.variants.some((v) => v.isAvailable);
+  const productLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.nameAr,
+    ...(product.nameFr ? { alternateName: product.nameFr } : {}),
+    ...(product.descriptionAr ? { description: product.descriptionAr } : {}),
+    ...(product.image ? { image: [absolute(mediaSrc(product.image))] } : {}),
+    brand: { "@type": "Brand", name: product.brandName },
+    ...(product.variants[0]?.sku ? { sku: product.variants[0].sku } : {}),
+    ...(prices.length
+      ? {
+          offers: {
+            "@type": "AggregateOffer",
+            priceCurrency: "MRU",
+            lowPrice: Math.min(...prices),
+            highPrice: Math.max(...prices),
+            offerCount: pricedVariants.length,
+            availability: anyAvailable ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          },
+        }
+      : {}),
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "الرئيسية", item: absolute("/") },
+      { "@type": "ListItem", position: 2, name: "العطور", item: absolute("/shop") },
+      { "@type": "ListItem", position: 3, name: product.nameAr, item: absolute(`/product/${product.slug}`) },
+    ],
+  };
+
   return (
     <div className="product-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([productLd, breadcrumbLd]) }}
+      />
       <ProductPurchase product={product} />
       <section className="product-facts section-pad">
         <div className="shell">

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ProductDetailDTO } from "@falcon/shared";
 import { formatMRU, waLink } from "@/lib/format";
 import { mediaSrc } from "@/lib/media";
@@ -36,18 +36,66 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
 
   const gallery = product.images.length ? product.images : product.image ? [{ url: product.image, alt: null }] : [];
   const waText = selected
-    ? `السلام عليكم، أريد طلب ${product.nameAr} (${product.brandName}) بحجم ${selected.sizeLabel}.`
-    : `السلام عليكم، أريد الاستفسار عن ${product.nameAr} (${product.brandName}).`;
+    ? `السلام عليكم، أريد طلب عطر:\nالمنتج: ${product.nameAr}\nالماركة: ${product.brandName ?? "غير محدد"}\nالحجم: ${selected.sizeLabel}\nالسعر: ${formatMRU(selected.priceMru, display)}`
+    : `السلام عليكم، أريد الاستفسار عن عطر: ${product.nameAr} (${product.brandName ?? "غير محدد"})`;
 
   function chooseVariant(id: string) {
     setVariantId(id);
     setQuantity(1);
   }
 
+  /* تنقّل المعرض بالسحب على الهاتف + تكبير بالنقر (Lightbox) */
+  const [lightbox, setLightbox] = useState(false);
+  const touchStartX = useRef(0);
+  const galleryIndex = gallery.findIndex((entry) => entry.url === image);
+  const goRelative = (dir: number) => {
+    if (gallery.length < 2) return;
+    const next = (galleryIndex + dir + gallery.length) % gallery.length;
+    setImage(gallery[next]!.url);
+  };
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0]!.clientX;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const dx = e.changedTouches[0]!.clientX - touchStartX.current;
+    if (Math.abs(dx) > 44) goRelative(dx < 0 ? 1 : -1);
+  };
+
+  useEffect(() => {
+    if (!lightbox) return;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(false);
+      if (e.key === "ArrowLeft") goRelative(1);
+      if (e.key === "ArrowRight") goRelative(-1);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", onKey);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightbox, galleryIndex, gallery.length]);
+
   return (
     <section className="product-detail-hero shell">
       <div className="product-gallery">
-        <div className="gallery-main" style={{ "--product-glow": product.glow } as React.CSSProperties}>
+        <div
+          className="gallery-main"
+          style={{ "--product-glow": product.glow } as React.CSSProperties}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
+          {image && (
+            <button
+              type="button"
+              className="gallery-zoom-btn"
+              onClick={() => setLightbox(true)}
+              aria-label="تكبير الصورة"
+            >
+              <span aria-hidden="true">⤢</span>
+            </button>
+          )}
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={image}
@@ -130,6 +178,11 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
                 </span>
               )}
               {selected.type === "decant" && <small>تعبئة 10ml من الزجاجة الأصلية</small>}
+              {selected.sku && (
+                <span style={{ marginRight: "auto", fontSize: "0.76rem", color: "var(--silver)" }}>
+                  SKU: <span className="num">{selected.sku}</span>
+                </span>
+              )}
             </div>
 
             <div className="live-price">
@@ -190,6 +243,61 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
           </ul>
         )}
       </div>
+
+      <AnimatePresence>
+        {lightbox && image && (
+          <motion.div
+            className="lightbox"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`صورة مكبّرة: ${product.nameAr}`}
+            initial={reducedMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={reducedMotion ? undefined : { opacity: 0 }}
+            onClick={() => setLightbox(false)}
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+          >
+            <button type="button" className="lightbox-close" aria-label="إغلاق">
+              ×
+            </button>
+            {gallery.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  className="lightbox-nav prev"
+                  aria-label="الصورة السابقة"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goRelative(-1);
+                  }}
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  className="lightbox-nav next"
+                  aria-label="الصورة التالية"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goRelative(1);
+                  }}
+                >
+                  ›
+                </button>
+              </>
+            )}
+            {/* الصورة الأصلية بلا قصّ لإتاحة التكبير الكامل */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={mediaSrc(image)}
+              alt={`${product.nameAr} — ${product.brandName}`}
+              className="lightbox-img"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

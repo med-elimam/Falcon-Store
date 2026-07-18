@@ -190,58 +190,65 @@ export async function registerAdminProductRoutes(app: FastifyInstance): Promise<
     if (!loaded) throw notFound("المنتج غير موجود.");
 
     const priceChanges: Record<string, { from: number | null; to: number | null }> = {};
-    await app.db.transaction(async (tx) => {
-      const existing = loaded.variants;
-      const keepIds: string[] = [];
-      for (const v of body.variants) {
-        const prev = v.id ? existing.find((e) => e.id === v.id) : undefined;
-        if (prev) {
-          if (prev.priceMru !== v.priceMru) priceChanges[v.sizeLabel] = { from: prev.priceMru, to: v.priceMru };
-          await tx
-            .update(productVariants)
-            .set({
-              sizeLabel: v.sizeLabel,
-              sizeMl: v.sizeMl,
-              sku: v.sku,
-              priceMru: v.priceMru,
-              compareAtPriceMru: v.compareAtPriceMru,
-              stockQuantity: v.stockQuantity,
-              lowStockThreshold: v.lowStockThreshold,
-              type: v.type,
-              isActive: v.isActive,
-              isAvailable: v.isAvailable,
-              sortOrder: v.sortOrder,
-              updatedAt: new Date(),
-            })
-            .where(eq(productVariants.id, prev.id));
-          keepIds.push(prev.id);
-        } else {
-          priceChanges[v.sizeLabel] = { from: null, to: v.priceMru };
-          const [created] = await tx
-            .insert(productVariants)
-            .values({
-              productId: id,
-              sizeLabel: v.sizeLabel,
-              sizeMl: v.sizeMl,
-              sku: v.sku,
-              priceMru: v.priceMru,
-              compareAtPriceMru: v.compareAtPriceMru,
-              stockQuantity: v.stockQuantity,
-              lowStockThreshold: v.lowStockThreshold,
-              type: v.type,
-              isActive: v.isActive,
-              isAvailable: v.isAvailable,
-              sortOrder: v.sortOrder,
-            })
-            .returning({ id: productVariants.id });
-          keepIds.push(created!.id);
+    try {
+      await app.db.transaction(async (tx) => {
+        const existing = loaded.variants;
+        const keepIds: string[] = [];
+        for (const v of body.variants) {
+          const prev = v.id ? existing.find((e) => e.id === v.id) : undefined;
+          if (prev) {
+            if (prev.priceMru !== v.priceMru) priceChanges[v.sizeLabel] = { from: prev.priceMru, to: v.priceMru };
+            await tx
+              .update(productVariants)
+              .set({
+                sizeLabel: v.sizeLabel,
+                sizeMl: v.sizeMl,
+                sku: v.sku,
+                priceMru: v.priceMru,
+                compareAtPriceMru: v.compareAtPriceMru,
+                stockQuantity: v.stockQuantity,
+                lowStockThreshold: v.lowStockThreshold,
+                type: v.type,
+                isActive: v.isActive,
+                isAvailable: v.isAvailable,
+                sortOrder: v.sortOrder,
+                updatedAt: new Date(),
+              })
+              .where(eq(productVariants.id, prev.id));
+            keepIds.push(prev.id);
+          } else {
+            priceChanges[v.sizeLabel] = { from: null, to: v.priceMru };
+            const [created] = await tx
+              .insert(productVariants)
+              .values({
+                productId: id,
+                sizeLabel: v.sizeLabel,
+                sizeMl: v.sizeMl,
+                sku: v.sku,
+                priceMru: v.priceMru,
+                compareAtPriceMru: v.compareAtPriceMru,
+                stockQuantity: v.stockQuantity,
+                lowStockThreshold: v.lowStockThreshold,
+                type: v.type,
+                isActive: v.isActive,
+                isAvailable: v.isAvailable,
+                sortOrder: v.sortOrder,
+              })
+              .returning({ id: productVariants.id });
+            keepIds.push(created!.id);
+          }
         }
+        const removed = existing.filter((e) => !keepIds.includes(e.id));
+        if (removed.length) {
+          await tx.delete(productVariants).where(inArray(productVariants.id, removed.map((r) => r.id)));
+        }
+      });
+    } catch (err: any) {
+      if (err.code === "23505" || err.message?.includes("product_variants_sku_uq")) {
+        throw conflict("رمز SKU المستخدم موجود بالفعل لعطر آخر. يرجى استخدام رمز فريد لكل حجم.");
       }
-      const removed = existing.filter((e) => !keepIds.includes(e.id));
-      if (removed.length) {
-        await tx.delete(productVariants).where(inArray(productVariants.id, removed.map((r) => r.id)));
-      }
-    });
+      throw err;
+    }
 
     if (Object.keys(priceChanges).length) {
       await writeAudit(app.db, req, {

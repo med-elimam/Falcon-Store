@@ -12,6 +12,7 @@ interface OrderData {
     orderNumber: string;
     status: "new" | "confirmed" | "preparing" | "out_for_delivery" | "completed" | "cancelled";
     createdAt: string;
+    updatedAt?: string;
     customerName: string;
     phone: string;
     area: string;
@@ -47,6 +48,19 @@ const STEPS = [
   { key: "completed", label: "تم التسليم", desc: "تمنياتنا لك بتجربة عطرية رائعة" },
 ];
 
+function maskName(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  return parts.map((part) => part[0] + "*".repeat(Math.max(1, part.length - 1))).join(" ");
+}
+
+function maskPhone(phoneStr: string): string {
+  const digits = phoneStr.replace(/\D/g, "");
+  if (digits.length >= 8) {
+    return `+222 **** ${digits.substring(digits.length - 4)}`;
+  }
+  return phoneStr;
+}
+
 export function OrderTracker() {
   const settings = usePublicSettings();
   const display = settings?.commerce.currencyDisplay ?? "mru";
@@ -59,14 +73,20 @@ export function OrderTracker() {
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
-    if (!orderNumber.trim() || !phone.trim()) return;
+    let cleanOrderNo = orderNumber.trim().toUpperCase();
+    if (/^\d+$/.test(cleanOrderNo)) {
+      cleanOrderNo = `FLC-${cleanOrderNo}`;
+    }
+    const cleanPhone = phone.replace(/\D/g, "");
+
+    if (!cleanOrderNo || !cleanPhone) return;
 
     setLoading(true);
     setError("");
 
     try {
       const payload = await api<OrderData>(
-        `/api/v1/orders/track?orderNumber=${encodeURIComponent(orderNumber.trim())}&phone=${encodeURIComponent(phone.trim())}`
+        `/api/v1/orders/track?orderNumber=${encodeURIComponent(cleanOrderNo)}&phone=${encodeURIComponent(cleanPhone)}`
       );
       setData(payload);
     } catch (err) {
@@ -87,8 +107,15 @@ export function OrderTracker() {
     const { order, items, support } = data;
     const isCancelled = order.status === "cancelled";
     
-    // Find active step index
-    const activeIndex = STEPS.findIndex((s) => s.key === order.status);
+    // Build steps: append Cancelled if relevant
+    const stepsToRender = isCancelled
+      ? [
+          ...STEPS,
+          { key: "cancelled", label: "تم إلغاء الطلب", desc: "تم إلغاء هذا الطلب بناءً على طلبكم أو لتعذر التواصل" }
+        ]
+      : STEPS;
+
+    const activeIndex = stepsToRender.findIndex((s) => s.key === order.status);
 
     const whatsappUrl = support.whatsapp
       ? waLink(support.whatsapp, `السلام عليكم، أستفسر عن حالة طلبي رقم ${order.orderNumber}`)
@@ -101,53 +128,57 @@ export function OrderTracker() {
             <span className="order-badge">الطلب #{order.orderNumber}</span>
             <h2>حالة طلبك الحالية</h2>
             <p>تاريخ التسجيل: {new Date(order.createdAt).toLocaleDateString("ar-MR", { dateStyle: "long" })}</p>
+            {order.updatedAt && (
+              <p style={{ marginTop: 6, color: "var(--silver)", fontSize: "0.84rem" }}>
+                آخر تحديث: {new Date(order.updatedAt).toLocaleString("ar-MR", { dateStyle: "long", timeStyle: "short" })}
+              </p>
+            )}
           </div>
           <button className="btn btn-ghost" onClick={handleReset}>
             تتبع طلب آخر
           </button>
         </div>
 
-        {isCancelled ? (
-          <div className="cancellation-banner">
-            <div className="cancel-icon">✕</div>
-            <div>
-              <h3>تم إلغاء هذا الطلب</h3>
-              <p>إذا كان لديك أي استفسار، تواصل معنا مباشرة عبر خدمة العملاء.</p>
-            </div>
+        <div className="timeline-container" style={{ marginBottom: 40 }}>
+          <div className="timeline-progress-bar">
+            <div
+              className="timeline-progress-fill"
+              style={{
+                height: `${(Math.max(0, activeIndex) / (stepsToRender.length - 1)) * 100}%`,
+                background: isCancelled ? "var(--danger)" : "var(--crimson)",
+              }}
+            />
           </div>
-        ) : (
-          <div className="timeline-container">
-            <div className="timeline-progress-bar">
-              <div
-                className="timeline-progress-fill"
-                style={{
-                  height: `${(Math.max(0, activeIndex) / (STEPS.length - 1)) * 100}%`,
-                }}
-              />
-            </div>
-            
-            <div className="timeline-steps">
-              {STEPS.map((step, idx) => {
-                const isPassed = idx <= activeIndex;
-                const isCurrent = idx === activeIndex;
-                return (
+          
+          <div className="timeline-steps">
+            {stepsToRender.map((step, idx) => {
+              const isPassed = idx <= activeIndex;
+              const isCurrent = idx === activeIndex;
+              const isStepCancelled = step.key === "cancelled";
+              return (
+                <div
+                  key={step.key}
+                  className={`timeline-step-item ${isPassed ? "passed" : ""} ${isCurrent ? "current" : ""}`}
+                >
                   <div
-                    key={step.key}
-                    className={`timeline-step-item ${isPassed ? "passed" : ""} ${isCurrent ? "current" : ""}`}
+                    className="step-bullet"
+                    style={{
+                      borderColor: isCurrent ? (isStepCancelled ? "var(--danger)" : "var(--crimson)") : "var(--line)",
+                      background: isPassed ? (isStepCancelled ? "var(--danger)" : "var(--crimson)") : "var(--graphite)",
+                      color: isPassed ? "white" : "var(--silver)",
+                    }}
                   >
-                    <div className="step-bullet">
-                      {isPassed && idx < activeIndex ? "✓" : idx + 1}
-                    </div>
-                    <div className="step-info">
-                      <strong>{step.label}</strong>
-                      <p>{step.desc}</p>
-                    </div>
+                    {isStepCancelled ? "✕" : (isPassed && idx < activeIndex ? "✓" : idx + 1)}
                   </div>
-                );
-              })}
-            </div>
+                  <div className="step-info">
+                    <strong style={{ color: isCurrent ? (isStepCancelled ? "var(--danger)" : "var(--ivory)") : "var(--silver)" }}>{step.label}</strong>
+                    <p>{step.desc}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        )}
+        </div>
 
         <div className="tracker-details-grid">
           {/* تفاصيل العميل والوجهة */}
@@ -156,11 +187,11 @@ export function OrderTracker() {
             <ul className="details-list">
               <li>
                 <span>الاسم الكامل:</span>
-                <strong>{order.customerName}</strong>
+                <strong>{maskName(order.customerName)}</strong>
               </li>
               <li>
                 <span>رقم الهاتف:</span>
-                <strong>{order.phone}</strong>
+                <strong>{maskPhone(order.phone)}</strong>
               </li>
               <li>
                 <span>المنطقة:</span>
@@ -240,14 +271,14 @@ export function OrderTracker() {
               className="field num"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="مثال: 22234744257"
+              placeholder="مثال: 36000000"
               required
             />
           </label>
         </div>
 
         {error && (
-          <p className="form-error" role="alert">
+          <p className="form-error" role="alert" style={{ marginBottom: 18 }}>
             {error}
           </p>
         )}

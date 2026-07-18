@@ -211,7 +211,7 @@ export async function seedCore(db: AnyDb): Promise<void> {
       value: {
         nameAr: "متجر الصقر للعطور",
         nameLatin: "Falcon Store",
-        description: "عطور نيش ومصممين وتعبئة دقيقة بحجم 10ml في نواكشوط.",
+        description: "عطور نيش وديزاينر وتعبئة دقيقة بحجم 10ml في نواكشوط.",
         logoUrl: null
       }
     })
@@ -221,7 +221,7 @@ export async function seedCore(db: AnyDb): Promise<void> {
         value: {
           nameAr: "متجر الصقر للعطور",
           nameLatin: "Falcon Store",
-          description: "عطور نيش ومصممين وتعبئة دقيقة بحجم 10ml في نواكشوط.",
+          description: "عطور نيش وديزاينر وتعبئة دقيقة بحجم 10ml في نواكشوط.",
           logoUrl: null
         }
       }
@@ -234,7 +234,7 @@ export async function seedCore(db: AnyDb): Promise<void> {
       key: "hero",
       type: "hero",
       titleAr: "عطور أصلية مختارة بعناية",
-      bodyAr: "اكتشف عطور النيش والمصممين، وجرّب أحجام 10ml قبل شراء الزجاجة الكاملة.",
+      bodyAr: "اكتشف عطور النيش والديزاينر، وجرّب أحجام 10ml قبل شراء الزجاجة الكاملة.",
       enabled: true,
       sortOrder: 0,
     })

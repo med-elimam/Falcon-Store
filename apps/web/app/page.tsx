@@ -19,7 +19,7 @@ export default async function Home() {
   ]);
 
   const display = settings?.commerce.currencyDisplay ?? "mru";
-  const featured = (products ?? []).filter((p) => p.featured).slice(0, 4);
+  const featured = (products ?? []).filter((p) => p.featured).sort((a, b) => (b.inStock ? 1 : 0) - (a.inStock ? 1 : 0)).slice(0, 4);
   const hasDecants = (products ?? []).some((p) => p.hasDecant);
   const heroSection = sections.find((s) => s.key === "hero");
   const decantsSection = sections.find((s) => s.key === "decants");
@@ -56,7 +56,10 @@ export default async function Home() {
     .filter((item) => item !== null)
     .slice(0, 4);
 
-  const testimonials = sections.filter((s) => s.type === "testimonial" && s.bodyAr);
+  const testimonials = sections
+    .filter((s) => s.type === "testimonial" && s.bodyAr)
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .slice(0, 3);
   const faqs = sections.filter((s) => s.type === "faq" && s.titleAr && s.bodyAr);
 
   return (
@@ -64,7 +67,7 @@ export default async function Home() {
       <Hero
         content={{
           titleAr: heroSection?.titleAr ?? "عطور أصلية مختارة بعناية",
-          bodyAr: heroSection?.bodyAr ?? "اكتشف عطور النيش والمصممين، وجرّب أحجام 10ml قبل شراء الزجاجة الكاملة.",
+          bodyAr: heroSection?.bodyAr ?? "اكتشف عطور النيش والديزاينر، وجرّب أحجام 10ml قبل شراء الزجاجة الكاملة.",
           showDecantCta: hasDecants,
           trust: heroTrust,
         }}
@@ -74,7 +77,9 @@ export default async function Home() {
         <div className="shell">
           <div className="categories-grid">
             <Link href="/shop?category=niche" className="category-card card-niche">
-              <div className="category-card-bg" />
+              <div className="category-card-bg">
+                <Image src="/images/vault-boxes.jpg" alt="عطور نيش" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" priority />
+              </div>
               <div className="category-card-content">
                 <span className="kicker">مجموعات خاصة</span>
                 <h3>عطور نيش</h3>
@@ -84,7 +89,9 @@ export default async function Home() {
             </Link>
             
             <Link href="/shop?category=designer" className="category-card card-designer">
-              <div className="category-card-bg" />
+              <div className="category-card-bg">
+                <Image src="/images/collection.jpg" alt="عطور ديزاينر" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
+              </div>
               <div className="category-card-content">
                 <span className="kicker">دور الأزياء العالمية</span>
                 <h3>عطور ديزاينر</h3>
@@ -94,7 +101,9 @@ export default async function Home() {
             </Link>
             
             <Link href="/shop?family=oriental" className="category-card card-arabic">
-              <div className="category-card-bg" />
+              <div className="category-card-bg">
+                <Image src="/images/uniquee-duo.jpg" alt="عطور عربية" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
+              </div>
               <div className="category-card-content">
                 <span className="kicker">أصالة الشرق</span>
                 <h3>عطور عربية</h3>
@@ -104,7 +113,9 @@ export default async function Home() {
             </Link>
             
             <Link href="/shop?size=10ml" className="category-card card-decants">
-              <div className="category-card-bg" />
+              <div className="category-card-bg">
+                <Image src="/images/decants.jpg" alt="عينات 10ml" fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
+              </div>
               <div className="category-card-content">
                 <span className="kicker">جرّب بذكاء</span>
                 <h3>عينات 10ml</h3>
@@ -129,7 +140,7 @@ export default async function Home() {
         <section className="featured-section section-pad">
           <div className="shell section-heading">
             <div>
-              <span className="section-kicker">الأكثر طلبًا</span>
+              <span className="section-kicker">مختارات Falcon Store</span>
               <h2>عطور نوصي بتجربتها</h2>
             </div>
             <Link href="/shop" className="text-link">

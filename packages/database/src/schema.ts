@@ -437,7 +437,7 @@ export const contentSections = pgTable(
     updatedAt: updatedAt(),
     updatedBy: uuid("updated_by").references(() => users.id, { onDelete: "set null" }),
   },
-  (t) => [check("content_sections_type_chk", sql`${t.type} in ('hero','section','offer','banner')`)]
+  (t) => [check("content_sections_type_chk", sql`${t.type} in ('hero','section','offer','banner','faq','testimonial')`)]
 );
 
 export const mediaAssets = pgTable("media_assets", {

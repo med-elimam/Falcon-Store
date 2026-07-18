@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getPublicSettings();
   const nameAr = settings?.identity.nameAr ?? "فالكون ستور";
   const description =
-    settings?.identity.description ?? "متجر عطور في نواكشوط: اختيارات نيش ومصممين وتعبئة دقيقة بحجم 10ml.";
+    settings?.identity.description ?? "متجر عطور في نواكشوط: اختيارات نيش وديزاينر وتعبئة دقيقة بحجم 10ml.";
   return {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
     title: { default: `${nameAr} | عطور نواكشوط`, template: `%s | ${nameAr}` },

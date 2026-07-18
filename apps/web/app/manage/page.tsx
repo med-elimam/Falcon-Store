@@ -21,6 +21,9 @@ interface Overview {
     status: OrderStatus;
     createdAt: string;
   }[];
+  pendingOrdersCount?: number;
+  todayOrdersCount?: number;
+  outOfStockCount?: number;
 }
 
 interface SettingsPayload {
@@ -77,6 +80,18 @@ export default function OverviewPage() {
           <span>طلبات جديدة</span>
           <strong className="num">{newOrders}</strong>
         </article>
+        {data.pendingOrdersCount !== undefined && (
+          <article>
+            <span>طلبات معلقة</span>
+            <strong className="num">{data.pendingOrdersCount}</strong>
+          </article>
+        )}
+        {data.todayOrdersCount !== undefined && (
+          <article>
+            <span>طلبات اليوم</span>
+            <strong className="num">{data.todayOrdersCount}</strong>
+          </article>
+        )}
         <article>
           <span>مبيعات آخر 30 يومًا</span>
           <strong className="num">{formatMRU(data.revenue30dMru)}</strong>
@@ -99,6 +114,12 @@ export default function OverviewPage() {
           <article>
             <span>أحجام قاربت على النفاد</span>
             <strong className="num">{data.lowStockCount}</strong>
+          </article>
+        )}
+        {data.outOfStockCount !== undefined && data.outOfStockCount > 0 && (
+          <article style={{ borderLeft: "4px solid var(--danger)" }}>
+            <span style={{ color: "var(--danger)" }}>أحجام نفدت بالكامل</span>
+            <strong className="num" style={{ color: "var(--danger)" }}>{data.outOfStockCount}</strong>
           </article>
         )}
       </section>

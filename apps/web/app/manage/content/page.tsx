@@ -328,6 +328,10 @@ export default function ContentPage() {
                 className="btn btn-crimson"
                 disabled={busy}
                 onClick={async () => {
+                  if (form.enabled && (!form.titleAr.trim() || !form.bodyAr.trim())) {
+                    toast.push("القسم المفعّل يجب أن يحتوي على عنوان ومحتوى باللغة العربية.", "error");
+                    return;
+                  }
                   setBusy(true);
                   try {
                     await api(`/api/v1/admin/content/${editing.key}`, {

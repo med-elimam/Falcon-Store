@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { api, ApiError } from "@/lib/client-api";
-import { Chip, ErrorBlock, LoadingBlock, useAdminData, useMe, useToast } from "@/components/manage/ui";
+import { Chip, ErrorBlock, LoadingBlock, useAdminData, useMe, useToast, ConfirmButton } from "@/components/manage/ui";
 
 interface SessionRow {
   id: string;
@@ -225,9 +225,11 @@ export default function SecurityPage() {
           <div>
             <h2>الأجهزة والجلسات النشطة</h2>
           </div>
-          <button
+          <ConfirmButton
+            label="تسجيل الخروج من كل الأجهزة"
+            confirmLabel="تأكيد الخروج من الكل؟"
             className="btn btn-ghost"
-            onClick={async () => {
+            onConfirm={async () => {
               try {
                 await api("/api/v1/auth/logout-all", { method: "POST" });
                 refresh();
@@ -235,9 +237,7 @@ export default function SecurityPage() {
                 toast.push(err instanceof ApiError ? err.message : "تعذر التنفيذ.", "error");
               }
             }}
-          >
-            تسجيل الخروج من كل الأجهزة
-          </button>
+          />
         </div>
         {sessions.loading ? (
           <LoadingBlock />
@@ -268,9 +268,11 @@ export default function SecurityPage() {
                       {s.id === sessions.data!.currentId ? (
                         <Chip tone="info">الجلسة الحالية</Chip>
                       ) : (
-                        <button
+                        <ConfirmButton
+                          label="إنهاء"
+                          confirmLabel="تأكيد الإنهاء؟"
                           className="btn btn-ghost"
-                          onClick={async () => {
+                          onConfirm={async () => {
                             try {
                               await api(`/api/v1/auth/sessions/${s.id}`, { method: "DELETE" });
                               toast.push("أُنهيت الجلسة.");
@@ -279,9 +281,7 @@ export default function SecurityPage() {
                               toast.push(err instanceof ApiError ? err.message : "تعذر الإنهاء.", "error");
                             }
                           }}
-                        >
-                          إنهاء
-                        </button>
+                        />
                       )}
                     </td>
                   </tr>

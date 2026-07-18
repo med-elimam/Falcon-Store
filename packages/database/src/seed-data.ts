@@ -303,9 +303,9 @@ export const SEED_PRODUCTS: SeedProduct[] = [
 
 /** خيارات دفع معروفة محليًا — تُزرع معطّلة، وصاحب المتجر يفعّل ما يستخدمه فعلاً. */
 export const SEED_PAYMENT_METHODS = [
-  { key: "bankily", labelAr: "Bankily", labelFr: "Bankily", sortOrder: 0 },
-  { key: "masrvi", labelAr: "Masrvi", labelFr: "Masrvi", sortOrder: 1 },
-  { key: "sedad", labelAr: "Sedad", labelFr: "Sedad", sortOrder: 2 },
+  { key: "bankily", labelAr: "بنكيلي", labelFr: "Bankily", sortOrder: 0 },
+  { key: "masrvi", labelAr: "مصرفي", labelFr: "Masrvi", sortOrder: 1 },
+  { key: "sedad", labelAr: "السداد", labelFr: "Sedad", sortOrder: 2 },
   { key: "cod", labelAr: "الدفع عند الاستلام", labelFr: "Paiement à la livraison", sortOrder: 3 },
 ] as const;
 

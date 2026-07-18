@@ -8,11 +8,16 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "الأسئلة الشائعة والسياسات",
   description: "أجوبة مباشرة عن الأصالة والتوصيل والدفع والإرجاع في فالكون ستور.",
+  alternates: {
+    canonical: "/faq",
+  },
 };
 
 export default async function FaqPage() {
   const [settings, sections] = await Promise.all([getPublicSettings(), getContentSections()]);
-  const faqs = sections.filter((s) => s.type === "faq" && s.titleAr && s.bodyAr);
+  const faqs = sections
+    .filter((s) => s.type === "faq" && s.titleAr && s.bodyAr)
+    .sort((a, b) => a.sortOrder - b.sortOrder);
   const whatsapp = settings?.contact.whatsapp ?? null;
 
   /* السياسات نصوص حقيقية يكتبها صاحب المتجر — يظهر منها ما اكتمل فقط */
@@ -21,10 +26,29 @@ export default async function FaqPage() {
     settings?.policies.returns ? { key: "returns", title: "الاستبدال والإرجاع", body: settings.policies.returns } : null,
     settings?.policies.privacy ? { key: "privacy", title: "الخصوصية", body: settings.policies.privacy } : null,
     settings?.policies.terms ? { key: "terms", title: "شروط البيع", body: settings.policies.terms } : null,
-  ].filter((p) => p !== null);
+  ].filter((p) => p !== null) as Array<{ key: string; title: string; body: string }>;
+
+  const faqSchema = faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map((faq) => ({
+      "@type": "Question",
+      "name": faq.titleAr,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.bodyAr,
+      },
+    })),
+  } : null;
 
   return (
     <div className="page-shell">
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
       <section className="shop-hero">
         <div className="shell">
           <span className="section-kicker">المساعدة</span>
@@ -40,11 +64,11 @@ export default async function FaqPage() {
             <p>تُنشر الأسئلة والسياسات هنا فور اعتمادها من إدارة المتجر.</p>
           </div>
         ) : (
-          <div className="help-columns">
+          <div className="help-block" style={{ maxWidth: 800, marginInline: "auto" }}>
             {faqs.length > 0 && (
-              <div className="help-block">
-                <h2>الأسئلة الشائعة</h2>
-                <div className="faq-list">
+              <div style={{ marginBottom: 40 }}>
+                <h2 style={{ fontSize: "1.65rem", marginBottom: 20, fontWeight: 800 }}>الأسئلة الشائعة</h2>
+                <div className="faq-list" style={{ display: "grid", gap: 12 }}>
                   {faqs.map((f) => (
                     <details key={f.key} className="faq-item">
                       <summary>{f.titleAr}</summary>
@@ -55,9 +79,9 @@ export default async function FaqPage() {
               </div>
             )}
             {policies.length > 0 && (
-              <div className="help-block">
-                <h2>سياسات المتجر</h2>
-                <div className="faq-list">
+              <div>
+                <h2 style={{ fontSize: "1.65rem", marginBottom: 20, fontWeight: 800 }}>سياسات المتجر</h2>
+                <div className="faq-list" style={{ display: "grid", gap: 12 }}>
                   {policies.map((p) => (
                     <details key={p.key} className="faq-item">
                       <summary>{p.title}</summary>

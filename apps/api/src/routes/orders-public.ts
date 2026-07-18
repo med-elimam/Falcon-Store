@@ -28,6 +28,9 @@ interface OrderResponse {
   deliveryFeeMru: number | null;
   whatsappMessage: string;
   whatsappNumber: string | null;
+  paymentMethodLabel: string;
+  status: string;
+  phone: string;
 }
 
 export async function registerOrderPublicRoutes(app: FastifyInstance): Promise<void> {
@@ -256,6 +259,7 @@ export async function registerOrderPublicRoutes(app: FastifyInstance): Promise<v
           orderNumber: order.orderNumber,
           status: order.status,
           createdAt: order.createdAt,
+          updatedAt: order.updatedAt,
           customerName: order.customerName,
           phone: order.phone,
           area: order.area,
@@ -310,5 +314,8 @@ async function buildResponse(app: FastifyInstance, orderId: string): Promise<Ord
     deliveryFeeMru: order.deliveryFeeMru,
     whatsappMessage,
     whatsappNumber: (contact.whatsapp as string | null) ?? null,
+    paymentMethodLabel: order.paymentMethodLabel,
+    status: order.status,
+    phone: order.phone,
   };
 }

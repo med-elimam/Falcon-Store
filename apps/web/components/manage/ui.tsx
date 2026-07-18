@@ -157,11 +157,13 @@ export function ConfirmButton({
   confirmLabel,
   onConfirm,
   className = "btn btn-ghost",
+  disabled = false,
 }: {
   label: string;
   confirmLabel: string;
   onConfirm: () => void;
   className?: string;
+  disabled?: boolean;
 }) {
   const [arm, setArm] = useState(false);
   useEffect(() => {
@@ -173,6 +175,7 @@ export function ConfirmButton({
     <button
       type="button"
       className={className}
+      disabled={disabled}
       style={arm ? { borderColor: "var(--crimson-hot)", color: "var(--crimson-hot)" } : undefined}
       onClick={() => {
         if (arm) {

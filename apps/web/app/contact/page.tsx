@@ -11,12 +11,24 @@ export const metadata: Metadata = {
   description: "قنوات التواصل مع فالكون ستور في نواكشوط: واتساب، هاتف، عنوان المتجر وأوقات العمل.",
 };
 
+function formatPhoneVisual(phoneStr: string): string {
+  const digits = phoneStr.replace(/\D/g, "");
+  if (digits.length === 11 && digits.startsWith("222")) {
+    return `+222 ${digits.substring(3, 5)} ${digits.substring(5, 7)} ${digits.substring(7, 9)} ${digits.substring(9, 11)}`;
+  }
+  if (digits.length === 8) {
+    return `+222 ${digits.substring(0, 2)} ${digits.substring(2, 4)} ${digits.substring(4, 6)} ${digits.substring(6, 8)}`;
+  }
+  return phoneStr;
+}
+
 export default async function ContactPage() {
   const settings = await getPublicSettings();
   const contact = settings?.contact;
   const whatsapp = contact?.whatsapp ?? null;
   const phone = contact?.phone ?? null;
-  const email = contact?.email ?? null;
+  const emailRaw = contact?.email ?? null;
+  const email = emailRaw && emailRaw.trim() !== "" && !emailRaw.includes("example.com") && emailRaw !== "contact@falcon-store.com" ? emailRaw : null;
   const address = contact?.address ?? null;
   const addressIsUrl = address ? /(?:https?:\/\/|www\.|maps\.app\.)/i.test(address) : false;
   const addressLabel = address && !addressIsUrl ? address : null;
@@ -56,11 +68,11 @@ export default async function ContactPage() {
               </a>
             )}
             {phone && (
-              <a className="contact-card" href={`tel:${phone.replace(/\s+/g, "")}`}>
+              <a className="contact-card" href={`tel:${phone.replace(/\D/g, "")}`}>
                 <PhoneIcon />
                 <b>الهاتف</b>
                 <p className="num" dir="ltr">
-                  {phone}
+                  {formatPhoneVisual(phone)}
                 </p>
                 <span className="contact-card-action">اتصل الآن</span>
               </a>
