@@ -399,6 +399,7 @@ a.contact-card:hover { border-color: var(--accent-border); transform: translateY
 .drawer-close { background: none; border: none; color: var(--silver); font-size: 1.8rem; cursor: pointer; padding: 0 8px; line-height: 1; transition: color .2s; }
 .drawer-close:hover { color: var(--ivory); }
 .mobile-filter-trigger-btn { display: none; }
+.drawer-foot { position: sticky; bottom: 0; margin: 16px -20px -22px; padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px)); background: var(--graphite); border-top: 1px solid var(--line); }
 input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; background: var(--surface-soft); border-radius: 3px; outline: none; margin-block: 10px; }
 input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--crimson); cursor: pointer; transition: transform .15s; }
 input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
@@ -464,6 +465,9 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 .quantity-control button { border: 0; background: transparent; cursor: pointer; }.quantity-control button:disabled { opacity: .35; cursor: not-allowed; }
 .quantity-control output { display: grid; place-items: center; border-inline: 1px solid var(--line); }
 .buy-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.buy-reassure { list-style: none; margin: 18px 0 0; padding: 16px 0 0; border-top: 1px solid var(--line); display: grid; gap: 8px; }
+.buy-reassure li { position: relative; padding-inline-start: 20px; color: var(--muted); font-size: .85rem; line-height: 1.6; }
+.buy-reassure li::before { content: "✓"; position: absolute; inset-inline-start: 0; color: var(--success); font-weight: 700; }
 .config-warning { margin-top: 12px; color: var(--danger); font-size: .72rem; line-height: 1.7; }
 .product-facts { background: var(--graphite); border-block: 1px solid var(--line); }
 .facts-intro { margin-bottom: 44px; }

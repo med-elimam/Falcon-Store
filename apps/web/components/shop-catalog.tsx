@@ -98,17 +98,18 @@ export function ShopCatalog({
     const count = filtered.length;
     if (count === 0) return "لا توجد عطور مطابقة";
     if (count === 1) return "عطر واحد مطابق";
-    if (count === 2) return "عطران مطبقان";
+    if (count === 2) return "عطران مطابقان";
     if (count >= 3 && count <= 10) return `${count} عطور مطابقة`;
     return `${count} عطرًا مطابقًا`;
   }, [filtered.length]);
 
-  const renderFiltersContent = () => (
+  {/* بادئة السياق تمنع تكرار مُعرّفات DOM لأن الفلاتر تُعرَض مرتين (سطح المكتب + لوحة الهاتف) */}
+  const renderFiltersContent = (ctx: string) => (
     <>
       <div className="filter-block">
-        <label htmlFor="search">ابحث بالاسم أو العلامة</label>
+        <label htmlFor={`search-${ctx}`}>ابحث بالاسم أو العلامة</label>
         <input
-          id="search"
+          id={`search-${ctx}`}
           className="field"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -116,16 +117,16 @@ export function ShopCatalog({
         />
       </div>
       <div className="filter-block">
-        <label htmlFor="category">الفئة</label>
-        <select id="category" className="field" value={category} onChange={(e) => setCategory(e.target.value)}>
+        <label htmlFor={`category-${ctx}`}>الفئة</label>
+        <select id={`category-${ctx}`} className="field" value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="all">جميع الفئات</option>
           <option value="niche">عطور نيش</option>
           <option value="designer">عطور ديزاينر</option>
         </select>
       </div>
       <div className="filter-block">
-        <label htmlFor="brand">العلامة</label>
-        <select id="brand" className="field" value={brand} onChange={(e) => setBrand(e.target.value)}>
+        <label htmlFor={`brand-${ctx}`}>العلامة</label>
+        <select id={`brand-${ctx}`} className="field" value={brand} onChange={(e) => setBrand(e.target.value)}>
           <option value="all">جميع العلامات</option>
           {brands.map((item) => (
             <option key={item} value={item}>
@@ -135,8 +136,8 @@ export function ShopCatalog({
         </select>
       </div>
       <div className="filter-block">
-        <label htmlFor="gender">الجنس</label>
-        <select id="gender" className="field" value={gender} onChange={(e) => setGender(e.target.value)}>
+        <label htmlFor={`gender-${ctx}`}>الجنس</label>
+        <select id={`gender-${ctx}`} className="field" value={gender} onChange={(e) => setGender(e.target.value)}>
           <option value="all">جميع الأنواع</option>
           <option value="رجالي">رجالي</option>
           <option value="نسائي">نسائي</option>
@@ -144,9 +145,9 @@ export function ShopCatalog({
         </select>
       </div>
       <div className="filter-block">
-        <label htmlFor="priceRange">الحد الأقصى للسعر: <span className="num">{priceRange} MRU</span></label>
+        <label htmlFor={`priceRange-${ctx}`}>الحد الأقصى للسعر: <span className="num">{priceRange} MRU</span></label>
         <input
-          id="priceRange"
+          id={`priceRange-${ctx}`}
           type="range"
           min="0"
           max={maxProductPrice}
@@ -157,9 +158,9 @@ export function ShopCatalog({
         />
       </div>
       <div className="filter-block">
-        <label htmlFor="family">العائلة العطرية</label>
+        <label htmlFor={`family-${ctx}`}>العائلة العطرية</label>
         <select
-          id="family"
+          id={`family-${ctx}`}
           className="field"
           value={family}
           onChange={(e) => setFamily(e.target.value as Family | "all")}
@@ -173,9 +174,9 @@ export function ShopCatalog({
         </select>
       </div>
       <div className="filter-block">
-        <label htmlFor="time">وقت الاستخدام</label>
+        <label htmlFor={`time-${ctx}`}>وقت الاستخدام</label>
         <select
-          id="time"
+          id={`time-${ctx}`}
           className="field"
           value={time}
           onChange={(e) => setTime(e.target.value as TimeTag | "all")}
@@ -219,7 +220,7 @@ export function ShopCatalog({
     <div className="shop-layout">
       {/* Desktop Sidebar Filters */}
       <aside className="filters" aria-label="فلاتر العطور">
-        {renderFiltersContent()}
+        {renderFiltersContent("d")}
       </aside>
 
       {/* Mobile Drawer (Bottom Sheet) */}
@@ -235,7 +236,12 @@ export function ShopCatalog({
           </button>
         </div>
         <div className="drawer-body">
-          {renderFiltersContent()}
+          {renderFiltersContent("m")}
+        </div>
+        <div className="drawer-foot">
+          <button type="button" className="btn btn-crimson btn-block" onClick={() => setIsDrawerOpen(false)}>
+            عرض {matchingCountLabel}
+          </button>
         </div>
       </div>
 

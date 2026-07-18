@@ -12,14 +12,16 @@ import { WhatsAppIcon } from "./icons";
 
 const STOCK_LABELS = {
   available: "متوفر",
-  low_stock: "كمية محدودة",
-  out_of_stock: "غير متوفر",
+  low_stock: "بقي القليل",
+  out_of_stock: "نفد مؤقتًا",
 } as const;
 
 export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
   const settings = usePublicSettings();
   const display = settings?.commerce.currencyDisplay ?? "mru";
   const whatsapp = settings?.contact.whatsapp ?? null;
+  const hasDelivery = (settings?.deliveryZones.length ?? 0) > 0;
+  const paymentLabels = (settings?.paymentMethods ?? []).map((m) => m.labelAr);
   const reducedMotion = useReducedMotion();
   const add = useCart((state) => state.add);
   const variants = product.variants;
@@ -122,7 +124,11 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
             <div className={`availability ${selected.availability}`}>
               <span className={selected.isAvailable ? "dot available" : "dot"} />
               <b>{STOCK_LABELS[selected.availability]}</b>
-              {selected.isAvailable && <span>الكمية المتاحة: <b className="num">{selected.stockQuantity}</b></span>}
+              {selected.availability === "low_stock" && selected.stockQuantity > 0 && selected.stockQuantity <= 3 && (
+                <span>
+                  (بقي <b className="num">{selected.stockQuantity}</b>)
+                </span>
+              )}
               {selected.type === "decant" && <small>تعبئة 10ml من الزجاجة الأصلية</small>}
             </div>
 
@@ -175,6 +181,14 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
             </a>
           )}
         </div>
+
+        {(hasDelivery || paymentLabels.length > 0) && (
+          <ul className="buy-reassure">
+            {hasDelivery && <li>التوصيل داخل نواكشوط</li>}
+            {paymentLabels.length > 0 && <li>الدفع: {paymentLabels.join(" · ")}</li>}
+            <li>يُؤكَّد موعد التوصيل بعد الطلب</li>
+          </ul>
+        )}
       </div>
     </section>
   );

@@ -77,7 +77,22 @@ export function CheckoutForm() {
     }
   }
 
-  if (!mounted) return <div className="checkout-loading">جارٍ تجهيز طلبك…</div>;
+  if (!mounted) {
+    return (
+      <div className="checkout-grid" aria-hidden="true">
+        <div className="checkout-form">
+          <span className="sk-line" style={{ height: 28, width: "40%" }} />
+          <span className="sk-line" style={{ height: 50, marginTop: 18 }} />
+          <span className="sk-line" style={{ height: 50, marginTop: 10 }} />
+          <span className="sk-line" style={{ height: 50, marginTop: 10 }} />
+        </div>
+        <aside className="order-summary">
+          <span className="sk-line" style={{ height: 24, width: "50%" }} />
+          <span className="sk-line" style={{ height: 60, marginTop: 14 }} />
+        </aside>
+      </div>
+    );
+  }
 
   if (result) {
     return (
