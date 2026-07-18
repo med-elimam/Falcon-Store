@@ -291,23 +291,23 @@ export function CheckoutForm() {
       </form>
       
       <aside className={`order-summary ${summaryExpanded ? "is-expanded" : ""}`}>
-        <div
+        <button
+          type="button"
           className="summary-head"
-          style={{ cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center" }}
           onClick={() => setSummaryExpanded(!summaryExpanded)}
           aria-expanded={summaryExpanded}
           aria-label="توسيع أو طي ملخص الطلب"
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <h2>ملخص الطلب</h2>
+          <span className="summary-title">
+            <span className="summary-heading" role="heading" aria-level={2}>ملخص الطلب</span>
             <span className="num" style={{ fontSize: "0.82rem", background: "var(--surface-soft)", padding: "2px 8px", borderRadius: "4px" }}>
               {formatArabicItemCount(items.length)}
             </span>
-          </div>
+          </span>
           <span className="chevron-toggle" style={{ fontSize: "0.8rem", color: "var(--silver)" }}>
             {summaryExpanded ? "▲" : "▼"}
           </span>
-        </div>
+        </button>
         
         <div className="summary-body">
           <div className="summary-items-list" style={{ marginTop: 14 }}>
@@ -317,7 +317,7 @@ export function CheckoutForm() {
                   {item.image && <Image src={mediaSrc(item.image)} alt="" fill sizes="68px" />}
                 </div>
                 <div>
-                  <small>{item.brand}</small>
+                  <small lang="en" dir="ltr">{item.brand}</small>
                   <strong>{item.nameAr}</strong>
                   <span>
                     {item.size} × <b className="num">{item.qty}</b>

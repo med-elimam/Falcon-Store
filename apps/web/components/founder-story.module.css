@@ -22,6 +22,7 @@
 }
 
 .media img {
+  object-fit: cover;
   object-position: 35% center;
 }
 
@@ -86,7 +87,7 @@
 }
 
 .signature strong {
-  font-family: var(--font-bodoni), Georgia, serif;
+  font-family: var(--font-manrope), "Segoe UI", Arial, sans-serif;
   font-size: 1rem;
   letter-spacing: 0.04em;
 }
@@ -112,7 +113,7 @@
 
   .media {
     min-height: 0;
-    aspect-ratio: 4 / 3;
+    height: clamp(280px, 48vw, 420px);
   }
 
   .content {
@@ -122,15 +123,15 @@
 
 @media (max-width: 760px) {
   .section {
-    margin-bottom: 64px;
-  }
-
-  .media {
-    aspect-ratio: 4 / 3.25;
+    margin-bottom: 20px;
   }
 
   .media img {
-    object-position: 33% center;
+    object-position: 33% 38%;
+  }
+
+  .media {
+    height: clamp(220px, 52vw, 300px);
   }
 
   .content {
@@ -142,9 +143,11 @@
   }
 
   .content h2 {
-    font-size: clamp(1.8rem, 9vw, 2.6rem);
+    width: min(100%, 21ch);
+    font-size: clamp(1.5rem, 6.4vw, 2.05rem);
     letter-spacing: normal;
-    line-height: 1.12;
+    line-height: 1.18;
+    text-wrap: balance;
   }
 
   .copy {

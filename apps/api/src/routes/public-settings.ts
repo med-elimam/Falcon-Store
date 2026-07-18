@@ -27,7 +27,8 @@ export async function registerPublicSettingsRoutes(app: FastifyInstance): Promis
       .from(contentSections)
       .where(eq(contentSections.enabled, true))
       .orderBy(asc(contentSections.sortOrder));
-    reply.header("cache-control", "public, max-age=60, s-maxage=300, stale-while-revalidate=600");
+    // Admin-managed content must reflect saved edits on the next storefront refresh.
+    reply.header("cache-control", "no-store, max-age=0");
     return { sections: rows };
   });
 }

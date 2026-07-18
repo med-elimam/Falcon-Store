@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Alexandria, Bodoni_Moda, Manrope } from "next/font/google";
+import "@fontsource-variable/alexandria";
+import "@fontsource-variable/manrope";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { CartDrawer } from "@/components/cart-drawer";
@@ -11,27 +12,6 @@ import { WhatsAppFab } from "@/components/whatsapp-fab";
 import { BrandAccent } from "@/components/brand-accent";
 import { accentVars } from "@/lib/accent";
 import { getPublicSettings } from "@/lib/api";
-
-const alexandria = Alexandria({
-  subsets: ["arabic", "latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-alexandria",
-  display: "swap",
-});
-
-const bodoni = Bodoni_Moda({
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  variable: "--font-bodoni",
-  display: "swap",
-});
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-manrope",
-  display: "swap",
-});
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getPublicSettings();
@@ -69,8 +49,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       dir="rtl"
       data-theme={ssrResolved}
       data-theme-mode={defaultTheme}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${alexandria.variable} ${bodoni.variable} ${manrope.variable}`}
       style={htmlStyle}
     >
       <head>

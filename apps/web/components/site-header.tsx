@@ -123,14 +123,19 @@ export function SiteHeader() {
         <Link href="/" className="brand-lockup" aria-label="فالكون ستور — الرئيسية">
           <FalconMark className="brand-mark" />
           <span>
-            <strong>FALCON STORE</strong>
+            <strong lang="en">FALCON STORE</strong>
             <small>عطور أصلية مختارة بعناية</small>
           </span>
         </Link>
 
         <nav className="desktop-nav" aria-label="التنقل الرئيسي">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className={pathname === link.href ? "active" : ""}>
+            <Link
+              key={link.href}
+              href={link.href}
+              className={pathname === link.href ? "active" : ""}
+              aria-current={pathname === link.href ? "page" : undefined}
+            >
               {link.label}
             </Link>
           ))}
@@ -197,6 +202,7 @@ export function SiteHeader() {
                       href={link.href}
                       onClick={() => setMenuOpen(false)}
                       data-active={pathname === link.href || undefined}
+                      aria-current={pathname === link.href ? "page" : undefined}
                     >
                       {link.label}
                     </Link>

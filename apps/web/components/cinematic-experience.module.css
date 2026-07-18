@@ -48,8 +48,8 @@
 .lockup { display: flex; align-items: center; gap: 10px; justify-self: start; }
 .lockup > svg { width: 46px; color: oklch(0.58 0.21 15); }
 .lockup span { display: grid; direction: ltr; }
-.lockup b { font-family: var(--font-bodoni), Georgia, serif; letter-spacing: .12em; font-size: .82rem; }
-.lockup small { color: oklch(0.8 0.02 250); font-size: .54rem; letter-spacing: .2em; }
+.lockup b { font-family: var(--font-manrope), "Segoe UI", Arial, sans-serif; letter-spacing: .12em; font-size: .82rem; }
+.lockup small { color: oklch(0.8 0.02 250); font-family: var(--font-manrope), "Segoe UI", Arial, sans-serif; font-size: .54rem; letter-spacing: .2em; }
 .prototypeHeader nav { display: flex; align-items: center; gap: clamp(20px, 3vw, 42px); font-size: .78rem; }
 .prototypeHeader nav a { position: relative; }
 .prototypeHeader nav a::after { content: ""; position: absolute; inset: auto 0 -8px; height: 1px; background: currentColor; transform: scaleX(0); transition: transform .25s cubic-bezier(.22,1,.36,1); }
@@ -76,11 +76,11 @@
 .signatureTrack { min-height: 300svh; position: relative; background: var(--xp-bg); }
 .signatureStage { --scene-glow: #486a88; position: sticky; top: 0; min-height: 100svh; padding: 100px clamp(24px, 6vw, 96px) 40px; display: grid; grid-template-columns: minmax(260px, .82fr) minmax(340px, 1.18fr); grid-template-rows: 1fr auto; align-items: center; gap: 20px 5vw; overflow: hidden; background: radial-gradient(circle at 66% 48%, color-mix(in srgb, var(--scene-glow) 34%, transparent), transparent 34%), linear-gradient(135deg, var(--xp-bg-soft), var(--xp-bg)); transition: background .65s cubic-bezier(.22,1,.36,1); }
 .signatureStage::before { content: ""; position: absolute; inset: 8% -10% auto auto; width: 58vw; aspect-ratio: 1; border: 1px solid color-mix(in srgb, var(--scene-glow) 55%, transparent); border-radius: 50%; opacity: .42; transform: rotate(-12deg); }
-.sceneNumber { position: absolute; inset: 92px auto auto 4vw; font: clamp(8rem, 24vw, 24rem)/.8 var(--font-bodoni), Georgia, serif; color: color-mix(in srgb, var(--xp-ink) 5%, transparent); direction: ltr; }
+.sceneNumber { position: absolute; inset: 92px auto auto 4vw; font: clamp(8rem, 24vw, 24rem)/.8 var(--font-manrope), "Segoe UI", Arial, sans-serif; color: color-mix(in srgb, var(--xp-ink) 5%, transparent); direction: ltr; }
 .signatureCopy { position: relative; z-index: 2; max-width: 520px; }
 .signatureCopy p { margin: 0 0 14px; color: var(--xp-metal); text-transform: uppercase; letter-spacing: .16em; font-size: .72rem; direction: ltr; }
 .signatureCopy h2 { margin: 0; font-size: clamp(2.8rem, 6vw, 4.5rem); line-height: 1.15; letter-spacing: normal; }
-.signatureCopy > span { display: block; margin-top: 12px; font: italic 1.1rem var(--font-bodoni), Georgia, serif; color: var(--xp-muted); direction: ltr; }
+.signatureCopy > span { display: block; margin-top: 12px; font: italic 1.1rem var(--font-manrope), "Segoe UI", Arial, sans-serif; color: var(--xp-muted); direction: ltr; }
 .signatureCopy > strong { display: block; margin-top: 26px; font-size: 1.05rem; }
 .textAction { display: inline-flex; align-items: center; gap: 10px; margin-top: 30px; color: var(--xp-ink); border-bottom: 1px solid var(--xp-line); padding-bottom: 7px; }
 .textAction svg { width: 18px; }

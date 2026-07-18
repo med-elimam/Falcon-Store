@@ -77,6 +77,16 @@ export async function getPublicSettings(): Promise<PublicSettingsDTO | null> {
 }
 
 export async function getContentSections(): Promise<ContentSectionDTO[]> {
-  const data = await serverFetch<{ sections: ContentSectionDTO[] }>("/api/v1/public/content", 300, ["content"]);
-  return data?.sections ?? [];
+  try {
+    const res = await fetch(`${API_URL}/api/v1/public/content`, {
+      cache: "no-store",
+      headers: { accept: "application/json", "cache-control": "no-cache" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return [];
+    const data = (await res.json()) as { sections: ContentSectionDTO[] };
+    return data.sections ?? [];
+  } catch {
+    return [];
+  }
 }

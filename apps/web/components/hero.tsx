@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, FalconMark } from "./icons";
+import { ArrowLeft, DropIcon, ShieldIcon, TruckIcon, WhatsAppIcon } from "./icons";
 import { Hero3D } from "./hero-3d";
 
 export interface HeroContent {
@@ -9,39 +9,67 @@ export interface HeroContent {
   trust: string[];
 }
 
+/* أيقونة مناسبة لكل نقطة ثقة قادمة من إعدادات المتجر */
+function trustIcon(label: string) {
+  if (label.includes("توصيل")) return <TruckIcon />;
+  if (label.includes("واتساب")) return <WhatsAppIcon />;
+  if (label.includes("10ml")) return <DropIcon />;
+  return <ShieldIcon />;
+}
+
+/* Falcon 3D Side Reveal: مشهد واحد متصل بخلفية الصفحة — الزجاجة تدخل من جهة،
+   والنص يقابلها. لا شبكة أعمدة ولا صندوق منفصل للمشهد. */
 export function Hero({ content }: { content: HeroContent }) {
   return (
     <section className="hero">
-      <div className="shell hero-grid">
+      <div className="hero-stage" aria-hidden="true">
+        <Hero3D />
+      </div>
+      <div className="shell hero-copy-wrap">
         <div className="hero-copy">
-          <div className="hero-signature">
-            <FalconMark />
-          </div>
+          <p className="hero-eyebrow">إما العظمة أو لا شيء</p>
           <h1>{content.titleAr}</h1>
-          {content.bodyAr && <p>{content.bodyAr}</p>}
+          {content.bodyAr && <p className="hero-lead">{content.bodyAr}</p>}
           <div className="hero-actions">
-            <Link href="/shop" className="btn btn-crimson">
-              تصفح العطور <ArrowLeft />
-            </Link>
-            {content.showDecantCta && (
-              <Link href="/shop?size=10ml" className="btn btn-ghost">
-                اكتشف أحجام 10ml
+            {content.showDecantCta ? (
+              <>
+                <Link href="/shop?size=10ml" className="btn btn-crimson">
+                  جرّب 10ml <ArrowLeft />
+                </Link>
+                <Link href="/shop" className="btn btn-ghost">
+                  كل العطور
+                </Link>
+              </>
+            ) : (
+              <Link href="/shop" className="btn btn-crimson">
+                تصفح العطور <ArrowLeft />
               </Link>
             )}
           </div>
-          {content.trust.length > 0 && (
-            <ul className="hero-trust">
-              {content.trust.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          )}
-        </div>
-        <div className="hero-visual">
-          <Hero3D />
-          <span className="hero-visual-caption"><em>إما العظمة</em> أو لا شيء</span>
         </div>
       </div>
+      {content.trust.length > 0 && (
+        <div className="hero-trust" aria-label="مزايا المتجر">
+          <div className="hero-trust-track">
+            <ul className="hero-trust-list">
+              {content.trust.map((item) => (
+                <li key={item}>
+                  {trustIcon(item)}
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <ul className="hero-trust-list" aria-hidden="true">
+              {content.trust.map((item) => (
+                <li key={`duplicate-${item}`}>
+                  {trustIcon(item)}
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

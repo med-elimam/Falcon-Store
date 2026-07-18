@@ -45,7 +45,7 @@ export function Footer({ settings }: { settings: PublicSettingsDTO | null }) {
         {/* هوية المتجر */}
         <div className="footer-brand">
           <FalconMark />
-          <strong>FALCON STORE</strong>
+          <strong lang="en">FALCON STORE</strong>
           {identity?.description && <p>{identity.description}</p>}
         </div>
 
@@ -110,9 +110,9 @@ export function Footer({ settings }: { settings: PublicSettingsDTO | null }) {
 
       {/* ── الشريط السفلي ── */}
       <div className="shell footer-bottom">
-        <span>© {new Date().getFullYear()} Falcon Store</span>
+        <span lang="en" dir="ltr">© {new Date().getFullYear()} Falcon Store</span>
         <span className="footer-bottom-brand">
-          {identity?.nameAr ?? "متجر الصقر للعطور"} — LUXURY SCENTS
+          {identity?.nameAr ?? "متجر الصقر للعطور"} — <span lang="en" dir="ltr">LUXURY SCENTS</span>
         </span>
       </div>
     </footer>

@@ -36,8 +36,22 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
 
   const gallery = product.images.length ? product.images : product.image ? [{ url: product.image, alt: null }] : [];
   const waText = selected
-    ? `السلام عليكم، أريد طلب عطر:\nالمنتج: ${product.nameAr}\nالماركة: ${product.brandName ?? "غير محدد"}\nالحجم: ${selected.sizeLabel}\nالسعر: ${formatMRU(selected.priceMru, display)}`
+    ? `السلام عليكم، ${selected.isAvailable ? "أريد طلب عطر" : "أريد معرفة موعد توفر هذا العطر"}:\nالمنتج: ${product.nameAr}\nالماركة: ${product.brandName ?? "غير محدد"}\nالحجم: ${selected.sizeLabel}\nالكمية: ${quantity}\nسعر الوحدة: ${formatMRU(selected.priceMru, display)}\nالإجمالي: ${formatMRU(selected.priceMru * quantity, display)}`
     : `السلام عليكم، أريد الاستفسار عن عطر: ${product.nameAr} (${product.brandName ?? "غير محدد"})`;
+
+  function addSelectedToCart() {
+    if (!selected?.isAvailable) return;
+    add({
+      variantId: selected.id,
+      slug: product.slug,
+      nameAr: product.nameAr,
+      brand: product.brandName,
+      image: product.image,
+      size: selected.sizeLabel,
+      priceMru: selected.priceMru,
+      maxQuantity: selected.stockQuantity,
+    }, quantity);
+  }
 
   function chooseVariant(id: string) {
     setVariantId(id);
@@ -47,6 +61,8 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
   /* تنقّل المعرض بالسحب على الهاتف + تكبير بالنقر (Lightbox) */
   const [lightbox, setLightbox] = useState(false);
   const touchStartX = useRef(0);
+  const lightboxRef = useRef<HTMLDivElement>(null);
+  const lightboxTriggerRef = useRef<HTMLButtonElement>(null);
   const galleryIndex = gallery.findIndex((entry) => entry.url === image);
   const goRelative = (dir: number) => {
     if (gallery.length < 2) return;
@@ -64,15 +80,38 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
   useEffect(() => {
     if (!lightbox) return;
     document.body.style.overflow = "hidden";
+    const dialog = lightboxRef.current;
+    const trigger = lightboxTriggerRef.current;
+    const focusables = () =>
+      dialog
+        ? [...dialog.querySelectorAll<HTMLButtonElement>('button:not([disabled])')].filter(
+            (element) => element.offsetParent !== null
+          )
+        : [];
+    focusables()[0]?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setLightbox(false);
       if (e.key === "ArrowLeft") goRelative(1);
       if (e.key === "ArrowRight") goRelative(-1);
+      if (e.key === "Tab") {
+        const items = focusables();
+        if (!items.length) return;
+        const first = items[0]!;
+        const last = items[items.length - 1]!;
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
       document.removeEventListener("keydown", onKey);
+      trigger?.focus();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lightbox, galleryIndex, gallery.length]);
@@ -88,6 +127,7 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
         >
           {image && (
             <button
+              ref={lightboxTriggerRef}
               type="button"
               className="gallery-zoom-btn"
               onClick={() => setLightbox(true)}
@@ -140,12 +180,12 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
 
       <div className="product-buy">
         <div className="product-brand">
-          <span>{product.brandName}</span>
+          <span lang="en" dir="ltr">{product.brandName}</span>
           <i />
           {product.concentration && <span>{product.concentration}</span>}
         </div>
         <h1>{product.nameAr}</h1>
-        {product.nameFr && <strong className="latin-name">{product.nameFr}</strong>}
+        {product.nameFr && <strong className="latin-name" lang="fr" dir="ltr">{product.nameFr}</strong>}
         {product.descriptionAr && <p className="product-description">{product.descriptionAr}</p>}
 
         <fieldset className="size-picker">
@@ -212,25 +252,13 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
             type="button"
             className="btn btn-crimson"
             disabled={!selected?.isAvailable}
-            onClick={() => {
-              if (!selected?.isAvailable) return;
-              add({
-                variantId: selected.id,
-                slug: product.slug,
-                nameAr: product.nameAr,
-                brand: product.brandName,
-                image: product.image,
-                size: selected.sizeLabel,
-                priceMru: selected.priceMru,
-                maxQuantity: selected.stockQuantity,
-              }, quantity);
-            }}
+            onClick={addSelectedToCart}
           >
             {selected?.isAvailable ? "أضف إلى السلة" : "غير متوفر"}
           </button>
           {whatsapp && (
             <a className="btn btn-whatsapp" href={waLink(whatsapp, waText)} target="_blank" rel="noopener noreferrer">
-              <WhatsAppIcon /> واتساب
+              <WhatsAppIcon /> {selected?.isAvailable ? "اطلب عبر واتساب" : "اسأل عن موعد التوفر"}
             </a>
           )}
         </div>
@@ -244,9 +272,32 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
         )}
       </div>
 
+      {selected && (
+        <div className="mobile-buy-bar" aria-label="إجراء الشراء السريع">
+          <div>
+            <small className={selected.isAvailable ? "is-available" : ""}>
+              {STOCK_LABELS[selected.availability]} · <span className="num">{selected.sizeLabel}</span>
+            </small>
+            <strong className="num">{formatMRU(selected.priceMru, display)}</strong>
+          </div>
+          {selected.isAvailable ? (
+            <button type="button" className="btn btn-crimson" onClick={addSelectedToCart}>
+              أضف للسلة
+            </button>
+          ) : whatsapp ? (
+            <a className="btn btn-whatsapp" href={waLink(whatsapp, waText)} target="_blank" rel="noopener noreferrer">
+              اسأل عن التوفر
+            </a>
+          ) : (
+            <span className="mobile-buy-unavailable">نفد مؤقتًا</span>
+          )}
+        </div>
+      )}
+
       <AnimatePresence>
         {lightbox && image && (
           <motion.div
+            ref={lightboxRef}
             className="lightbox"
             role="dialog"
             aria-modal="true"
@@ -258,7 +309,15 @@ export function ProductPurchase({ product }: { product: ProductDetailDTO }) {
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
           >
-            <button type="button" className="lightbox-close" aria-label="إغلاق">
+            <button
+              type="button"
+              className="lightbox-close"
+              aria-label="إغلاق"
+              onClick={(event) => {
+                event.stopPropagation();
+                setLightbox(false);
+              }}
+            >
               ×
             </button>
             {gallery.length > 1 && (

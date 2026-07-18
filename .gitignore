@@ -1,7 +1,6 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
+# Dependencies
+/node_modules/
+**/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -10,57 +9,64 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
-/.next/
+# Tests and generated output
+/coverage/
+**/coverage/
+**/.next/
 /out/
+**/dist/
+**/build/
+*.tsbuildinfo
+next-env.d.ts
 
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
+# Logs and local runtime files
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+**/media-uploads/
+**/.tmp/
 
-# env files (can opt-in for committing if needed)
-.env*
+# Local environment and deployment state
+.env
+.env.*
+!.env.example
+!**/.env.example
+.vercel/
 
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
+# Local tools
 .claude/
 .codex/
 .agents/
+.impeccable/
 
-# monorepo artifacts
-apps/api/dist/
-media-uploads/
-.env
-.env.local
+# Operating-system files and local certificates
+.DS_Store
+Thumbs.db
+*.pem
 
+# Local database clusters, exports, and backups
+/database-backups/
+/database-local/
+/database-exports/
+**/pgdata/
+**/.pglite/
+*.dump
+*.dump.gz
+*.backup
+*.backup.gz
+*.pgdump
+*.pgbackup
+*.sql
+*.sql.gz
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
 
-@"
-node_modules/
-.next/
-**/.next/
-dist/
-**/dist/
-build/
-**/build/
-.env
-.env.local
-.env.*.local
-*.log
-"@ | Set-Content .gitignore
+# Official database migrations are source code and must remain trackable
+!packages/database/migrations/
+!packages/database/migrations/**/*.sql

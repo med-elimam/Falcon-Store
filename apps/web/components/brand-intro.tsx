@@ -2,9 +2,8 @@ import { FalconMark } from "@/components/icons";
 import styles from "./brand-intro.module.css";
 
 const INTRO_DURATION_MS = 1450;
-const REDUCED_MOTION_DURATION_MS = 80;
 
-const INTRO_BOOTSTRAP = `(function(){var d=document.documentElement;var played=sessionStorage.getItem('falcon-intro-played');var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(played||reduced){d.dataset.falconIntro='hidden';return;}d.dataset.falconIntro='visible';sessionStorage.setItem('falcon-intro-played','true');setTimeout(function(){d.dataset.falconIntro='hidden';},1450);})();`;
+const INTRO_BOOTSTRAP = `(function(){var d=document.documentElement;var played=sessionStorage.getItem('falcon-intro-played');var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(played||reduced){d.dataset.falconIntro='hidden';return;}d.dataset.falconIntro='visible';sessionStorage.setItem('falcon-intro-played','true');setTimeout(function(){d.dataset.falconIntro='hidden';},${INTRO_DURATION_MS});})();`;
 
 export function BrandIntro() {
   return (

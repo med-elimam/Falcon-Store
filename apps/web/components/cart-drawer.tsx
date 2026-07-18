@@ -93,6 +93,8 @@ export function CartDrawer() {
           <motion.aside
             ref={drawerRef}
             className="cart-drawer"
+            role="dialog"
+            aria-modal="true"
             initial={reducedMotion ? false : { x: "100%" }}
             animate={{ x: 0 }}
             exit={reducedMotion ? undefined : { x: "100%" }}
@@ -139,7 +141,7 @@ export function CartDrawer() {
                             {item.image && <Image src={mediaSrc(item.image)} alt={item.nameAr} fill sizes="84px" />}
                           </div>
                           <div className="cart-copy">
-                            <small>{item.brand}</small>
+                            <small lang="en" dir="ltr">{item.brand}</small>
                             <h3>{item.nameAr}</h3>
                             <span>
                               {item.size} · <b className="num">{formatMRU(item.priceMru, display)}</b>

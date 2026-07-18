@@ -10,10 +10,12 @@ export function FounderStory({
   titleAr,
   bodyAr,
   whatsapp,
+  imageUrl,
 }: {
   titleAr: string | null;
   bodyAr: string;
   whatsapp: string | null;
+  imageUrl: string;
 }) {
   const contactUrl = whatsapp
     ? waLink(whatsapp, "السلام عليكم، أريد الاستفسار عن عطور فالكون ستور.")
@@ -24,7 +26,7 @@ export function FounderStory({
       <div className={styles.frame}>
         <Reveal className={styles.media}>
           <Image
-            src="/images/falcon-founder.jpg"
+            src={imageUrl}
             alt="فريق فالكون ستور في نواكشوط"
             fill
             sizes="(max-width: 760px) calc(100vw - 28px), (max-width: 1200px) 54vw, 720px"

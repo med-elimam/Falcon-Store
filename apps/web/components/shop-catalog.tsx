@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { CurrencyDisplay, Family, ProductCardDTO, TimeTag } from "@falcon/shared";
 import { FAMILY_LABELS, TIME_LABELS } from "@falcon/shared";
@@ -25,6 +25,8 @@ export function ShopCatalog({
   const familyParam = params.get("family");
   const timeParam = params.get("time");
   const categoryParam = params.get("category");
+  const sizeParam = params.get("size");
+  const hasUrlIntent = Boolean(familyParam || timeParam || categoryParam || sizeParam);
   const settings = usePublicSettings();
 
   // Filter States
@@ -34,7 +36,7 @@ export function ShopCatalog({
   const [family, setFamily] = useState<Family | "all">(isFamily(familyParam) ? familyParam : "all");
   const [time, setTime] = useState<TimeTag | "all">(isTime(timeParam) ? timeParam : "all");
   const [gender, setGender] = useState("all");
-  const [decantOnly, setDecantOnly] = useState(params.get("size") === "10ml");
+  const [decantOnly, setDecantOnly] = useState(sizeParam === "10ml");
   const [inStockOnly, setInStockOnly] = useState(false);
   const [sort, setSort] = useState<Sort>("featured");
 
@@ -43,6 +45,47 @@ export function ShopCatalog({
 
   // Mobile Drawer State
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const drawerTriggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isDrawerOpen) return;
+    const drawer = drawerRef.current;
+    const trigger = drawerTriggerRef.current;
+    const focusables = () =>
+      drawer
+        ? [...drawer.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), input:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+          )].filter((element) => element.offsetParent !== null)
+        : [];
+
+    document.body.style.overflow = "hidden";
+    focusables()[0]?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsDrawerOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const items = focusables();
+      if (!items.length) return;
+      const first = items[0]!;
+      const last = items[items.length - 1]!;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", onKeyDown);
+      trigger?.focus();
+    };
+  }, [isDrawerOpen]);
 
   const brands = useMemo(() => [...new Set(products.map((p) => p.brandName).filter(Boolean))], [products]);
 
@@ -60,7 +103,7 @@ export function ShopCatalog({
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem("falcon-shop-filters");
-      if (saved) {
+      if (saved && !hasUrlIntent) {
         const data = JSON.parse(saved);
         /* استعادة الفلاتر بعد الترطيب مقصودة داخل effect لتفادي تعارض SSR/الترطيب */
         /* eslint-disable react-hooks/set-state-in-effect */
@@ -77,16 +120,10 @@ export function ShopCatalog({
         /* eslint-enable react-hooks/set-state-in-effect */
       }
 
-      const savedScroll = sessionStorage.getItem("falcon-shop-scroll");
-      if (savedScroll) {
-        setTimeout(() => {
-          window.scrollTo({ top: Number(savedScroll), behavior: "instant" as ScrollBehavior });
-        }, 120);
-      }
     } catch (e) {
       console.error(e);
     }
-  }, []);
+  }, [hasUrlIntent]);
 
   // Save Filter States to sessionStorage
   useEffect(() => {
@@ -97,15 +134,6 @@ export function ShopCatalog({
       console.error(e);
     }
   }, [query, brand, category, family, time, gender, decantOnly, inStockOnly, sort, priceRange]);
-
-  // Track Scroll Position
-  useEffect(() => {
-    const handleScroll = () => {
-      sessionStorage.setItem("falcon-shop-scroll", window.scrollY.toString());
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   const filtered = useMemo(
     () =>
@@ -339,19 +367,35 @@ export function ShopCatalog({
         onClick={() => setIsDrawerOpen(false)}
       />
       <div
+        ref={drawerRef}
         className={`mobile-filters-drawer ${isDrawerOpen ? "open" : ""}`}
         aria-hidden={!isDrawerOpen}
+        inert={!isDrawerOpen}
         role="dialog"
         aria-modal="true"
-        aria-label="فلاتر البحث"
+        aria-label="الفلترة والترتيب"
       >
         <div className="drawer-header">
           <h3>{matchingCountLabel}</h3>
-          <button type="button" className="drawer-close" onClick={() => setIsDrawerOpen(false)} aria-label="إغلاق فلاتر البحث">
+          <button type="button" className="drawer-close" onClick={() => setIsDrawerOpen(false)} aria-label="إغلاق الفلترة والترتيب">
             &times;
           </button>
         </div>
         <div className="drawer-body">
+          <div className="filter-block">
+            <label htmlFor="sort-m">الترتيب</label>
+            <select
+              id="sort-m"
+              className="field"
+              value={sort}
+              onChange={(e) => setSort(e.target.value as Sort)}
+            >
+              <option value="featured">المميزة أولاً</option>
+              <option value="low">السعر من الأقل</option>
+              <option value="high">السعر من الأعلى</option>
+              <option value="name">الاسم</option>
+            </select>
+          </div>
           {renderFiltersContent("m")}
         </div>
         <div className="drawer-foot" style={{ display: "flex", gap: "10px" }}>
@@ -374,11 +418,12 @@ export function ShopCatalog({
           <span>{countLabel}</span>
           <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
             <button
+              ref={drawerTriggerRef}
               type="button"
               className="mobile-filter-trigger-btn"
               onClick={() => setIsDrawerOpen(true)}
             >
-              الفلاتر
+              الفلترة والترتيب
               {activeFiltersCount > 0 && (
                 <span style={{
                   background: "var(--crimson)",
@@ -394,7 +439,7 @@ export function ShopCatalog({
               )}
             </button>
             <select
-              className="field"
+              className="field catalog-sort"
               style={{ minWidth: 140 }}
               value={sort}
               onChange={(e) => setSort(e.target.value as Sort)}

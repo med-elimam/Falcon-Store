@@ -207,7 +207,7 @@ export function OrderTracker() {
               {items.map((item) => (
                 <div key={item.id} className="tracker-product-item">
                   <div>
-                    {item.brandName && <small>{item.brandName}</small>}
+                    {item.brandName && <small lang="en" dir="ltr">{item.brandName}</small>}
                     <strong>{item.nameAr}</strong>
                     <span>الحجم: {item.size} × {item.qty}</span>
                   </div>

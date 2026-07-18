@@ -8,6 +8,8 @@ import { FounderStory } from "@/components/founder-story";
 import { ArrowLeft, DropIcon, ShieldIcon, TruckIcon, WalletIcon, WhatsAppIcon } from "@/components/icons";
 import { getCatalog, getContentSections, getPublicSettings } from "@/lib/api";
 import { waLink } from "@/lib/format";
+import { homeImage, HOME_IMAGES_SECTION_KEY } from "@/lib/home-images";
+import { mediaSrc } from "@/lib/media";
 
 export const revalidate = 300;
 
@@ -24,6 +26,8 @@ export default async function Home() {
   const heroSection = sections.find((s) => s.key === "hero");
   const decantsSection = sections.find((s) => s.key === "decants");
   const storySection = sections.find((s) => s.key === "story" && s.bodyAr);
+  const homeImagesSection = sections.find((s) => s.key === HOME_IMAGES_SECTION_KEY);
+  const homeImages = homeImagesSection?.data;
   const offers = sections.filter((s) => s.type === "offer");
   const whatsapp = settings?.contact.whatsapp ?? null;
   const authenticity = settings?.policies.authenticity ?? null;
@@ -78,7 +82,7 @@ export default async function Home() {
           <div className="categories-grid">
             <Link href="/shop?category=niche" className="category-card card-niche">
               <div className="category-card-bg" style={{ position: "absolute", inset: 0 }}>
-                <Image src="/images/vault-boxes.jpg" alt="عطور نيش" fill sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" priority />
+                <Image src={mediaSrc(homeImage(homeImages, "categoryNiche"))} alt="" fill loading="eager" sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" />
               </div>
               <div className="category-card-content">
                 <span className="kicker">مجموعات خاصة</span>
@@ -87,10 +91,10 @@ export default async function Home() {
                 <span className="arrow-btn">←</span>
               </div>
             </Link>
-            
+
             <Link href="/shop?category=designer" className="category-card card-designer">
               <div className="category-card-bg" style={{ position: "absolute", inset: 0 }}>
-                <Image src="/images/collection.jpg" alt="عطور ديزاينر" fill sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" />
+                <Image src={mediaSrc(homeImage(homeImages, "categoryDesigner"))} alt="" fill sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" />
               </div>
               <div className="category-card-content">
                 <span className="kicker">دور الأزياء العالمية</span>
@@ -99,10 +103,10 @@ export default async function Home() {
                 <span className="arrow-btn">←</span>
               </div>
             </Link>
-            
+
             <Link href="/shop?family=oriental" className="category-card card-arabic">
               <div className="category-card-bg" style={{ position: "absolute", inset: 0 }}>
-                <Image src="/images/uniquee-duo.jpg" alt="عطور عربية" fill sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" />
+                <Image src={mediaSrc(homeImage(homeImages, "categoryArabic"))} alt="" fill sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" />
               </div>
               <div className="category-card-content">
                 <span className="kicker">أصالة الشرق</span>
@@ -111,10 +115,10 @@ export default async function Home() {
                 <span className="arrow-btn">←</span>
               </div>
             </Link>
-            
+
             <Link href="/shop?size=10ml" className="category-card card-decants">
               <div className="category-card-bg" style={{ position: "absolute", inset: 0 }}>
-                <Image src="/images/decants.jpg" alt="عينات 10ml" fill sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" />
+                <Image src={mediaSrc(homeImage(homeImages, "categoryDecants"))} alt="" fill sizes="(max-width: 768px) 80vw, 25vw" className="object-cover" />
               </div>
               <div className="category-card-content">
                 <span className="kicker">جرّب بذكاء</span>
@@ -159,10 +163,10 @@ export default async function Home() {
         <section id="decants" className="decant-section">
           <div className="decant-media">
             <Image
-              src="/images/decants.jpg"
+              src={mediaSrc(homeImage(homeImages, "decants"))}
               alt="عبوات 10ml مع زجاجات العطور الأصلية في فالكون ستور"
               fill
-              sizes="100vw"
+              sizes="(max-width: 760px) calc(100vw - 28px), 52vw"
             />
           </div>
           <div className="shell decant-layout">
@@ -234,7 +238,12 @@ export default async function Home() {
       )}
 
       {storySection && (
-        <FounderStory titleAr={storySection.titleAr} bodyAr={storySection.bodyAr!} whatsapp={whatsapp} />
+        <FounderStory
+          titleAr={storySection.titleAr}
+          bodyAr={storySection.bodyAr!}
+          whatsapp={whatsapp}
+          imageUrl={mediaSrc(homeImage(homeImages, "story"))}
+        />
       )}
 
       {testimonials.length > 0 && (
@@ -252,8 +261,15 @@ export default async function Home() {
                   <span className="testimonial-quote" aria-hidden="true">
                     ”
                   </span>
-                  <p>{t.bodyAr}</p>
-                  {t.titleAr && <b>{t.titleAr}</b>}
+                  <blockquote className="testimonial-copy">
+                    <p>{t.bodyAr}</p>
+                  </blockquote>
+                  {t.titleAr && (
+                    <div className="testimonial-author">
+                      <span aria-hidden="true">{t.titleAr.trim().charAt(0)}</span>
+                      <b>{t.titleAr}</b>
+                    </div>
+                  )}
                 </Reveal>
               ))}
             </div>
@@ -286,7 +302,12 @@ export default async function Home() {
       {(whatsapp || addressLabel || mapUrl) && (
         <section id="visit" className="visit-section">
           <div className="visit-image">
-            <Image src="/images/storefront.jpg" alt="واجهة متجر فالكون ستور للعطور في نواكشوط" fill sizes="100vw" />
+            <Image
+              src={mediaSrc(homeImage(homeImages, "visit"))}
+              alt="واجهة متجر فالكون ستور للعطور في نواكشوط"
+              fill
+              sizes="(max-width: 760px) calc(100vw - 28px), 52vw"
+            />
           </div>
           <div className="visit-content">
             <Reveal>

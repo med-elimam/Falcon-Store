@@ -212,7 +212,7 @@
 }
 
 .identity strong {
-  font-family: var(--font-bodoni), Georgia, serif;
+  font-family: var(--font-manrope), "Segoe UI", Arial, sans-serif;
   font-size: clamp(1.55rem, 4.2vw, 2.45rem);
   font-weight: 500;
   line-height: 1;

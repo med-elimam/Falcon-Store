@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { HeroSceneHandle } from "./hero-3d-scene";
 
-/* يُحمَّل three.js كسولاً وفقط عندما يدعم الجهاز WebGL ولا يفضّل تقليل الحركة؛
-   الصورة الأصلية تبقى تحته كبديل دائم. */
+/* يُحمَّل three.js كسولاً عندما يدعم الجهاز WebGL؛ الخلفية اللونية المتجانسة
+   تبقى تحته كبديل خفيف من دون صورة تنافس المشهد. */
 export function Hero3D() {
   const ref = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
@@ -31,8 +31,17 @@ export function Hero3D() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    /* مع «تقليل الحركة» نعرض إطاراً ثابتاً بدل إلغاء المشهد — الزجاجة تظهر للجميع */
-    const staticMode = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    /* مع «تقليل الحركة» نعرض المشهد ثابتاً، أما توفير البيانات والاتصالات البطيئة
+       فتستخدم الخلفية اللونية الخفيفة بلا تحميل three.js. */
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }).connection;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const shouldUseLightweightBackdrop =
+      connection?.saveData === true ||
+      connection?.effectiveType === "slow-2g" ||
+      connection?.effectiveType === "2g";
+    if (shouldUseLightweightBackdrop) return;
     const probe = document.createElement("canvas");
     if (!probe.getContext("webgl2") && !probe.getContext("webgl")) return;
 
@@ -49,7 +58,7 @@ export function Hero3D() {
 
     import("./hero-3d-scene").then(({ createHeroScene }) => {
       if (disposed) return;
-      handle = createHeroScene(el, () => setReady(true), { staticMode });
+      handle = createHeroScene(el, () => setReady(true), { staticMode: prefersReducedMotion });
       io = new IntersectionObserver(([entry]) => {
         inView = entry.isIntersecting;
         sync();

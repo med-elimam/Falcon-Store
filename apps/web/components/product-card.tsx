@@ -53,9 +53,9 @@ export function ProductCard({
 
       <div className="product-meta">
         <div>
-          <small>{product.brandName}</small>
+          <small lang="en" dir="ltr">{product.brandName}</small>
           <h3><Link href={`/product/${product.slug}`}>{product.nameAr}</Link></h3>
-          {product.nameFr && <span>{product.nameFr}</span>}
+          {product.nameFr && <span lang="fr" dir="ltr">{product.nameFr}</span>}
         </div>
         {selected && <strong className="product-live-price num">{formatMRU(selected.priceMru, display)}</strong>}
       </div>
@@ -88,26 +88,30 @@ export function ProductCard({
       )}
 
       <div className="product-actions">
-        <button
-          type="button"
-          className="quick-add"
-          disabled={!selected?.isAvailable}
-          onClick={() => {
-            if (!selected?.isAvailable) return;
-            add({
-              variantId: selected.id,
-              slug: product.slug,
-              nameAr: product.nameAr,
-              brand: product.brandName,
-              image: product.image,
-              size: selected.sizeLabel,
-              priceMru: selected.priceMru,
-              maxQuantity: selected.stockQuantity,
-            });
-          }}
-        >
-          {selected?.isAvailable ? `أضف ${selected.sizeLabel} إلى السلة` : "غير متوفر"}
-        </button>
+        {selected?.isAvailable ? (
+          <button
+            type="button"
+            className="quick-add"
+            onClick={() => {
+              add({
+                variantId: selected.id,
+                slug: product.slug,
+                nameAr: product.nameAr,
+                brand: product.brandName,
+                image: product.image,
+                size: selected.sizeLabel,
+                priceMru: selected.priceMru,
+                maxQuantity: selected.stockQuantity,
+              });
+            }}
+          >
+            أضف {selected.sizeLabel} إلى السلة
+          </button>
+        ) : (
+          <Link href={`/product/${product.slug}`} className="quick-add sold-out-link">
+            تفاصيل وموعد التوفر
+          </Link>
+        )}
         <Link href={`/product/${product.slug}`} className="round-link" aria-label={`تفاصيل ${product.nameAr}`}>
           <ArrowLeft />
         </Link>

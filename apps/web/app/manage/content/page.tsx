@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { api, ApiError } from "@/lib/client-api";
+import { HOME_IMAGES_SECTION_KEY } from "@/lib/home-images";
+import { HomeImagesEditor } from "@/components/manage/home-images-editor";
 import {
   Chip,
   ConfirmButton,
@@ -21,6 +23,7 @@ interface Section {
   bodyAr: string | null;
   titleFr: string | null;
   bodyFr: string | null;
+  data: Record<string, unknown> | null;
   enabled: boolean;
   sortOrder: number;
 }
@@ -209,6 +212,7 @@ export default function ContentPage() {
         bodyAr: null,
         titleFr: null,
         bodyFr: null,
+        data: null,
         enabled: false,
         sortOrder,
       }
@@ -223,6 +227,11 @@ export default function ContentPage() {
           <h1>محتوى الموقع</h1>
         </div>
       </header>
+      <HomeImagesEditor
+        key={JSON.stringify(data.sections.find((section) => section.key === HOME_IMAGES_SECTION_KEY)?.data ?? null)}
+        section={data.sections.find((section) => section.key === HOME_IMAGES_SECTION_KEY)}
+        onSaved={reload}
+      />
       <section className="manage-card">
         <div className="manage-card-head">
           <div>
@@ -342,6 +351,7 @@ export default function ContentPage() {
                         bodyAr: form.bodyAr.trim() || null,
                         titleFr: form.titleFr.trim() || null,
                         bodyFr: form.bodyFr.trim() || null,
+                        data: editing.data,
                         enabled: form.enabled,
                         sortOrder: editing.sortOrder,
                       },

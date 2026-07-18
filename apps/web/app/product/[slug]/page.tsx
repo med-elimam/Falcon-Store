@@ -92,92 +92,87 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         dangerouslySetInnerHTML={{ __html: JSON.stringify([productLd, breadcrumbLd]) }}
       />
       <ProductPurchase product={product} />
-      <section className="product-facts section-pad">
-        <div className="shell">
-          <div className="facts-intro">
-            <span className="section-kicker">هوية الرائحة</span>
-            <h2>تفاصيل العطر</h2>
-          </div>
-          <div className="facts-grid">
-            {product.families.length > 0 && (
-              <div>
-                <small>الطابع</small>
-                <strong>{product.families.map((f) => FAMILY_LABELS[f as Family]).join(" · ")}</strong>
-              </div>
-            )}
-            {product.seasons && (
-              <div>
-                <small>الموسم</small>
-                <strong>{product.seasons}</strong>
-              </div>
-            )}
-            {product.projection && (
-              <div>
-                <small>الفوحان</small>
-                <strong>{product.projection}</strong>
-              </div>
-            )}
-            {product.origin && (
-              <div>
-                <small>المنشأ</small>
-                <strong>{product.origin}</strong>
-              </div>
-            )}
-            {product.gender && (
-              <div>
-                <small>النوع</small>
-                <strong>{product.gender}</strong>
-              </div>
-            )}
-            {product.concentration && (
-              <div>
-                <small>التركيز</small>
-                <strong>{product.concentration}</strong>
-              </div>
-            )}
-          </div>
+      <section className="product-profile section-pad" aria-label="بصمة العطر">
+        <div className="shell product-profile-grid">
+          <section className="product-profile-block" aria-labelledby="scent-identity-title">
+            <h2 id="scent-identity-title">هوية العطر</h2>
+            <p className="product-profile-caption">ملخص سريع يساعدك على معرفة إن كان يناسب ذوقك.</p>
+            <dl className="scent-facts">
+              {product.families.length > 0 && (
+                <div>
+                  <dt>الطابع</dt>
+                  <dd>{product.families.map((f) => FAMILY_LABELS[f as Family]).join(" · ")}</dd>
+                </div>
+              )}
+              {product.seasons && (
+                <div>
+                  <dt>الموسم</dt>
+                  <dd>{product.seasons}</dd>
+                </div>
+              )}
+              {product.projection && (
+                <div>
+                  <dt>الفوحان</dt>
+                  <dd>{product.projection}</dd>
+                </div>
+              )}
+              {product.origin && (
+                <div>
+                  <dt>المنشأ</dt>
+                  <dd>{product.origin}</dd>
+                </div>
+              )}
+              {product.gender && (
+                <div>
+                  <dt>النوع</dt>
+                  <dd>{product.gender}</dd>
+                </div>
+              )}
+              {product.concentration && (
+                <div>
+                  <dt>التركيز</dt>
+                  <dd>{product.concentration}</dd>
+                </div>
+              )}
+            </dl>
+          </section>
+          {(product.notesTop.length > 0 || product.notesHeart.length > 0 || product.notesBase.length > 0) && (
+            <section className="product-profile-block" aria-labelledby="scent-timeline-title">
+              <h2 id="scent-timeline-title">تطوّر الرائحة</h2>
+              <p className="product-profile-caption">قد يختلف الثبات والفوحان باختلاف البشرة والطقس.</p>
+              <ol className="scent-timeline">
+                {product.notesTop.length > 0 && (
+                  <li>
+                    <span className="num">01</span>
+                    <div>
+                      <span>الافتتاحية</span>
+                      <strong>{product.notesTop.join(" · ")}</strong>
+                    </div>
+                  </li>
+                )}
+                {product.notesHeart.length > 0 && (
+                  <li>
+                    <span className="num">02</span>
+                    <div>
+                      <span>قلب العطر</span>
+                      <strong>{product.notesHeart.join(" · ")}</strong>
+                    </div>
+                  </li>
+                )}
+                {product.notesBase.length > 0 && (
+                  <li>
+                    <span className="num">03</span>
+                    <div>
+                      <span>القاعدة</span>
+                      <strong>{product.notesBase.join(" · ")}</strong>
+                    </div>
+                  </li>
+                )}
+              </ol>
+            </section>
+          )}
         </div>
       </section>
-      {(product.notesTop.length > 0 || product.notesHeart.length > 0 || product.notesBase.length > 0) && (
-        <section className="notes-section section-pad">
-          <div className="shell notes-layout">
-            <div>
-              <span className="section-kicker">الهرم العطري</span>
-              <h2>الرائحة عبر الوقت</h2>
-              <p>الثبات والفوحان قد يختلفان حسب البشرة والطقس وطريقة الاستخدام.</p>
-            </div>
-            <div className="note-stack">
-              {product.notesTop.length > 0 && (
-                <article>
-                  <span className="num">01</span>
-                  <div>
-                    <small>الافتتاحية</small>
-                    <strong>{product.notesTop.join(" · ")}</strong>
-                  </div>
-                </article>
-              )}
-              {product.notesHeart.length > 0 && (
-                <article>
-                  <span className="num">02</span>
-                  <div>
-                    <small>قلب العطر</small>
-                    <strong>{product.notesHeart.join(" · ")}</strong>
-                  </div>
-                </article>
-              )}
-              {product.notesBase.length > 0 && (
-                <article>
-                  <span className="num">03</span>
-                  <div>
-                    <small>القاعدة</small>
-                    <strong>{product.notesBase.join(" · ")}</strong>
-                  </div>
-                </article>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
       {related.length > 0 && (
         <section className="related section-pad">
           <div className="shell">

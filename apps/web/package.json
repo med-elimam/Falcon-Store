@@ -12,6 +12,8 @@
   "dependencies": {
     "@falcon/shared": "*",
     "@falcon/validation": "*",
+    "@fontsource-variable/alexandria": "^5.2.8",
+    "@fontsource-variable/manrope": "^5.2.8",
     "@types/three": "^0.185.1",
     "framer-motion": "^12.42.2",
     "next": "16.2.10",
