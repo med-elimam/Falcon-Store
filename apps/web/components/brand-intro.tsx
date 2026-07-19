@@ -1,28 +1,28 @@
 import { FalconMark } from "@/components/icons";
 import styles from "./brand-intro.module.css";
 
-/* افتتاحية «خزنة العطر» — تُعرض عند كل دخول أو تحديث للرئيسية:
-   ومضات ضوء تمسح العتمة، شعار الصقر يُرسم بخيط ذهبي، الاسم يتماسك حرفاً حرفاً،
-   ثم تنكشف الصفحة كانتشار رذاذ من قلب الشعار وتُسلّم الدور لدخول الزجاجة ثلاثية الأبعاد.
+/* افتتاحية «خزنة العطر». المبدأ الأساسي لتفادي أي وميض:
+   الغطاء يظهر افتراضياً من أول إطار عبر CSS حرج سطريّ في <head>، ويتلاشى بأنيميشن
+   CSS خالص (falconIntroOut). لا يعتمد إطلاقاً على تنفيذ JavaScript قبل الرسم — فحتى
+   لو تأخّر السكربت أو تعطّل، لا يظهر المحتوى قبل الافتتاحية ولا تبقى عالقة.
+   السكربت مهمّته الثانوية فقط: تعليم الانتهاء (لإخفائها نهائياً)، وتخطّيها بأي تفاعل,
+   ومنع تكرارها في تنقّلات SPA. تُصيَّر الحاوية في الرئيسية فقط. */
 
-   الإقلاع (سكربت + CSS حرج) يُركّب سطرياً في <head> عبر الـ layout الجذري فيعمل قبل
-   أول رسم: السكربت يضبط سمة الحالة، والـ CSS الحرج يغطّي الشاشة فوراً بلون الخزنة —
-   فلا يظهر المحتوى للحظة قبل الافتتاحية حتى في وضع التطوير حيث تتأخّر وحدات CSS.
-   مقيّد بالمسار «/»، ولا يعمل في تنقلات الـ SPA، ويُتخطّى بأي نقرة أو مفتاح أو تمرير. */
+/* المدة الكلية للغطاء = زمن البقاء ثم التلاشي. متطابقة مع falconIntroOut في CSS الحرج. */
+const INTRO_MS = 2200;
+const INTRO_REDUCED_MS = 900;
 
-const INTRO_MS = 2100;
-const INTRO_REDUCED_MS = 700;
+/* سكربت سطريّ في <head>: يضبط «done» عند الانتهاء أو التخطّي فيُخفي الغطاء نهائياً.
+   لا يضبط «visible» — الظهور هو الحالة الافتراضية في CSS الحرج. */
+export const INTRO_BOOTSTRAP = `(function(){if(location.pathname!=='/')return;var d=document.documentElement;if(d.getAttribute('data-falcon-intro')==='done')return;var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;var done=false;var evs=['pointerdown','keydown','wheel','touchmove'];function rm(){for(var i=0;i<evs.length;i++)removeEventListener(evs[i],end,true);}function end(){if(done)return;done=true;d.setAttribute('data-falcon-intro','done');rm();}setTimeout(end,reduced?${INTRO_REDUCED_MS}:${INTRO_MS});for(var i=0;i<evs.length;i++)addEventListener(evs[i],end,{capture:true,passive:true});})();`;
 
-/* يُركّب سطرياً في <head> عبر الـ layout — يعمل قبل الترطيب فلا وميض. */
-export const INTRO_BOOTSTRAP = `(function(){if(location.pathname!=='/')return;var d=document.documentElement;var reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(reduced)d.dataset.falconIntroReduced='true';d.dataset.falconIntro='visible';var done=false;function end(){if(done)return;done=true;d.dataset.falconIntro='hidden';removeEventListener('click',end,true);removeEventListener('keydown',end,true);removeEventListener('wheel',end,true);removeEventListener('touchmove',end,true);}setTimeout(end,reduced?${INTRO_REDUCED_MS}:${INTRO_MS});addEventListener('click',end,true);addEventListener('keydown',end,true);addEventListener('wheel',end,{capture:true,passive:true});addEventListener('touchmove',end,{capture:true,passive:true});})();`;
-
-/* CSS حرج سطري: يغطّي الشاشة بلون الخزنة لحظة ضبط السمة، قبل تحميل وحدة CSS.
-   يستهدف المعرّف الثابت #falcon-intro (لا الصنف المُجزّأ) كي يُطبَّق فوراً. */
+/* CSS حرج سطريّ في <head>: الغطاء ظاهر افتراضياً ويتلاشى بأنيميشن خالص.
+   يستهدف المعرّف الثابت #falcon-intro كي يُطبَّق فوراً قبل تحميل وحدة CSS. */
 export const INTRO_CRITICAL_CSS =
-  "#falcon-intro{display:none}" +
-  'html[data-falcon-intro="visible"] #falcon-intro{display:grid;place-items:center;position:fixed;inset:0;z-index:10000;background:#070707;overflow:hidden}' +
-  'html[data-falcon-intro="visible"] body{overflow:hidden}' +
-  'html[data-falcon-intro="hidden"] #falcon-intro{display:none}';
+  "#falcon-intro{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;overflow:hidden;background:#070707;animation:falconIntroOut 2200ms cubic-bezier(.4,0,.2,1) forwards}" +
+  "@media (prefers-reduced-motion:reduce){#falcon-intro{animation-duration:900ms}}" +
+  'html[data-falcon-intro="done"] #falcon-intro{display:none}' +
+  "@keyframes falconIntroOut{0%,63%{opacity:1;visibility:visible}100%{opacity:0;visibility:hidden}}";
 
 export function BrandIntro() {
   return (

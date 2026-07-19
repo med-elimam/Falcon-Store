@@ -1,51 +1,14 @@
-/* افتتاحية «خزنة العطر» — عتمة أوبسيديان تُمسح بومضات ضوء، شعار يُرسم بخيط ذهبي,
-   ثم تنكشف الصفحة كانتشار رذاذ من قلب الشعار (mask دائري ناعم يتسع).
-   الأسود هنا هو نفسه أسود الـ hero فيبدو الكشف امتداداً واحداً بلا حواف.
-   التوقيت مشدود (~2.1ث) كي يرى المشتري المنتج بسرعة بلا انتظار. */
-
-@property --intro-r {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: -18%;
-}
+/* افتتاحية «خزنة العطر» — المحتوى الداخلي فقط (الشعار، الاسم، الومضات، الرذاذ).
+   الغطاء والظهور والتلاشي يملكها CSS الحرج السطريّ في <head> (#falcon-intro) كي تعمل
+   من أول إطار بلا اعتماد على JavaScript أو على تحميل هذه الوحدة.
+   هذه العناصر تُبنى فوق الغطاء أثناء بقائه، ثم تتلاشى معه (الحاوية تخفت شفافيتها). */
 
 .intro {
-  --intro-obsidian: #070707;
   --intro-ivory: #f3efe8;
   --intro-gold: #c8a25e;
   --intro-gold-bright: #e6c98f;
   --intro-crimson: #a20f35;
   --intro-out: cubic-bezier(0.16, 1, 0.3, 1);
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  display: none;
-  place-items: center;
-  overflow: hidden;
-  isolation: isolate;
-  background: var(--intro-obsidian);
-  pointer-events: auto;
-  touch-action: none;
-  overscroll-behavior: contain;
-  -webkit-mask-image: radial-gradient(
-    circle at 50% 44%,
-    transparent calc(var(--intro-r) - 0%),
-    #000 calc(var(--intro-r) + 18%)
-  );
-  mask-image: radial-gradient(
-    circle at 50% 44%,
-    transparent calc(var(--intro-r) - 0%),
-    #000 calc(var(--intro-r) + 18%)
-  );
-}
-
-:global(html[data-falcon-intro="visible"]) .intro {
-  display: grid;
-  animation: introReveal 2100ms linear both;
-}
-
-:global(html[data-falcon-intro="hidden"]) .intro {
-  display: none;
 }
 
 /* حبيبات فيلمية خفيفة تمنح العتمة ملمساً سينمائياً */
@@ -126,7 +89,7 @@
   place-items: center;
   gap: clamp(22px, 3.4vh, 34px);
   transform: translateY(-4vh);
-  animation: stageDrift 2100ms var(--intro-out) both;
+  animation: stageDrift 2200ms var(--intro-out) both;
 }
 
 .markWrap {
@@ -228,55 +191,24 @@
   animation: taglineRise 420ms var(--intro-out) 960ms both;
 }
 
-/* ===== تقليل الحركة: تكوين ساكن يظهر ويتلاشى سريعاً ===== */
-:global(html[data-falcon-intro-reduced="true"]) .intro {
-  -webkit-mask-image: none;
-  mask-image: none;
-  animation: introFadeReduced 700ms linear both;
-}
-
-:global(html[data-falcon-intro-reduced="true"]) .streak,
-:global(html[data-falcon-intro-reduced="true"]) .mist,
-:global(html[data-falcon-intro-reduced="true"]) .sheen {
-  display: none;
-}
-
-:global(html[data-falcon-intro-reduced="true"]) .stage,
-:global(html[data-falcon-intro-reduced="true"]) .mark path:first-child,
-:global(html[data-falcon-intro-reduced="true"]) .mark path:last-child,
-:global(html[data-falcon-intro-reduced="true"]) .identity strong,
-:global(html[data-falcon-intro-reduced="true"]) .divider i,
-:global(html[data-falcon-intro-reduced="true"]) .divider em,
-:global(html[data-falcon-intro-reduced="true"]) .tagline {
-  animation: none;
-  opacity: 1;
-  transform: none;
-  stroke-dashoffset: 0;
-}
-
-@keyframes introReveal {
-  0%,
-  66% {
-    --intro-r: -18%;
+/* تقليل الحركة: محتوى ساكن يظهر ثابتاً (الغطاء يتلاشى بسرعة عبر CSS الحرج) */
+@media (prefers-reduced-motion: reduce) {
+  .streak,
+  .mist,
+  .sheen {
+    display: none;
+  }
+  .stage,
+  .mark path:first-child,
+  .mark path:last-child,
+  .identity strong,
+  .divider i,
+  .divider em,
+  .tagline {
+    animation: none;
     opacity: 1;
-  }
-  90% {
-    --intro-r: 150%;
-    opacity: 1;
-  }
-  100% {
-    --intro-r: 150%;
-    opacity: 0;
-  }
-}
-
-@keyframes introFadeReduced {
-  0%,
-  62% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
+    transform: none;
+    stroke-dashoffset: 0;
   }
 }
 

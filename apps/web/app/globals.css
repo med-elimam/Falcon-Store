@@ -259,7 +259,8 @@ p { text-wrap: pretty; }
 .hero-stage { position: absolute; inset: 0; background: transparent; }
 .hero-stage::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgb(7 7 7 / .22), rgb(7 7 7 / .68)); }
 .hero-3d { z-index: 0; }
-.hero-copy-wrap { position: relative; z-index: 2; width: 100%; pointer-events: none; padding-block: clamp(28px, 5vh, 56px); display: grid; align-items: center; }
+/* المسافة العلوية أكبر من السفلية كي ينزل النص ويتنفّس تحت الهيدر الثابت على سطح المكتب */
+.hero-copy-wrap { position: relative; z-index: 2; width: 100%; pointer-events: none; padding-block: clamp(64px, 14vh, 170px) clamp(28px, 5vh, 60px); display: grid; align-items: center; }
 .hero-copy { max-width: 540px; }
 .hero-copy a, .hero-copy button { pointer-events: auto; }
 .hero-eyebrow { display: inline-flex; align-items: center; gap: 12px; margin: 0 0 18px; color: #ff7896; font-size: clamp(.92rem, 1.4vw, 1.1rem); font-weight: 700; animation: hero-copy-in .7s var(--ease) both; }
