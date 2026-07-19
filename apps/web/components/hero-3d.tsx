@@ -87,7 +87,7 @@ export function Hero3D() {
         inset: 0,
         overflow: "hidden",
         opacity: ready ? 1 : 0,
-        transition: "opacity 1.4s ease",
+        transition: "opacity 0.55s ease",
       }}
       aria-hidden="true"
     />

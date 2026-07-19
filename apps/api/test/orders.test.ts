@@ -209,5 +209,48 @@ describe("order creation, stock and idempotency", () => {
     expect(reopen.statusCode).toBe(200);
     expect(await getVariantStock(variantId)).toBe(2);
     expect(await getRevenue30d()).toBe(revenueBeforeCancel);
+
+    /* إلغاء ثانٍ بعد إعادة الفتح لا يعيد المخزون من جديد — كان الخلل يضيف الكمية كل دورة إلغاء */
+    const cancelAgain = await ctx.app.inject({
+      method: "PATCH",
+      url: `/api/v1/admin/orders/${orderId}/status`,
+      headers: authed(ownerCookie),
+      payload: { status: "cancelled", note: "إلغاء ثانٍ" },
+    });
+    expect(cancelAgain.statusCode).toBe(200);
+    expect(await getVariantStock(variantId)).toBe(2);
+  });
+
+  it("rejects a partial phone on tracking but accepts the full number in any format", async () => {
+    const created = await ctx.app.inject({
+      method: "POST",
+      url: "/api/v1/orders",
+      headers: { origin: TEST_ORIGIN },
+      payload: {
+        customerName: "زبون تتبّع",
+        phone: "22239998877",
+        deliveryZoneId: zoneId,
+        paymentMethodId: paymentId,
+        idempotencyKey: randomUUID(),
+        items: [{ variantId, qty: 1 }],
+      },
+    });
+    expect(created.statusCode).toBe(201);
+    const orderNumber = created.json().orderNumber as string;
+
+    /* جزء من الرقم لم يعد يكفي — التطابق الجزئي كان يسمح بتخمين طلبات الغير */
+    const partial = await ctx.app.inject({
+      method: "GET",
+      url: `/api/v1/orders/track?orderNumber=${orderNumber}&phone=39998`,
+    });
+    expect(partial.statusCode).toBe(400);
+
+    /* الرقم الكامل يعمل، ويتسامح مع صيغة +222 والمسافات */
+    const exact = await ctx.app.inject({
+      method: "GET",
+      url: `/api/v1/orders/track?orderNumber=${orderNumber}&phone=${encodeURIComponent("+222 39 99 88 77")}`,
+    });
+    expect(exact.statusCode).toBe(200);
+    expect(exact.json().order.orderNumber).toBe(orderNumber);
   });
 });

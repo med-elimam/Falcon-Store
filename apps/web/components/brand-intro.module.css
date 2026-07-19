@@ -1,6 +1,7 @@
 /* افتتاحية «خزنة العطر» — عتمة أوبسيديان تُمسح بومضات ضوء، شعار يُرسم بخيط ذهبي,
    ثم تنكشف الصفحة كانتشار رذاذ من قلب الشعار (mask دائري ناعم يتسع).
-   الأسود هنا هو نفسه أسود الـ hero فيبدو الكشف امتداداً واحداً بلا حواف. */
+   الأسود هنا هو نفسه أسود الـ hero فيبدو الكشف امتداداً واحداً بلا حواف.
+   التوقيت مشدود (~2.1ث) كي يرى المشتري المنتج بسرعة بلا انتظار. */
 
 @property --intro-r {
   syntax: "<percentage>";
@@ -40,7 +41,7 @@
 
 :global(html[data-falcon-intro="visible"]) .intro {
   display: grid;
-  animation: introReveal 2450ms linear both;
+  animation: introReveal 2100ms linear both;
 }
 
 :global(html[data-falcon-intro="hidden"]) .intro {
@@ -72,14 +73,14 @@
 .streakGold {
   top: 36%;
   background: linear-gradient(90deg, transparent, var(--intro-gold-bright) 45%, #fff 50%, var(--intro-gold-bright) 55%, transparent);
-  animation: streakSweep 820ms var(--intro-out) 60ms both;
+  animation: streakSweep 680ms var(--intro-out) 30ms both;
 }
 
 .streakCrimson {
   top: 63%;
   background: linear-gradient(90deg, transparent, var(--intro-crimson) 48%, #e14a6d 50%, var(--intro-crimson) 52%, transparent);
   opacity: 0;
-  animation: streakSweepBack 900ms var(--intro-out) 300ms both;
+  animation: streakSweepBack 720ms var(--intro-out) 220ms both;
 }
 
 /* أنفاس رذاذ دافئة تتنفس حول الشعار ثم تتبدد */
@@ -98,7 +99,7 @@
   height: 300px;
   top: calc(44% - 150px);
   left: calc(50% - 260px);
-  animation: mistBreath 1700ms ease-out 420ms both;
+  animation: mistBreath 1400ms ease-out 340ms both;
 }
 
 .mistB {
@@ -107,7 +108,7 @@
   top: calc(44% - 60px);
   left: calc(50% + 30px);
   background: radial-gradient(closest-side, rgb(226 74 109 / 0.1), transparent 70%);
-  animation: mistBreath 1600ms ease-out 640ms both;
+  animation: mistBreath 1350ms ease-out 500ms both;
 }
 
 .mistC {
@@ -115,7 +116,7 @@
   height: 200px;
   top: calc(44% - 230px);
   left: calc(50% - 90px);
-  animation: mistBreath 1500ms ease-out 540ms both;
+  animation: mistBreath 1300ms ease-out 440ms both;
 }
 
 .stage {
@@ -125,7 +126,7 @@
   place-items: center;
   gap: clamp(22px, 3.4vh, 34px);
   transform: translateY(-4vh);
-  animation: stageDrift 2450ms var(--intro-out) both;
+  animation: stageDrift 2100ms var(--intro-out) both;
 }
 
 .markWrap {
@@ -146,12 +147,12 @@
 .mark path:first-child {
   stroke-dasharray: 330;
   stroke-dashoffset: 330;
-  animation: markDraw 760ms var(--intro-out) 140ms both;
+  animation: markDraw 620ms var(--intro-out) 90ms both;
 }
 
 .mark path:last-child {
   opacity: 0;
-  animation: markFillIn 420ms var(--intro-out) 680ms both;
+  animation: markFillIn 360ms var(--intro-out) 560ms both;
 }
 
 /* توهج معدني يتنفس خلف الشعار لحظة اكتماله */
@@ -162,7 +163,7 @@
   border-radius: 50%;
   background: radial-gradient(closest-side, rgb(230 201 143 / 0.34), rgb(230 201 143 / 0.08) 55%, transparent 75%);
   opacity: 0;
-  animation: sheenSwell 900ms var(--intro-out) 760ms both;
+  animation: sheenSwell 760ms var(--intro-out) 620ms both;
 }
 
 .identity {
@@ -179,7 +180,7 @@
   letter-spacing: 0.15em;
   white-space: nowrap;
   opacity: 0;
-  animation: wordLock 700ms var(--intro-out) 640ms both;
+  animation: wordLock 600ms var(--intro-out) 540ms both;
 }
 
 .divider {
@@ -194,7 +195,7 @@
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--intro-gold));
   transform: scaleX(0);
-  animation: lineGrow 420ms var(--intro-out) 980ms both;
+  animation: lineGrow 340ms var(--intro-out) 820ms both;
 }
 
 .divider i:last-child {
@@ -212,7 +213,7 @@
   background: var(--intro-crimson);
   clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
   opacity: 0;
-  animation: diamondLock 360ms var(--intro-out) 1020ms both;
+  animation: diamondLock 300ms var(--intro-out) 860ms both;
 }
 
 .tagline {
@@ -224,14 +225,14 @@
   color: color-mix(in srgb, var(--intro-ivory) 72%, var(--intro-gold));
   white-space: nowrap;
   opacity: 0;
-  animation: taglineRise 520ms var(--intro-out) 1120ms both;
+  animation: taglineRise 420ms var(--intro-out) 960ms both;
 }
 
 /* ===== تقليل الحركة: تكوين ساكن يظهر ويتلاشى سريعاً ===== */
 :global(html[data-falcon-intro-reduced="true"]) .intro {
   -webkit-mask-image: none;
   mask-image: none;
-  animation: introFadeReduced 850ms linear both;
+  animation: introFadeReduced 700ms linear both;
 }
 
 :global(html[data-falcon-intro-reduced="true"]) .streak,
@@ -255,15 +256,13 @@
 
 @keyframes introReveal {
   0%,
-  58% {
+  66% {
     --intro-r: -18%;
     opacity: 1;
   }
-  84% {
-    opacity: 1;
-  }
-  96% {
+  90% {
     --intro-r: 150%;
+    opacity: 1;
   }
   100% {
     --intro-r: 150%;
@@ -273,7 +272,7 @@
 
 @keyframes introFadeReduced {
   0%,
-  64% {
+  62% {
     opacity: 1;
   }
   100% {
@@ -283,11 +282,11 @@
 
 @keyframes stageDrift {
   0%,
-  60% {
+  62% {
     transform: translateY(-4vh) scale(1);
   }
   100% {
-    transform: translateY(-4vh) scale(1.05);
+    transform: translateY(-4vh) scale(1.045);
   }
 }
 

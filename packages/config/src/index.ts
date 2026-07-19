@@ -32,10 +32,22 @@ const apiEnvSchema = z.object({
   MEDIA_DIR: z.string().default("./media-uploads"),
   /** الأساس العام لروابط الوسائط، مثل https://api.example.com */
   PUBLIC_API_BASE: z.string().url().optional(),
+  /**
+   * عدد الوكلاء الموثوقين أمام التطبيق (قفزات). القيمة الرقمية تعني: ثق بهذا العدد
+   * من الوكلاء فقط عند قراءة X-Forwarded-For — فلا يستطيع العميل تزوير عنوانه لتجاوز
+   * حدود المعدل. على Railway هناك وكيل واحد ⇒ TRUST_PROXY=1.
+   * القيم: عدد صحيح موجب (قفزات) · 0/فارغ ⇒ لا ثقة (اتصال مباشر) · "true" ⇒ قفزة واحدة (توافق قديم).
+   */
   TRUST_PROXY: z
     .string()
     .optional()
-    .transform((v) => v === "1" || v === "true"),
+    .transform((v): number | boolean => {
+      if (!v) return false;
+      const n = Number(v);
+      if (Number.isInteger(n) && n >= 0) return n === 0 ? false : n;
+      if (v.toLowerCase() === "true") return 1;
+      return false;
+    }),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
 });
 

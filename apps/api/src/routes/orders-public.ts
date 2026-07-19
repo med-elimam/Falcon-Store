@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { and, asc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, sql } from "drizzle-orm";
 import { API_PREFIX } from "@falcon/config";
 import { waMessageForOrder, type CurrencyDisplay } from "@falcon/shared";
 import {
@@ -16,10 +16,15 @@ import {
   products,
   brands,
 } from "@falcon/database";
-import { orderCreateSchema } from "@falcon/validation";
+import { normalizeMauritanianPhone, orderCreateSchema } from "@falcon/validation";
 import { writeAudit } from "../lib/audit.js";
-import { badRequest, conflict, notFound } from "../lib/errors.js";
+import { badRequest, conflict, notFound, tooMany } from "../lib/errors.js";
 import { getSettingsGroup } from "../lib/settings.js";
+
+/* حماية متسامحة من الطلبات الوهمية: سقف لعدد الطلبات من نفس الرقم خلال نافذة قصيرة.
+   العميل الحقيقي لا يقترب منه، لكنه يكبح الإغراق الآلي الذي قد يستنزف المخزون. */
+const RECENT_ORDER_WINDOW_MS = 10 * 60_000;
+const RECENT_ORDER_CAP = 6;
 
 interface OrderResponse {
   orderNumber: string;
@@ -49,6 +54,16 @@ export async function registerOrderPublicRoutes(app: FastifyInstance): Promise<v
       if (existing[0]) {
         const response = await buildResponse(app, existing[0].id);
         return reply.status(200).send(response);
+      }
+
+      /* كبح الإغراق لكل رقم هاتف — إعادة المحاولة بنفس مفتاح التكرار عادت أعلاه ولا تُحتسب هنا. */
+      const since = new Date(Date.now() - RECENT_ORDER_WINDOW_MS);
+      const [recent] = await app.db
+        .select({ n: sql<number>`count(*)::int` })
+        .from(orders)
+        .where(and(eq(orders.phone, body.phone), gte(orders.createdAt, since)));
+      if ((recent?.n ?? 0) >= RECENT_ORDER_CAP) {
+        throw tooMany("سجّلت عدة طلبات في وقت قصير. تواصل معنا عبر واتساب لإكمال طلبك.");
       }
 
       const [zone] = await app.db
@@ -235,8 +250,16 @@ export async function registerOrderPublicRoutes(app: FastifyInstance): Promise<v
         throw notFound("لم نعثر على طلب بهذا الرقم. يرجى التأكد من الرقم.");
       }
 
+      /* مطابقة تامة لا جزئية: التطابق الجزئي كان يسمح بتخمين الطلبات بجزء من الرقم.
+         نوحّد الطرفين للصيغة القياسية (222########) قبل المقارنة كي نتسامح مع صيغ الإدخال
+         (+222، 00222، فواصل) لكن نرفض أي رقم غير مطابق بالكامل. */
+      const queryCanonical = normalizeMauritanianPhone(query.phone);
+      const orderCanonical = normalizeMauritanianPhone(order.phone);
       const orderPhoneClean = order.phone.replace(/\D/g, "");
-      if (!orderPhoneClean.includes(normalizedPhone) && !normalizedPhone.includes(orderPhoneClean)) {
+      const exactMatch =
+        (queryCanonical !== null && orderCanonical !== null && queryCanonical === orderCanonical) ||
+        (normalizedPhone.length >= 8 && normalizedPhone === orderPhoneClean);
+      if (!exactMatch) {
         throw badRequest("رقم الهاتف المدخل لا يتطابق مع رقم الهاتف المسجل في الطلب.");
       }
 

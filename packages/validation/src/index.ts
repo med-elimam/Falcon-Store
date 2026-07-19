@@ -55,6 +55,21 @@ const optionalText = (max: number) =>
     .nullish()
     .transform((v) => v ?? null);
 
+/* رابط ويب يُعرض لاحقًا كـ href: يُقبل فارغًا، أو رابط http/https صالح فقط.
+   يمنع مخططات خطرة مثل javascript: و data: من الوصول إلى سمة href. */
+function isHttpUrl(value: string): boolean {
+  try {
+    const u = new URL(value);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+const httpUrl = (max: number) =>
+  optionalText(max).refine((v) => v === null || isHttpUrl(v), {
+    message: "الرابط يجب أن يبدأ بـ http:// أو https://",
+  });
+
 /* ── المصادقة ───────────────────────────────────────────── */
 
 export const loginSchema = z.object({
@@ -259,7 +274,7 @@ export const settingsContactSchema = z.object({
   phone: phoneSchema.nullish().transform((v) => v ?? null),
   email: emailSchema.nullish().transform((v) => v ?? null),
   address: optionalText(300),
-  mapUrl: optionalText(500),
+  mapUrl: httpUrl(500),
 });
 
 export const settingsCommerceSchema = z.object({
@@ -276,10 +291,10 @@ export const settingsPoliciesSchema = z.object({
 });
 
 export const settingsSocialSchema = z.object({
-  instagram: optionalText(200),
-  facebook: optionalText(200),
-  tiktok: optionalText(200),
-  other: optionalText(200),
+  instagram: httpUrl(200),
+  facebook: httpUrl(200),
+  tiktok: httpUrl(200),
+  other: httpUrl(200),
 });
 
 export const settingsOperationsSchema = z.object({

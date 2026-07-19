@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { api, ApiError } from "@/lib/client-api";
 import { formatMRU, waLink } from "@/lib/format";
 import { usePublicSettings } from "./settings-context";
@@ -65,7 +66,10 @@ export function OrderTracker() {
   const settings = usePublicSettings();
   const display = settings?.commerce.currencyDisplay ?? "mru";
 
-  const [orderNumber, setOrderNumber] = useState("");
+  /* رقم الطلب يُملأ من الرابط (?orderNumber=) القادم من صفحة النجاح.
+     الهاتف لا يُقرأ من الرابط أبدًا — يدخله العميل بنفسه في النموذج. */
+  const searchParams = useSearchParams();
+  const [orderNumber, setOrderNumber] = useState(() => searchParams.get("orderNumber") ?? "");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { OrderTracker } from "@/components/order-tracker";
 
 export const metadata: Metadata = {
@@ -17,7 +18,9 @@ export default function TrackPage() {
         </div>
       </section>
       <section className="shell track-section">
-        <OrderTracker />
+        <Suspense fallback={null}>
+          <OrderTracker />
+        </Suspense>
       </section>
     </div>
   );

@@ -98,22 +98,31 @@ export async function registerAdminOrderRoutes(app: FastifyInstance): Promise<vo
         actorId: req.authUser!.id,
         note: body.note,
       });
-      /* إرجاع المخزون عند الإلغاء (مرة واحدة فقط) */
+      /* إرجاع المخزون عند الإلغاء — مرة واحدة فقط طوال عمر الطلب.
+         نحرس بوجود حركة «cancel» سابقة لهذا الطلب: هكذا لا يتضخّم المخزون عند تكرار
+         دورة إلغاء ⇄ إعادة تفعيل (كان كل إلغاء يعيد الكمية من جديد). */
       if (body.status === "cancelled" && from !== "cancelled") {
-        const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, id));
-        for (const item of items) {
-          if (!item.variantId) continue;
-          await tx
-            .update(productVariants)
-            .set({ stockQuantity: sql`${productVariants.stockQuantity} + ${item.qty}`, updatedAt: new Date() })
-            .where(eq(productVariants.id, item.variantId));
-          await tx.insert(inventoryMovements).values({
-            variantId: item.variantId,
-            delta: item.qty,
-            reason: "cancel",
-            orderId: id,
-            actorId: req.authUser!.id,
-          });
+        const [alreadyRestored] = await tx
+          .select({ id: inventoryMovements.id })
+          .from(inventoryMovements)
+          .where(and(eq(inventoryMovements.orderId, id), eq(inventoryMovements.reason, "cancel")))
+          .limit(1);
+        if (!alreadyRestored) {
+          const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, id));
+          for (const item of items) {
+            if (!item.variantId) continue;
+            await tx
+              .update(productVariants)
+              .set({ stockQuantity: sql`${productVariants.stockQuantity} + ${item.qty}`, updatedAt: new Date() })
+              .where(eq(productVariants.id, item.variantId));
+            await tx.insert(inventoryMovements).values({
+              variantId: item.variantId,
+              delta: item.qty,
+              reason: "cancel",
+              orderId: id,
+              actorId: req.authUser!.id,
+            });
+          }
         }
       }
     });

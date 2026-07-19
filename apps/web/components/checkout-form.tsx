@@ -114,7 +114,9 @@ export function CheckoutForm() {
   }
 
   if (result) {
-    const successTrackUrl = `/track?orderNumber=${result.orderNumber}&phone=${result.phone}`;
+    /* رقم الطلب فقط في الرابط — لا نضع الهاتف كي لا يتسرّب إلى سجل المتصفح والإحالات والتحليلات.
+       يدخل العميل هاتفه في صفحة التتبّع (المطابقة التامة تتطلبه على أي حال). */
+    const successTrackUrl = `/track?orderNumber=${encodeURIComponent(result.orderNumber)}`;
     return (
       <div className="order-success" role="status" aria-live="polite" style={{ padding: "40px 16px" }}>
         <span style={{ color: "var(--success)", fontSize: "3.5rem", display: "block", marginBottom: 12 }}>✓</span>

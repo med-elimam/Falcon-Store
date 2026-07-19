@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { WhatsAppIcon } from "@/components/icons";
 import { getContentSections, getPublicSettings } from "@/lib/api";
 import { waLink } from "@/lib/format";
+import { jsonLdHtml } from "@/lib/json-ld";
 
 export const revalidate = 300;
 
@@ -46,7 +47,7 @@ export default async function FaqPage() {
       {faqSchema && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(faqSchema) }}
         />
       )}
       <section className="shop-hero">

@@ -220,7 +220,8 @@ const easeOutCubic = (k: number) => 1 - Math.pow(1 - k, 3);
 /* الوقفة الأساسية: ¾ view — دوران Y نحو 15° وميل Z طفيف بلا دوران كامل */
 const BASE_YAW = -0.26;
 const BASE_TILT = 0.04;
-const ENTRY_DURATION = 1.5;
+/* دخول سريع: أول ما يراه المشتري يجب أن يستقر بسرعة بلا انتظار */
+const ENTRY_DURATION = 0.9;
 
 /* دورة الرشّة: ضغطة على البخاخ ثم نفثة رذاذ ناعمة تتبدد */
 const MIST_COUNT = 140;

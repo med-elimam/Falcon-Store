@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/product-card";
 import { FAMILY_LABELS, type Family } from "@falcon/shared";
 import { getCatalog, getProductDetail, getPublicSettings } from "@/lib/api";
 import { mediaSrc } from "@/lib/media";
+import { jsonLdHtml } from "@/lib/json-ld";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const absolute = (path: string) => (path.startsWith("http") ? path : `${SITE_URL}${path.startsWith("/") ? "" : "/"}${path}`);
@@ -89,7 +90,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
     <div className="product-page">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([productLd, breadcrumbLd]) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml([productLd, breadcrumbLd]) }}
       />
       <ProductPurchase product={product} />
       <section className="product-profile section-pad" aria-label="بصمة العطر">

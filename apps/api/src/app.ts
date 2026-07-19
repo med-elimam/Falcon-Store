@@ -46,7 +46,7 @@ export async function buildApp(opts: BuildAppOptions): Promise<FastifyInstance> 
         censor: "[REDACTED]",
       },
     },
-    trustProxy: env.TRUST_PROXY === true,
+    trustProxy: env.TRUST_PROXY,
     bodyLimit: MAX_BODY_BYTES,
     disableRequestLogging: env.NODE_ENV === "test",
   });
