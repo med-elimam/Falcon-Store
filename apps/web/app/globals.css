@@ -714,7 +714,7 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
 .accent-preview h3 { font-size: 1.05rem; }
 .setup-callout[data-tone="warning"] { background: var(--warning-soft); border-color: color-mix(in oklch, var(--warning) 50%, transparent); }
 .recovery-codes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; padding: 16px; background: var(--surface-soft); border: 1px dashed var(--control-border-strong); }
-.recovery-codes code { font-family: var(--font-manrope), monospace; direction: ltr; text-align: center; font-size: .85rem; }
+.recovery-codes code { min-width: 0; font-family: var(--font-manrope), monospace; direction: ltr; text-align: center; font-size: .85rem; overflow-wrap: anywhere; word-break: break-all; }
 
 /* Footer & 404 */
 .site-footer { border-top: 1px solid var(--line); padding-top: clamp(40px, 5vw, 60px); background: var(--footer-surface); }
@@ -851,16 +851,17 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
   .manage-menu-button:active, .manage-sidebar-close:active { background: var(--accent-soft); transform: scale(.97); }
   .manage-menu-backdrop { position: fixed; inset: 0; z-index: var(--z-scrim); width: 100%; height: 100%; padding: 0; border: 0; display: block; background: var(--scrim); opacity: 0; visibility: hidden; cursor: pointer; transition: opacity .24s var(--ease), visibility 0s linear .24s; }
   .manage-menu-backdrop[data-open] { opacity: 1; visibility: visible; transition-delay: 0s; }
-  .manage-sidebar { position: fixed; inset: 0 0 0 auto; z-index: var(--z-drawer); width: min(88vw, 340px); height: 100dvh; padding: max(14px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom)); border-inline-end: 0; border-inline-start: 1px solid var(--line); box-shadow: -6px 0 14px rgb(0 0 0 / .16); transform: translateX(105%); visibility: hidden; overscroll-behavior: contain; transition: transform .28s var(--ease), visibility 0s linear .28s, background-color .22s var(--ease), border-color .22s var(--ease); }
+  .manage-sidebar { position: fixed; inset: 0 0 0 auto; z-index: var(--z-drawer); width: min(88vw, 340px); height: 100dvh; overflow: hidden; padding: max(14px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom)); border-inline-end: 0; border-inline-start: 1px solid var(--line); box-shadow: -6px 0 14px rgb(0 0 0 / .16); transform: translateX(105%); visibility: hidden; overscroll-behavior: contain; transition: transform .28s var(--ease), visibility 0s linear .28s, background-color .22s var(--ease), border-color .22s var(--ease); }
   .manage-sidebar[data-open] { transform: translateX(0); visibility: visible; transition-delay: 0s; }
-  .manage-sidebar-head { position: sticky; top: 0; z-index: 1; align-items: center; margin: -14px -14px 0; padding: max(14px, env(safe-area-inset-top)) 14px 8px; background: var(--graphite); }
+  .manage-sidebar-head { flex-shrink: 0; z-index: 1; align-items: center; margin: -14px -14px 0; padding: max(14px, env(safe-area-inset-top)) 14px 8px; background: var(--graphite); }
   .manage-logo { min-width: 0; padding: 0; }
   .manage-logo svg { width: 38px; flex: 0 0 38px; }
   .manage-logo b { font-size: .74rem; white-space: nowrap; }
-  .manage-theme { margin-block: 10px 12px; }
-  .manage-nav { grid-auto-flow: row; }
-  .manage-nav a { min-height: 48px; padding-block: 11px; font-size: .94rem; }
-  .manage-nav .nav-group { margin-top: 12px; padding-top: 3px; font-size: .72rem; }
+  .manage-theme { order: 2; flex-shrink: 0; margin-block: 6px 8px; }
+  .manage-nav { grid-auto-flow: row; flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .manage-side-foot { flex-shrink: 0; }
+  .manage-nav a { min-height: 38px; padding-block: 7px; font-size: .88rem; }
+  .manage-nav .nav-group { margin-top: 8px; padding-top: 2px; padding-bottom: 3px; font-size: .68rem; }
   .manage-side-foot a, .manage-side-foot button { min-height: 46px; font-size: .86rem; }
   .manage-main { padding: 22px 14px 70px; }
   .manage-card-head .field { width: 100%; }.variant-fields { grid-template-columns: 1fr; }.variant-editor-head { align-items: stretch; flex-direction: column; }.image-row { grid-template-columns: 56px 1fr; }
