@@ -259,8 +259,9 @@ p { text-wrap: pretty; }
 .hero-stage { position: absolute; inset: 0; background: transparent; }
 .hero-stage::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgb(7 7 7 / .22), rgb(7 7 7 / .68)); }
 .hero-3d { z-index: 0; }
-/* المسافة العلوية أكبر من السفلية كي ينزل النص ويتنفّس تحت الهيدر الثابت على سطح المكتب */
-.hero-copy-wrap { position: relative; z-index: 2; width: 100%; pointer-events: none; padding-block: clamp(64px, 14vh, 170px) clamp(28px, 5vh, 60px); display: grid; align-items: center; }
+/* عرض كامل ليتوزّع النص مع مشهد الـ3D، لكن مع حشو أفقي كي لا يلتصق النص بحافة الشاشة
+   (بداية السطر في RTL هي الحافة اليمنى). بدون هذا الحشو كان width:100% يلغي هامش .shell. */
+.hero-copy-wrap { position: relative; z-index: 2; width: 100%; pointer-events: none; padding-block: clamp(28px, 5vh, 56px); padding-inline: clamp(20px, 4vw, 64px); display: grid; align-items: center; }
 .hero-copy { max-width: 540px; }
 .hero-copy a, .hero-copy button { pointer-events: auto; }
 .hero-eyebrow { display: inline-flex; align-items: center; gap: 12px; margin: 0 0 18px; color: #ff7896; font-size: clamp(.92rem, 1.4vw, 1.1rem); font-weight: 700; animation: hero-copy-in .7s var(--ease) both; }
@@ -789,7 +790,7 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
      والعنوان يجاورها في اليمين، ثم الوصف والأزرار يمتدان أسفل منطقة التداخل */
   .hero { --hero-ink: #f3efe8; --hero-muted: rgb(243 239 232 / .84); min-height: 0; padding-top: 60px; grid-template-rows: auto auto; align-items: stretch; }
   .hero-stage::after { background: linear-gradient(180deg, rgb(7 7 7 / .58), rgb(7 7 7 / .2) 38%, rgb(7 7 7 / .82)); }
-  .hero-copy-wrap { padding-block: 20px 26px; align-items: start; }
+  .hero-copy-wrap { padding-block: 20px 26px; padding-inline: 0; align-items: start; }
   .hero-copy { max-width: 100%; }
   .hero-eyebrow { margin-bottom: 12px; font-size: .88rem; }
   .hero-eyebrow::after { width: 24px; }

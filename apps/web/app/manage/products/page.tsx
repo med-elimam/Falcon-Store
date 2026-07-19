@@ -624,7 +624,7 @@ export default function ProductsPage() {
                     <label>السعر MRU<input className="field num" inputMode="numeric" value={v.priceMru} onChange={(e) => {
                       const variants = [...form.variants]; variants[i] = { ...v, priceMru: e.target.value.replace(/\D/g, "") }; setForm({ ...form, variants });
                     }} /></label>
-                    <label>سعر المقارنة<input className="field num" inputMode="numeric" value={v.compareAtPriceMru} onChange={(e) => {
+                    <label>السعر قبل الخصم<input className="field num" inputMode="numeric" placeholder="اختياري" value={v.compareAtPriceMru} onChange={(e) => {
                       const variants = [...form.variants]; variants[i] = { ...v, compareAtPriceMru: e.target.value.replace(/\D/g, "") }; setForm({ ...form, variants });
                     }} /></label>
                     <label>المخزون<input className="field num" inputMode="numeric" value={v.stockQuantity} onChange={(e) => {
