@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { BrandIntro } from "@/components/brand-intro";
 import { Hero } from "@/components/hero";
 import { ProductCard } from "@/components/product-card";
 import { Reveal } from "@/components/reveal";
@@ -68,6 +69,7 @@ export default async function Home() {
 
   return (
     <>
+      <BrandIntro />
       <Hero
         content={{
           titleAr: heroSection?.titleAr ?? "عطور أصلية مختارة بعناية",

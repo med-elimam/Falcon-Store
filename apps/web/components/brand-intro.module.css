@@ -1,10 +1,20 @@
+/* افتتاحية «خزنة العطر» — عتمة أوبسيديان تُمسح بومضات ضوء، شعار يُرسم بخيط ذهبي,
+   ثم تنكشف الصفحة كانتشار رذاذ من قلب الشعار (mask دائري ناعم يتسع).
+   الأسود هنا هو نفسه أسود الـ hero فيبدو الكشف امتداداً واحداً بلا حواف. */
+
+@property --intro-r {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: -18%;
+}
+
 .intro {
-  --intro-ivory: #f7f5f0;
-  --intro-ink: #070707;
-  --intro-mineral: #8d8a84;
-  --intro-stone: #d8d0c4;
+  --intro-obsidian: #070707;
+  --intro-ivory: #f3efe8;
+  --intro-gold: #c8a25e;
+  --intro-gold-bright: #e6c98f;
   --intro-crimson: #a20f35;
-  --intro-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --intro-out: cubic-bezier(0.16, 1, 0.3, 1);
   position: fixed;
   inset: 0;
   z-index: 10000;
@@ -12,424 +22,320 @@
   place-items: center;
   overflow: hidden;
   isolation: isolate;
+  background: var(--intro-obsidian);
   pointer-events: auto;
   touch-action: none;
   overscroll-behavior: contain;
+  -webkit-mask-image: radial-gradient(
+    circle at 50% 44%,
+    transparent calc(var(--intro-r) - 0%),
+    #000 calc(var(--intro-r) + 18%)
+  );
+  mask-image: radial-gradient(
+    circle at 50% 44%,
+    transparent calc(var(--intro-r) - 0%),
+    #000 calc(var(--intro-r) + 18%)
+  );
 }
 
 :global(html[data-falcon-intro="visible"]) .intro {
   display: grid;
+  animation: introReveal 2450ms linear both;
 }
 
-.curtain {
-  position: absolute;
-  inset-block: 0;
-  width: calc(50% + 1px);
-  z-index: -1;
-  background: var(--intro-ivory);
-  will-change: transform;
+:global(html[data-falcon-intro="hidden"]) .intro {
+  display: none;
 }
 
-.curtain::after {
+/* حبيبات فيلمية خفيفة تمنح العتمة ملمساً سينمائياً */
+.grain {
   position: absolute;
-  top: 12%;
-  bottom: 12%;
-  width: 1px;
-  content: "";
-  background: color-mix(in srgb, var(--intro-ink) 16%, transparent);
+  inset: -40px;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: 0.055;
+  pointer-events: none;
+}
+
+/* ومضتا ضوء أفقيتان — مسح ضوئي على سطح الخزنة */
+.streak {
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  height: 1px;
+  z-index: 2;
   opacity: 0;
-  animation: seamReveal 220ms var(--intro-ease) 20ms both;
+  filter: blur(1.5px);
+  pointer-events: none;
 }
 
-.curtainLeft {
-  left: 0;
-  animation: curtainLeftRelease 1450ms var(--intro-ease) both;
+.streakGold {
+  top: 36%;
+  background: linear-gradient(90deg, transparent, var(--intro-gold-bright) 45%, #fff 50%, var(--intro-gold-bright) 55%, transparent);
+  animation: streakSweep 820ms var(--intro-out) 60ms both;
 }
 
-.curtainLeft::after {
-  right: 0;
+.streakCrimson {
+  top: 63%;
+  background: linear-gradient(90deg, transparent, var(--intro-crimson) 48%, #e14a6d 50%, var(--intro-crimson) 52%, transparent);
+  opacity: 0;
+  animation: streakSweepBack 900ms var(--intro-out) 300ms both;
 }
 
-.curtainRight {
-  right: 0;
-  animation: curtainRightRelease 1450ms var(--intro-ease) both;
+/* أنفاس رذاذ دافئة تتنفس حول الشعار ثم تتبدد */
+.mist {
+  position: absolute;
+  z-index: 2;
+  border-radius: 50%;
+  filter: blur(34px);
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgb(255 200 130 / 0.16), transparent 70%);
 }
 
-.curtainRight::after {
-  left: 0;
+.mistA {
+  width: 300px;
+  height: 300px;
+  top: calc(44% - 150px);
+  left: calc(50% - 260px);
+  animation: mistBreath 1700ms ease-out 420ms both;
+}
+
+.mistB {
+  width: 240px;
+  height: 240px;
+  top: calc(44% - 60px);
+  left: calc(50% + 30px);
+  background: radial-gradient(closest-side, rgb(226 74 109 / 0.1), transparent 70%);
+  animation: mistBreath 1600ms ease-out 640ms both;
+}
+
+.mistC {
+  width: 200px;
+  height: 200px;
+  top: calc(44% - 230px);
+  left: calc(50% - 90px);
+  animation: mistBreath 1500ms ease-out 540ms both;
 }
 
 .stage {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   display: grid;
-  width: min(76vw, 560px);
-  min-height: 310px;
   place-items: center;
-  align-content: center;
-  gap: clamp(20px, 3vh, 30px);
-  color: var(--intro-ink);
-  animation: stageLifecycle 1450ms var(--intro-ease) both;
-  will-change: transform, opacity, filter;
+  gap: clamp(22px, 3.4vh, 34px);
+  transform: translateY(-4vh);
+  animation: stageDrift 2450ms var(--intro-out) both;
 }
 
-.apertureLine {
-  position: absolute;
-  left: 50%;
-  top: 4%;
-  bottom: 4%;
-  width: 1px;
-  background: var(--intro-ink);
-  transform-origin: center;
-  animation: aperture 460ms var(--intro-ease) both;
-}
-
-.markAssembly {
+.markWrap {
   position: relative;
   display: grid;
-  width: clamp(116px, 13vw, 168px);
-  aspect-ratio: 4 / 3;
   place-items: center;
+  width: clamp(120px, 14vw, 168px);
 }
 
 .mark {
   position: relative;
   z-index: 2;
   width: 100%;
-  color: var(--intro-ink);
-  opacity: 0;
-  filter: drop-shadow(0 12px 22px color-mix(in srgb, var(--intro-ink) 10%, transparent));
-  animation: markLock 360ms var(--intro-ease) 150ms both;
+  color: var(--intro-gold);
 }
 
-.mark path {
+/* النجمة تُرسم كخيط ذهبي، ثم يمتلئ جسد الصقر */
+.mark path:first-child {
   stroke-dasharray: 330;
   stroke-dashoffset: 330;
-  animation: markDraw 380ms var(--intro-ease) 110ms both;
+  animation: markDraw 760ms var(--intro-out) 140ms both;
 }
 
-.core {
-  position: absolute;
-  z-index: 3;
-  top: 43.5%;
-  left: 50%;
-  width: 13px;
-  height: 13px;
-  background: var(--intro-crimson);
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+.mark path:last-child {
   opacity: 0;
-  animation: coreLock 180ms var(--intro-ease) 300ms both;
+  animation: markFillIn 420ms var(--intro-out) 680ms both;
 }
 
-.shards {
+/* توهج معدني يتنفس خلف الشعار لحظة اكتماله */
+.sheen {
   position: absolute;
-  inset: 0;
+  inset: -46%;
   z-index: 1;
-  pointer-events: none;
-}
-
-.shard {
-  --x: 0px;
-  --y: 0px;
-  --start-x: 0vw;
-  --rotation: 0deg;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: clamp(58px, 8vw, 104px);
-  height: clamp(8px, 1vw, 13px);
-  background: var(--intro-ink);
-  clip-path: polygon(0 48%, 100% 0, 84% 100%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(230 201 143 / 0.34), rgb(230 201 143 / 0.08) 55%, transparent 75%);
   opacity: 0;
-  animation: shardAssemble 520ms var(--intro-ease) var(--delay, 35ms) both;
-}
-
-.leftTop {
-  --x: -112px;
-  --y: -42px;
-  --start-x: -46vw;
-  --rotation: 16deg;
-  --delay: 20ms;
-  background: var(--intro-mineral);
-}
-
-.leftMiddle {
-  --x: -119px;
-  --y: -12px;
-  --start-x: -52vw;
-  --rotation: 4deg;
-  --delay: 45ms;
-}
-
-.leftBottom {
-  --x: -108px;
-  --y: 20px;
-  --start-x: -48vw;
-  --rotation: -12deg;
-  --delay: 70ms;
-  background: var(--intro-stone);
-}
-
-.rightTop,
-.rightMiddle,
-.rightBottom {
-  clip-path: polygon(0 0, 100% 48%, 16% 100%);
-}
-
-.rightTop {
-  --x: 8px;
-  --y: -42px;
-  --start-x: 46vw;
-  --rotation: -16deg;
-  --delay: 20ms;
-  background: var(--intro-mineral);
-}
-
-.rightMiddle {
-  --x: 15px;
-  --y: -12px;
-  --start-x: 52vw;
-  --rotation: -4deg;
-  --delay: 45ms;
-}
-
-.rightBottom {
-  --x: 4px;
-  --y: 20px;
-  --start-x: 48vw;
-  --rotation: 12deg;
-  --delay: 70ms;
-  background: var(--intro-stone);
+  animation: sheenSwell 900ms var(--intro-out) 760ms both;
 }
 
 .identity {
   display: grid;
   place-items: center;
-  color: var(--intro-ink);
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
-  animation: identityReveal 240ms var(--intro-ease) 300ms both;
+  color: var(--intro-ivory);
 }
 
 .identity strong {
   font-family: var(--font-manrope), "Segoe UI", Arial, sans-serif;
-  font-size: clamp(1.55rem, 4.2vw, 2.45rem);
+  font-size: clamp(1.5rem, 4.4vw, 2.3rem);
   font-weight: 500;
   line-height: 1;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.15em;
   white-space: nowrap;
+  opacity: 0;
+  animation: wordLock 700ms var(--intro-out) 640ms both;
 }
 
-.identity span {
-  margin-top: 10px;
-  font-family: var(--font-manrope), sans-serif;
-  font-size: clamp(0.54rem, 1.4vw, 0.7rem);
-  font-weight: 500;
-  letter-spacing: 0.42em;
-  white-space: nowrap;
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
 }
 
-.identity i {
-  width: 38px;
+.divider i {
+  width: 44px;
   height: 1px;
-  margin-top: 18px;
+  background: linear-gradient(90deg, transparent, var(--intro-gold));
+  transform: scaleX(0);
+  animation: lineGrow 420ms var(--intro-out) 980ms both;
+}
+
+.divider i:last-child {
+  background: linear-gradient(90deg, var(--intro-gold), transparent);
+  transform-origin: left;
+}
+
+.divider i:first-child {
+  transform-origin: right;
+}
+
+.divider em {
+  width: 9px;
+  height: 9px;
   background: var(--intro-crimson);
-  transform-origin: center;
-  animation: accentLine 160ms var(--intro-ease) 440ms both;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  opacity: 0;
+  animation: diamondLock 360ms var(--intro-out) 1020ms both;
 }
 
-@media (max-width: 520px) {
-  .stage {
-    width: min(88vw, 390px);
-    min-height: 280px;
-    gap: 18px;
-  }
-
-  .markAssembly {
-    width: 112px;
-  }
-
-  .shard {
-    width: 68px;
-    height: 9px;
-  }
-
-  .leftTop {
-    --x: -78px;
-    --y: -35px;
-  }
-
-  .leftMiddle {
-    --x: -83px;
-    --y: -11px;
-  }
-
-  .leftBottom {
-    --x: -76px;
-    --y: 15px;
-  }
-
-  .rightTop {
-    --x: 10px;
-    --y: -35px;
-  }
-
-  .rightMiddle {
-    --x: 15px;
-    --y: -11px;
-  }
-
-  .rightBottom {
-    --x: 8px;
-    --y: 15px;
-  }
-
-  .identity strong {
-    letter-spacing: 0.11em;
-  }
-
+.tagline {
+  margin-top: 14px;
+  font-family: var(--font-manrope), "Segoe UI", Tahoma, sans-serif;
+  font-size: clamp(0.62rem, 1.5vw, 0.74rem);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  color: color-mix(in srgb, var(--intro-ivory) 72%, var(--intro-gold));
+  white-space: nowrap;
+  opacity: 0;
+  animation: taglineRise 520ms var(--intro-out) 1120ms both;
 }
 
-:global(html[data-theme="dark"]) .curtain {
-  background: #12100f;
+/* ===== تقليل الحركة: تكوين ساكن يظهر ويتلاشى سريعاً ===== */
+:global(html[data-falcon-intro-reduced="true"]) .intro {
+  -webkit-mask-image: none;
+  mask-image: none;
+  animation: introFadeReduced 850ms linear both;
 }
 
-:global(html[data-theme="dark"]) .stage,
-:global(html[data-theme="dark"]) .identity,
-:global(html[data-theme="dark"]) .mark {
-  color: var(--intro-ivory);
+:global(html[data-falcon-intro-reduced="true"]) .streak,
+:global(html[data-falcon-intro-reduced="true"]) .mist,
+:global(html[data-falcon-intro-reduced="true"]) .sheen {
+  display: none;
 }
 
-:global(html[data-theme="dark"]) .curtain::after,
-:global(html[data-theme="dark"]) .apertureLine {
-  background: color-mix(in srgb, var(--intro-ivory) 22%, transparent);
+:global(html[data-falcon-intro-reduced="true"]) .stage,
+:global(html[data-falcon-intro-reduced="true"]) .mark path:first-child,
+:global(html[data-falcon-intro-reduced="true"]) .mark path:last-child,
+:global(html[data-falcon-intro-reduced="true"]) .identity strong,
+:global(html[data-falcon-intro-reduced="true"]) .divider i,
+:global(html[data-falcon-intro-reduced="true"]) .divider em,
+:global(html[data-falcon-intro-reduced="true"]) .tagline {
+  animation: none;
+  opacity: 1;
+  transform: none;
+  stroke-dashoffset: 0;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .curtain::after,
-  .apertureLine,
-  .mark,
-  .mark path,
-  .core,
-  .shard,
-  .identity,
-  .identity i {
-    animation: none;
-  }
-
-  .mark,
-  .core,
-  .identity {
+@keyframes introReveal {
+  0%,
+  58% {
+    --intro-r: -18%;
     opacity: 1;
-    transform: none;
   }
-
-  .apertureLine,
-  .shards {
-    display: none;
-  }
-
-  .curtainLeft,
-  .curtainRight,
-  .stage {
-    animation: none;
-  }
-}
-
-@keyframes seamReveal {
-  0% {
-    opacity: 0;
-    transform: scaleY(0.1);
-  }
-  100% {
-    opacity: 1;
-    transform: scaleY(1);
-  }
-}
-
-@keyframes curtainLeftRelease {
-  0%,
-  84% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(-101%, 0, 0);
-  }
-}
-
-@keyframes curtainRightRelease {
-  0%,
-  84% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(101%, 0, 0);
-  }
-}
-
-@keyframes stageLifecycle {
-  0%,
   84% {
     opacity: 1;
-    transform: scale(1);
-    filter: blur(0);
+  }
+  96% {
+    --intro-r: 150%;
   }
   100% {
+    --intro-r: 150%;
     opacity: 0;
-    transform: scale(0.98);
-    filter: blur(2px);
   }
 }
 
-@keyframes aperture {
-  0% {
-    opacity: 0;
-    transform: scaleY(0.08);
-  }
-  24% {
-    opacity: 0.9;
-    transform: scaleY(1);
-  }
-  72% {
-    opacity: 0.9;
-    transform: scaleY(0.28);
-  }
-  100% {
-    opacity: 0;
-    transform: scaleY(0.02);
-  }
-}
-
-@keyframes shardAssemble {
-  0% {
-    opacity: 0;
-    transform: translate3d(var(--start-x), var(--y), 0) rotate(var(--rotation));
-  }
-  52% {
-    opacity: 0.92;
-  }
-  72% {
-    opacity: 0.92;
-    transform: translate3d(var(--x), var(--y), 0) rotate(var(--rotation));
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--x), var(--y), 0) rotate(var(--rotation)) scaleX(0.72);
-  }
-}
-
-@keyframes markLock {
-  0% {
-    opacity: 0;
-    transform: scale(0.88);
-  }
-  68% {
+@keyframes introFadeReduced {
+  0%,
+  64% {
     opacity: 1;
-    transform: scale(1);
   }
   100% {
+    opacity: 0;
+  }
+}
+
+@keyframes stageDrift {
+  0%,
+  60% {
+    transform: translateY(-4vh) scale(1);
+  }
+  100% {
+    transform: translateY(-4vh) scale(1.05);
+  }
+}
+
+@keyframes streakSweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-46vw);
+  }
+  18% {
+    opacity: 0.75;
+  }
+  82% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(46vw);
+  }
+}
+
+@keyframes streakSweepBack {
+  0% {
+    opacity: 0;
+    transform: translateX(42vw);
+  }
+  20% {
+    opacity: 0.45;
+  }
+  80% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-42vw);
+  }
+}
+
+@keyframes mistBreath {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.9);
+  }
+  45% {
     opacity: 1;
-    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(1.08);
   }
 }
 
@@ -439,29 +345,68 @@
   }
 }
 
-@keyframes coreLock {
-  0% {
+@keyframes markFillIn {
+  from {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.3) rotate(45deg);
+    transform: translateY(3px);
   }
-  100% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1) rotate(0);
-  }
-}
-
-@keyframes identityReveal {
   to {
     opacity: 1;
     transform: none;
   }
 }
 
-@keyframes accentLine {
-  from {
-    transform: scaleX(0);
+@keyframes sheenSwell {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
   }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.35;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes wordLock {
+  0% {
+    opacity: 0;
+    letter-spacing: 0.4em;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    letter-spacing: 0.15em;
+    transform: none;
+  }
+}
+
+@keyframes lineGrow {
   to {
     transform: scaleX(1);
+  }
+}
+
+@keyframes diamondLock {
+  0% {
+    opacity: 0;
+    transform: scale(0.25) rotate(90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes taglineRise {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
   }
 }

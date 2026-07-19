@@ -10,6 +10,7 @@ import { SettingsProvider } from "@/components/settings-context";
 import { ThemeProvider } from "@/components/theme-switcher";
 import { WhatsAppFab } from "@/components/whatsapp-fab";
 import { BrandAccent } from "@/components/brand-accent";
+import { BrandIntroBootstrap } from "@/components/brand-intro";
 import { accentVars } from "@/lib/accent";
 import { getPublicSettings } from "@/lib/api";
 
@@ -58,6 +59,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <Script id="falcon-theme" strategy="beforeInteractive">
           {`try{var t=localStorage.getItem('falcon-theme');var m=t==='light'||t==='dark'||t==='system'?t:'${defaultTheme}';var r=m==='light'||m==='dark'?m:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');var d=document.documentElement;d.dataset.theme=r;d.dataset.themeMode=m;d.style.colorScheme=r;var c=document.querySelector('meta[name="theme-color"][data-falcon-theme]');if(c)c.content=r==='light'?'#f6f3f4':'#0b090a';}catch(e){}`}
         </Script>
+        <BrandIntroBootstrap />
       </head>
       <body suppressHydrationWarning>
         <ThemeProvider defaultMode={defaultTheme}>

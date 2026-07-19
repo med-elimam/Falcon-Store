@@ -655,6 +655,24 @@ export function createHeroScene(
     if (staticMode) renderOnce();
   };
 
+  /* تسليم متصل مع الافتتاحية: ما دامت ظاهرة نُمسك دخول الزجاجة،
+     فيتزامن انزلاقها مع لحظة انكشاف الصفحة */
+  let entryHold = !staticMode && document.documentElement.dataset.falconIntro === "visible";
+  let introObserver: MutationObserver | null = null;
+  if (entryHold) {
+    introObserver = new MutationObserver(() => {
+      if (document.documentElement.dataset.falconIntro !== "visible") {
+        entryHold = false;
+        introObserver?.disconnect();
+        introObserver = null;
+      }
+    });
+    introObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-falcon-intro"],
+    });
+  }
+
   /* دخول المشهد: الزجاجة تنزلق من حافتها، الكاميرا تقترب، ولمعة تمر على الزجاج */
   let entryT = staticMode ? ENTRY_DURATION : 0;
   resize();
@@ -720,7 +738,16 @@ export function createHeroScene(
     const dt = Math.min(timer.getDelta(), 0.05);
     const t = timer.getElapsed();
 
-    if (entryT < ENTRY_DURATION) {
+    if (entryHold) {
+      /* الافتتاحية ما تزال ظاهرة: الزجاجة خارج الكادر بانتظار الكشف */
+      const x = bottleTargetX - 2.4;
+      product.position.x = x;
+      reflection.position.x = x;
+      ground.position.x = x;
+      camera.position.z = camZ + 0.9;
+      camera.lookAt(bottleTargetX * 0.4, lookY, 0);
+      keyLight.position.x = -6;
+    } else if (entryT < ENTRY_DURATION) {
       entryT += dt;
       const k = easeOutCubic(Math.min(1, entryT / ENTRY_DURATION));
       /* تدخل من جهتها (اليسار في RTL) وتستقر في مكانها */
@@ -820,6 +847,7 @@ export function createHeroScene(
       renderer.setAnimationLoop(null);
       timer.dispose();
       ro.disconnect();
+      introObserver?.disconnect();
       canvas.removeEventListener("pointerdown", onDown);
       canvas.removeEventListener("pointermove", onMove);
       canvas.removeEventListener("pointerup", onUp);
