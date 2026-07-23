@@ -133,9 +133,14 @@ export function BrandIntroController() {
     const unlockScroll = () => {
       if (!scrollLocked) return;
       scrollLocked = false;
-      html.style.overflow = htmlOverflow;
-      document.body.style.overflow = bodyOverflow;
-      history.scrollRestoration = previousScrollRestoration;
+      /* لا نعيد قيمة "hidden" ملتقطة من قفل تمرير آخر (قائمة الأدمن تقفل body عند
+         فتحها، ونقرة «فتح المتجر» تلتقطها قبل أن تُغلق القائمة وتستعيدها) — وإلا بقي
+         التمرير مقفولاً بعد الافتتاحية = جمود. بعد افتتاحية تغطي الشاشة، الحالة
+         الصحيحة دائماً هي التمرير الطبيعي. كذلك لا نترك scrollRestoration=manual. */
+      html.style.overflow = htmlOverflow === "hidden" ? "" : htmlOverflow;
+      document.body.style.overflow = bodyOverflow === "hidden" ? "" : bodyOverflow;
+      history.scrollRestoration =
+        previousScrollRestoration === "manual" ? "auto" : previousScrollRestoration;
       delete window.__falconIntroHtmlOverflow;
       delete window.__falconIntroScrollRestoration;
     };

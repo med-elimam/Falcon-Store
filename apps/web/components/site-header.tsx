@@ -105,6 +105,9 @@ export function SiteHeader() {
   /* دخول الإدارة: جلسة قائمة → لوحة التحكم مباشرة؛ وإلا نافذة الدخول */
   const openAdmin = useCallback(async () => {
     setMenuOpen(false);
+    /* التحقق من الجلسة يأخذ لحظات قبل الانتقال؛ نصعد إلى القمة فوراً حتى لا يبقى
+       أسفلُ الصفحة ظاهراً «ثوانٍ» أثناء الانتظار عند الدخول للإدارة */
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     try {
       await api("/api/v1/auth/me", { timeoutMs: 6000 });
       router.push("/manage");
