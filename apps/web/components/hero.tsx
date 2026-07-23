@@ -23,7 +23,8 @@ function trustIcon(label: string) {
    فلا يغطي النصُّ وجهَ المقدّم ولا يدَه ولا نصَّ الزجاجة في أي تكوين. */
 export function Hero({ content }: { content: HeroContent }) {
   return (
-    <section className={styles.hero}>
+    /* data-falcon-hero: تقيس الترويسة به هل ما زال المشهد خلفها فتتحول شفافة فوقه */
+    <section className={styles.hero} data-falcon-hero="">
       <HeroVideo />
       <div className={styles.scrim} aria-hidden="true" />
 

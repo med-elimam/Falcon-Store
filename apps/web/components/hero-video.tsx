@@ -16,9 +16,10 @@ const POSTER_DESKTOP = "/videos/hero-desktop-poster.webp";
 const INTRO_SAFETY_MS = 3600;
 
 function introActive() {
+  /* «leaving» تعني أن التلاشي بدأ: نطلق الفيديو فوراً فتظهر حركته عبر الانكشاف */
+  const attr = document.documentElement.dataset.falconIntro;
   return (
-    document.getElementById("falcon-intro") !== null &&
-    document.documentElement.dataset.falconIntro !== "done"
+    document.getElementById("falcon-intro") !== null && attr !== "done" && attr !== "leaving"
   );
 }
 

@@ -207,6 +207,23 @@ p { text-wrap: pretty; }
 .site-header::before { content: ""; position: absolute; inset: 0; z-index: -1; opacity: 0; backdrop-filter: blur(14px); transition: opacity .3s var(--ease); }
 .site-header[data-scrolled] { border-bottom-color: var(--header-line); background: var(--header-scrolled); }
 .site-header[data-scrolled]::before { opacity: 1; }
+/* فوق فيديو البطل (الرئيسية): مظهر ليلي واحد مهما كانت السمة — شفافة في القمة،
+   داكنة مصنفرة أثناء التمرير داخل المشهد، وتعود لمظهر السمة الطبيعي بعد مغادرته.
+   القيم مطابقة لقيم :root الليلية فلا يتغير الوضع المظلم إطلاقاً. */
+.site-header[data-overlay] {
+  --header-ink: oklch(0.95 0.012 80);
+  --header-muted: oklch(0.78 0.01 260);
+  --header-line: rgb(184 188 194 / 0.14);
+  --header-control: rgb(7 7 7 / 0.58);
+  --header-control-border: rgb(243 239 232 / 0.35);
+  background: linear-gradient(180deg, rgb(7 7 7 / 0.62), rgb(7 7 7 / 0));
+}
+.site-header[data-overlay][data-scrolled] { background: rgb(7 7 7 / 0.9); }
+/* شعار الصقر: قرمزي السمة الفاتحة داكن فيغرق في الفيديو — نرفع إضاءته بلا فقدان
+   لون العلامة الذي يضبطه الأدمن (المزج يحفظ الصبغة). المظلم يبقى كما هو. */
+html[data-theme="light"] .site-header[data-overlay] .brand-mark {
+  color: color-mix(in oklab, var(--crimson-hot) 72%, white);
+}
 /* الـ hero يتبع الثيم الآن، فلا حاجة لقلب ألوان الهيدر فوقه في الوضع الفاتح */
 .header-inner { height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
 .header-actions { display: flex; align-items: center; gap: 6px; }

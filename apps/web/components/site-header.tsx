@@ -26,6 +26,9 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  /* فوق فيديو البطل تتبنى الترويسة مظهرها الليلي الشفاف؛ القيمة الأولية تطابق
+     ما يُصيَّر من الخادم (الرئيسية = فوق البطل) فلا يحدث أي وميض ترطيب */
+  const [overlay, setOverlay] = useState(pathname === "/");
   const reducedMotion = useReducedMotion();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
@@ -34,20 +37,31 @@ export function SiteHeader() {
   const openCart = useCart((s) => s.openDrawer);
   const count = mounted ? items.reduce((sum, item) => sum + item.qty, 0) : 0;
 
-  /* حالة التمرير — مستمع سلبي مع rAF لتفادي أي إجهاد تخطيط */
+  /* حالة التمرير — مستمع سلبي مع rAF لتفادي أي إجهاد تخطيط.
+     نقيس أيضاً هل قسم البطل ما زال خلف شريط الترويسة: ما دام كذلك تبقى
+     الترويسة بمظهرها الليلي الشفاف، وبمجرد مغادرة المشهد تعود لمظهر السمة */
   useEffect(() => {
     let raf = 0;
+    const measure = () => {
+      setScrolled(window.scrollY > 12);
+      const hero = document.querySelector("[data-falcon-hero]");
+      /* الرئيسية تُبثّ تدريجياً: قد يعمل القياس قبل وصول قسم البطل إلى DOM.
+         غيابه على الرئيسية يعني أننا في القمة فوقه — لا أنه غير موجود. */
+      setOverlay(hero ? hero.getBoundingClientRect().bottom > 72 : pathname === "/");
+    };
     const onScroll = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setScrolled(window.scrollY > 12));
+      raf = requestAnimationFrame(measure);
     };
-    onScroll();
+    measure();
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [pathname]);
 
   /* قفل تمرير الجسم + حبس التركيز + Escape أثناء فتح القائمة */
   useEffect(() => {
@@ -103,7 +117,7 @@ export function SiteHeader() {
     <header
       className="site-header"
       data-scrolled={scrolled || undefined}
-      data-overlay={pathname === "/" || undefined}
+      data-overlay={overlay || undefined}
     >
       <div className="shell header-inner">
         <button
