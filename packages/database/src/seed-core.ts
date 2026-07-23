@@ -47,10 +47,8 @@ export async function seedCore(db: AnyDb): Promise<void> {
     await db
       .insert(s.paymentMethods)
       .values({ key: pm.key, labelAr: pm.labelAr, labelFr: pm.labelFr, enabled: isDefaultEnabled, sortOrder: pm.sortOrder })
-      .onConflictDoUpdate({
-        target: s.paymentMethods.key,
-        set: { enabled: isDefaultEnabled }
-      });
+      /* لا نلمس صفاً موجوداً: تفعيل/تعطيل طرق الدفع قرار المالك، لا يُعاد ضبطه بالزرع */
+      .onConflictDoNothing({ target: s.paymentMethods.key });
   }
 
   const defaultZones = [
@@ -191,18 +189,8 @@ export async function seedCore(db: AnyDb): Promise<void> {
         mapUrl: "https://maps.google.com"
       }
     })
-    .onConflictDoUpdate({
-      target: s.siteSettings.key,
-      set: {
-        value: {
-          whatsapp: "22234744257",
-          phone: "22234744257",
-          email: "contact@falcon-store.com",
-          address: "نواكشوط — تفرغ زينه، قرب ملتقى طرق كلينيك",
-          mapUrl: "https://maps.google.com"
-        }
-      }
-    });
+    /* بيانات تواصل افتراضية للتركيب الأول فقط؛ لا نكتب فوق ما أدخله المالك لاحقاً */
+    .onConflictDoNothing({ target: s.siteSettings.key });
 
   await db
     .insert(s.siteSettings)
@@ -215,17 +203,8 @@ export async function seedCore(db: AnyDb): Promise<void> {
         logoUrl: null
       }
     })
-    .onConflictDoUpdate({
-      target: s.siteSettings.key,
-      set: {
-        value: {
-          nameAr: "متجر الصقر للعطور",
-          nameLatin: "Falcon Store",
-          description: "عطور نيش وديزاينر وتعبئة دقيقة بحجم 10ml في نواكشوط.",
-          logoUrl: null
-        }
-      }
-    });
+    /* هوية افتراضية للتركيب الأول فقط؛ لا نمحو اسم/شعار المتجر الذي ضبطه المالك */
+    .onConflictDoNothing({ target: s.siteSettings.key });
 
   /* أقسام المحتوى الأساسية — نص افتراضي محايد بلا ادعاءات غير موثقة */
   await db

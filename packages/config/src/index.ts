@@ -54,7 +54,15 @@ const apiEnvSchema = z.object({
 export type ApiEnv = z.infer<typeof apiEnvSchema>;
 
 export function loadApiEnv(source: Record<string, string | undefined> = process.env): ApiEnv {
-  const parsed = apiEnvSchema.safeParse(source);
+  /* إن وُجد قرص Railway الدائم ولم يحدد المالك MEDIA_DIR صراحةً، نخزّن الصور داخل
+     القرص تلقائياً بدل نظام الملفات المؤقت الذي يُمحى مع كل نشر — فلا تختفي صور
+     المنتجات بعد push. تحديد MEDIA_DIR يدوياً يتقدّم على هذا دائماً. */
+  const volumeMount = source.RAILWAY_VOLUME_MOUNT_PATH?.trim();
+  const patched =
+    !source.MEDIA_DIR && volumeMount
+      ? { ...source, MEDIA_DIR: `${volumeMount.replace(/[/\\]+$/, "")}/media-uploads` }
+      : source;
+  const parsed = apiEnvSchema.safeParse(patched);
   if (!parsed.success) {
     const details = parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ");
     throw new Error(`Invalid API environment configuration → ${details}`);
