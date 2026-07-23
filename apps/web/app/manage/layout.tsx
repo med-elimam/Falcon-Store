@@ -8,6 +8,7 @@ import { api } from "@/lib/client-api";
 import { CloseIcon, FalconMark, MenuIcon } from "@/components/icons";
 import { LoginForm } from "@/components/login-form";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { requestHomeIntro } from "@/components/brand-intro-events";
 import { LoadingBlock, MeProvider, ToastProvider, useMe } from "@/components/manage/ui";
 
 const NAV: { group: string; items: { href: string; label: string; perm?: string }[] }[] = [
@@ -219,6 +220,7 @@ function Shell({ children }: { children: ReactNode }) {
                 await api("/api/v1/auth/logout", { method: "POST" });
               } finally {
                 refresh();
+                requestHomeIntro("/");
                 router.push("/");
               }
             }}

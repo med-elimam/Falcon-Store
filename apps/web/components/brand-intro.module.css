@@ -11,6 +11,12 @@
   --intro-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Defensive only: the bootstrap also hides the cover imperatively. */
+:global(html[data-falcon-intro="off"]) .intro,
+:global(html[data-falcon-intro="done"]) .intro {
+  display: none !important;
+}
+
 /* حبيبات فيلمية خفيفة تمنح العتمة ملمساً سينمائياً */
 .grain {
   position: absolute;

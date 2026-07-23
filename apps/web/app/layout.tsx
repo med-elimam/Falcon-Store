@@ -10,7 +10,9 @@ import { SettingsProvider } from "@/components/settings-context";
 import { ThemeProvider } from "@/components/theme-switcher";
 import { WhatsAppFab } from "@/components/whatsapp-fab";
 import { BrandAccent } from "@/components/brand-accent";
-import { BrandIntro, INTRO_BOOTSTRAP, INTRO_CRITICAL_CSS } from "@/components/brand-intro";
+import { BrandIntro } from "@/components/brand-intro";
+import { INTRO_BOOTSTRAP } from "@/components/brand-intro-bootstrap";
+import { BrandIntroController } from "@/components/brand-intro-controller";
 import { accentVars } from "@/lib/accent";
 import { getPublicSettings } from "@/lib/api";
 
@@ -55,19 +57,21 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       style={htmlStyle}
     >
       <head>
+        <script
+          id="falcon-intro-boot"
+          dangerouslySetInnerHTML={{ __html: INTRO_BOOTSTRAP }}
+        />
+        <noscript>
+          <style>{"#falcon-intro{display:none!important}"}</style>
+        </noscript>
         <meta name="theme-color" content={ssrResolved === "dark" ? "#0b090a" : "#f6f3f4"} data-falcon-theme="true" />
         <Script id="falcon-theme" strategy="beforeInteractive">
           {`try{var t=localStorage.getItem('falcon-theme');var m=t==='light'||t==='dark'||t==='system'?t:'${defaultTheme}';var r=m==='light'||m==='dark'?m:(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');var d=document.documentElement;d.dataset.theme=r;d.dataset.themeMode=m;d.style.colorScheme=r;var c=document.querySelector('meta[name="theme-color"][data-falcon-theme]');if(c)c.content=r==='light'?'#f6f3f4':'#0b090a';}catch(e){}`}
         </Script>
-        {/* الافتتاحية: CSS حرج يغطّي الشاشة فوراً + سكربت خام متزامن يدير الدورة
-            قبل أول رسم (وسم خام لا next/script: التزامن هنا شرط لا تحسين) */}
-        <style dangerouslySetInnerHTML={{ __html: INTRO_CRITICAL_CSS }} />
-        <script dangerouslySetInnerHTML={{ __html: INTRO_BOOTSTRAP }} />
       </head>
       <body suppressHydrationWarning>
-        {/* غطاء الافتتاحية في الهيكل الثابت لا في محتوى الصفحة المتدفق: يوجد من
-            أول إطار فيغطي بثّ الرئيسية كاملاً، ويُخفى قبل الرسم في بقية الصفحات */}
         <BrandIntro />
+        <BrandIntroController />
         <ThemeProvider defaultMode={defaultTheme}>
           <SettingsProvider value={settings}>
             <BrandAccent />

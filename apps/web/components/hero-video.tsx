@@ -16,10 +16,9 @@ const POSTER_DESKTOP = "/videos/hero-desktop-poster.webp";
 const INTRO_SAFETY_MS = 3600;
 
 function introActive() {
-  /* «leaving» تعني أن التلاشي بدأ: نطلق الفيديو فوراً فتظهر حركته عبر الانكشاف */
-  const attr = document.documentElement.dataset.falconIntro;
   return (
-    document.getElementById("falcon-intro") !== null && attr !== "done" && attr !== "leaving"
+    document.getElementById("falcon-intro") !== null &&
+    document.documentElement.dataset.falconIntro === "active"
   );
 }
 
@@ -157,7 +156,14 @@ export function HeroVideo() {
       {/* إخراج فني حسب الاتجاه عبر <picture> — ما لا يدعمه next/image، لذا <img> مقصودة */}
       <picture className={styles.poster}>
         <source media="(orientation: portrait)" srcSet={POSTER_MOBILE} />
-        <img src={POSTER_DESKTOP} alt="" fetchPriority="high" decoding="async" draggable={false} />
+        <img
+          src={POSTER_DESKTOP}
+          alt=""
+          fetchPriority="high"
+          decoding="async"
+          draggable={false}
+          data-falcon-hero-poster=""
+        />
       </picture>
       <video
         ref={videoRef}
