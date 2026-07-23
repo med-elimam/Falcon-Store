@@ -1,0 +1,507 @@
+/* ============================================================================
+   مِحراب الصقر — تركيب طبقي: غرفة معتمة، شخص، فلاكون، رذاذ حيّ.
+   كل قيمة قابلة للضبط أعلى الملف حتى تُعاير الإضاءة بصرياً بسرعة.
+   ========================================================================== */
+
+.sanctum {
+  --sp: 0; /* تقدّم التمرير 0→1 */
+
+  /* --- تكوين الهاتف (الافتراضي): الفلاكون يسار-أعلى، الشخص يملأ الأسفل --- */
+  --flacon-w: 74%;
+  --flacon-x: -19%;
+  --flacon-y: 11%;
+  --figure-w: 122%;
+  --figure-x: -14%;
+  --figure-b: -10%;
+
+  /* --- ضبط دقيق فوق التدريج المخبوز في الملف --- */
+  --fig-brightness: 1.04;
+  --fig-contrast: 1.04;
+  --fig-saturate: 1;
+
+  position: relative;
+  height: 100svh;
+  min-height: 560px;
+  max-height: 1180px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #050404;
+  color: #f3efe8;
+}
+
+/* ---------------------------- عمق الغرفة ---------------------------- */
+.chamber {
+  position: absolute;
+  inset: -4% -6%;
+  z-index: 0;
+  background-image: url("/images/sanctum-backdrop.webp");
+  background-size: cover;
+  background-position: 42% 38%;
+  /* انجراف بالغ البطء: الغرفة نفسها تتنفّس فلا تبدو صورة معلّقة */
+  animation: chamberDrift 42s ease-in-out infinite alternate;
+  transform: translate3d(0, calc(var(--sp) * -3%), 0);
+}
+
+/* تدريج فوق الصورة: يوحّدها مع لوحة العلامة ويسحق ما تبقى من ضوء */
+.chamberGrade {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(46% 32% at 26% 30%, rgb(146 74 26 / 0.3), transparent 66%),
+    radial-gradient(56% 46% at 82% 40%, color-mix(in oklab, var(--crimson) 26%, transparent), transparent 72%),
+    linear-gradient(180deg, rgb(3 2 2 / 0.5) 0%, rgb(3 2 2 / 0.06) 30%, rgb(3 2 2 / 0.58) 100%);
+}
+
+@keyframes chamberDrift {
+  from { background-position: 40% 36%; }
+  to { background-position: 52% 44%; }
+}
+
+/* وهج خلف الفلاكون: هو ما يجعل الزجاج «يُضاء من الخلف» لا يُلصق على خلفية */
+.bloom {
+  position: absolute;
+  z-index: 1;
+  left: calc(var(--flacon-x) + var(--flacon-w) * 0.34);
+  top: calc(var(--flacon-y) + 4%);
+  width: min(96%, 620px);
+  aspect-ratio: 1;
+  transform: translate(-28%, -16%) scale(calc(1 + var(--sp) * 0.12));
+  background: radial-gradient(
+    circle,
+    rgb(255 186 116 / 0.3) 0%,
+    rgb(214 108 48 / 0.13) 34%,
+    rgb(150 40 40 / 0.05) 60%,
+    transparent 74%
+  );
+  opacity: 0;
+  animation: bloomIn 1.6s 0.15s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  pointer-events: none;
+}
+
+.sanctum[data-lit="true"] .bloom {
+  animation-play-state: running;
+}
+
+@keyframes bloomIn {
+  to { opacity: 1; }
+}
+
+/* ------------------------------ الشخص ------------------------------ */
+.figure {
+  position: absolute;
+  z-index: 2;
+  left: var(--figure-x);
+  bottom: var(--figure-b);
+  width: var(--figure-w);
+  pointer-events: none;
+  /* يتحرك أسرع من الفلاكون عند التمرير — فرق السرعة هو ما يصنع العمق */
+  transform: translate3d(0, calc(var(--sp) * 12%), 0);
+  opacity: 0;
+  animation: figureIn 1.8s 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* إعادة تدريج: من نهار محايد إلى ليل دافئ منخفض المفتاح */
+  filter: brightness(var(--fig-brightness)) contrast(var(--fig-contrast))
+    saturate(var(--fig-saturate));
+  /* يذوب في السواد من الأسفل والجانبين فلا تظهر حافة القص أبداً */
+  mask-image:
+    linear-gradient(to top, transparent 0%, #000 16%),
+    linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+/* ظل يسقط على الجهة البعيدة عن مصدر الضوء */
+.figureShade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgb(3 2 2 / 0.92) 0%, rgb(4 3 2 / 0.35) 22%, transparent 46%),
+    linear-gradient(258deg, rgb(3 2 2 / 0.5) 0%, transparent 36%),
+    radial-gradient(64% 46% at 52% 26%, transparent 46%, rgb(4 3 2 / 0.4) 100%);
+  mix-blend-mode: multiply;
+}
+
+/* ضوء المفتاح: يأتي من جهة الفلاكون فيبدو أن الزجاجة هي التي تضيئه */
+.figureKey {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    30% 20% at 48% 14%,
+    rgb(255 208 152 / 0.44) 0%,
+    rgb(224 130 62 / 0.16) 46%,
+    transparent 74%
+  );
+  mix-blend-mode: screen;
+}
+
+/* ----------------------------- الفلاكون ----------------------------- */
+.flacon {
+  position: absolute;
+  z-index: 3;
+  left: var(--flacon-x);
+  top: var(--flacon-y);
+  width: var(--flacon-w);
+  pointer-events: none;
+  transform: translate3d(0, calc(var(--sp) * 5%), 0);
+  opacity: 0;
+  animation: flaconIn 1.5s 0.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* جسم الزجاجة يحمل الطفو، والغلاف يحمل الانضغاطة — فلا تتصادم الحركتان */
+.flaconBody {
+  position: relative;
+  display: block;
+  animation: flaconFloat 11s ease-in-out infinite;
+  transform-origin: 50% 88%;
+  transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.flacon[data-spray="1"] .flaconBody {
+  transform: translateY(4px) scale(0.994);
+  transition-duration: 0.11s;
+  transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+.flacon img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 26px 46px rgb(0 0 0 / 0.72))
+    drop-shadow(0 0 34px color-mix(in oklab, var(--crimson) 26%, transparent));
+}
+
+/* البريق مقنّع بصورة الزجاجة نفسها: يمرّ على الزجاج ولا يلمس الهواء حوله */
+.flaconSheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    104deg,
+    transparent 34%,
+    rgb(255 236 206 / 0.16) 46%,
+    rgb(255 246 226 / 0.34) 50%,
+    rgb(255 236 206 / 0.14) 54%,
+    transparent 66%
+  );
+  background-size: 260% 100%;
+  mix-blend-mode: screen;
+  -webkit-mask-image: url("/images/falcon-flacon.webp");
+  mask-image: url("/images/falcon-flacon.webp");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  animation: sheenSweep 9s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+@keyframes sheenSweep {
+  0%, 62% { background-position: 190% 0; }
+  92%, 100% { background-position: -90% 0; }
+}
+
+/* انعكاس على السطح المصقول تحت الزجاجة — يمنحها مكاناً وثِقلاً */
+.flaconReflection {
+  position: absolute;
+  inset-inline: 0;
+  top: 84%;
+  height: 46%;
+  background-image: url("/images/falcon-flacon.webp");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transform: scaleY(-1);
+  opacity: 0.16;
+  filter: blur(3px) saturate(0.7);
+  -webkit-mask-image: linear-gradient(to top, transparent 6%, #000 72%);
+  mask-image: linear-gradient(to top, transparent 6%, #000 72%);
+  pointer-events: none;
+}
+
+/* هالة ملتصقة بالزجاجة تكشف حوافها من السواد */
+.flaconGlow {
+  position: absolute;
+  inset: -14% -22%;
+  background: radial-gradient(
+    52% 46% at 50% 46%,
+    rgb(255 190 122 / 0.22),
+    rgb(196 82 40 / 0.08) 46%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  animation: glowPulse 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes flaconFloat {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  34% { transform: translate3d(0.5%, -1.6%, 0) rotate(-0.5deg); }
+  68% { transform: translate3d(-0.4%, -0.7%, 0) rotate(0.32deg); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.78; }
+  50% { opacity: 1; }
+}
+
+@keyframes flaconIn {
+  from { opacity: 0; transform: translate3d(0, 26px, 0) scale(0.97); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes figureIn {
+  from { opacity: 0; transform: translate3d(0, 30px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* --------------------------- الرذاذ الحيّ --------------------------- */
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+/* -------------------------- المعالجة النهائية -------------------------- */
+.vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background:
+    radial-gradient(88% 68% at 44% 42%, transparent 42%, rgb(0 0 0 / 0.6) 100%),
+    linear-gradient(to bottom, rgb(3 2 2 / 0.66) 0%, transparent 13%);
+}
+
+.grain {
+  position: absolute;
+  inset: -50%;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grainShift 0.72s steps(3) infinite;
+}
+
+@keyframes grainShift {
+  0% { transform: translate3d(0, 0, 0); }
+  33% { transform: translate3d(-2%, 1.5%, 0); }
+  66% { transform: translate3d(1.5%, -1%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* تلاشٍ سفلي إلى لون الصفحة: يمنع ظهور أي «حدّ» بين المشهد وما بعده */
+.seam {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 18%;
+  z-index: 7;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, #070707 98%);
+}
+
+/* ------------------------------ النصوص ------------------------------ */
+.copy {
+  position: absolute;
+  z-index: 8;
+  inset-inline-start: 0;
+  inset-block-start: 0;
+  width: 100%;
+  display: grid;
+  justify-items: start;
+  text-align: start;
+  padding-block: max(112px, calc(78px + 9vh)) 0;
+  padding-inline-start: clamp(18px, 5vw, 76px);
+  padding-inline-end: 46%;
+  pointer-events: none;
+  transform: translate3d(0, calc(var(--sp) * -14%), 0);
+  opacity: calc(1 - var(--sp) * 1.5);
+}
+
+.copy a,
+.copy button {
+  pointer-events: auto;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  color: var(--gold);
+  font-size: clamp(0.84rem, 1.25vw, 1rem);
+  font-weight: 700;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 0.9);
+  opacity: 0;
+  animation: copyIn 0.9s 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.eyebrow::after {
+  content: "";
+  width: 34px;
+  height: 1px;
+  background: linear-gradient(to left, currentColor, transparent);
+}
+
+.copy h1 {
+  margin: 0 0 16px;
+  max-width: 13ch;
+  font-size: clamp(1.72rem, 7.2vw, 3.9rem);
+  line-height: 1.14;
+  text-wrap: balance;
+  text-shadow: 0 4px 44px rgb(0 0 0 / 0.9);
+  opacity: 0;
+  animation: copyIn 0.9s 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.lead {
+  margin: 0;
+  max-width: 24ch;
+  color: rgb(243 239 232 / 0.82);
+  font-size: clamp(0.92rem, 1.3vw, 1.08rem);
+  line-height: 1.85;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 0.9);
+  opacity: 0;
+  animation: copyIn 0.9s 0.74s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: copyIn 0.9s 0.86s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes copyIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ------------------------------ الثقة ------------------------------ */
+.trust {
+  position: absolute;
+  z-index: 9;
+  inset-inline: 0;
+  bottom: 0;
+  overflow: hidden;
+  border-block-start: 1px solid rgb(243 239 232 / 0.09);
+  background: linear-gradient(to top, rgb(4 3 3 / 0.94), rgb(4 3 3 / 0.28));
+  backdrop-filter: blur(8px);
+  font-size: 0.8rem;
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(to left, transparent, #000 7%, #000 93%, transparent);
+}
+
+.trustTrack {
+  width: max-content;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  direction: ltr;
+  animation: trustTicker 28s linear infinite;
+  will-change: transform;
+}
+
+.trustList {
+  min-width: 100vw;
+  list-style: none;
+  margin: 0;
+  padding: 0 clamp(16px, 5vw, 72px);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 24px;
+  direction: rtl;
+}
+
+.trustList li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.trustList svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  color: var(--gold);
+}
+
+@keyframes trustTicker {
+  to { transform: translateX(50%); }
+}
+
+@media (hover: hover) {
+  .trust:hover .trustTrack { animation-play-state: paused; }
+}
+
+/* ============================ الشاشة العريضة ============================ */
+@media (min-width: 861px) {
+  .sanctum {
+    --flacon-w: 34%;
+    --flacon-x: 1%;
+    --flacon-y: 6%;
+    --figure-w: 40%;
+    --figure-x: 27%;
+    --figure-b: -6%;
+  }
+
+  .copy {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+    width: min(46%, 620px);
+    padding-block: 0;
+    padding-inline-start: clamp(20px, 3vw, 48px);
+    top: 50%;
+    transform: translate3d(0, calc(-50% + var(--sp) * -10%), 0);
+  }
+
+  .figure img {
+    mask-image:
+      linear-gradient(to top, transparent 0%, #000 14%),
+      linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  }
+}
+
+/* شاشات قصيرة: النص أولاً، لا نسمح بتصادمه مع الشريط */
+@media (max-height: 700px) and (max-width: 860px) {
+  .copy h1 { font-size: clamp(1.5rem, 6.4vw, 1.9rem); }
+  .lead { display: none; }
+  .sanctum { --figure-w: 118%; --flacon-w: 60%; --flacon-y: 8%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain,
+  .trustTrack,
+  .flaconBody,
+  .flaconSheen,
+  .chamber,
+  .flaconGlow {
+    animation: none !important;
+  }
+  .trustTrack { transform: none !important; }
+  .trustList[aria-hidden="true"] { display: none; }
+  .bloom,
+  .figure,
+  .flacon,
+  .eyebrow,
+  .copy h1,
+  .lead,
+  .actions {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

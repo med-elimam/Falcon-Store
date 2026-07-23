@@ -1,0 +1,412 @@
+/* ============================================================================
+   بطل الفيديو — لقطتان حقيقيتان: أفقية (1280×720) للشاشات العريضة،
+   وعمودية (720×1280) للهاتف. الاختيار عبر استعلام (orientation) نفسه
+   في <source> وملصق <picture> والتنسيقات، فتتطابق الطبقات دائماً.
+
+   خريطة اللقطة الأفقية: الزجاجة يسار الكادر (x ‏8–28%)، المقدّم يمينه
+   (x ‏58–95%)، وستارة معتمة أعلى الوسط — هناك يجلس العنوان.
+   خريطة اللقطة العمودية: الوجه أعلى الوسط، الرشّ في المنتصف، ملصق
+   الزجاجة عند y ‏57–70% — فتنزل الرسالة إلى سطح الطاولة أسفله.
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  height: 100vh;
+  height: 100svh; /* ثابت مع أشرطة سفاري المتحركة: لا قفز في التخطيط أثناء التمرير */
+  min-height: 560px;
+  max-height: 1180px;
+  overflow: hidden;
+  isolation: isolate; /* سياق تراص مغلق: طبقات المشهد لا تتسرب فوق الترويسة */
+  background: #050404;
+  color: #f3efe8;
+}
+
+/* ------------------------------ الوسائط ------------------------------ */
+.media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none; /* الفيديو خلفية خالصة: لا لمس ولا قائمة سياق ولا سحب */
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.poster,
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 42%;
+}
+
+.video {
+  object-fit: cover;
+  /* ميل طفيف نحو الأعلى: عند قصّ الشاشات الأعرض تُحمى الوجوه قبل سطح الطاولة */
+  object-position: 50% 42%;
+  opacity: 0;
+  transition: opacity 0.35s var(--ease);
+}
+
+/* لا يظهر عنصر الفيديو إلا بعد أول إطار مُعروض فعلاً — الملصق المطابق تحته
+   يسدّ أي فجوة تحميل، فلا وميض أسود ولا قفزة بين الصورة والحركة */
+.video[data-live="1"] {
+  opacity: 1;
+}
+
+/* ------------------------------ التظليل ------------------------------ */
+/* عدسة قراءة لا ستارة: تعتيم موضعي خلف النص فقط، والوجه والزجاجة بلا حجاب */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(5 4 4 / 0.5) 0%, rgb(5 4 4 / 0.12) 14%, transparent 30%),
+    radial-gradient(46% 40% at 47% 16%, rgb(5 4 4 / 0.42), transparent 72%);
+}
+
+/* ------------------------------ النصوص ------------------------------ */
+/* الشاشة العريضة: العنوان يتوسط المساحة المعتمة بين الزجاجة والمقدّم.
+   موضع فيزيائي (left) لا منطقي: التكوين يتبع كادر الفيديو لا اتجاه اللغة */
+.copy {
+  position: absolute;
+  z-index: 2;
+  /* نزول متعمّد عن الترويسة: الكتلة تتوازن بين أعلى الكادر ومستوى الأيدي،
+     فلا تبدو ملتصقة بحافة الشاشة العليا */
+  top: clamp(126px, 19svh, 220px);
+  left: 46.5%;
+  transform: translateX(-50%);
+  width: min(88vw, 580px);
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.copy a,
+.copy button {
+  pointer-events: auto;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  /* عاجيّ دافئ لا ذهبي: الذهبي كان يذوب في كتف الزجاجة العنبرية على الهاتف؛
+     يبقى الذهب في الشرطتين الجانبيتين فقط فتظهر العبارة على أي خلفية */
+  color: rgb(246 240 230);
+  font-size: clamp(0.8rem, 1.1vw, 0.95rem);
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.75), 0 3px 18px rgb(0 0 0 / 0.88);
+  opacity: 0;
+  animation: copyIn 0.9s 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.eyebrow::before,
+.eyebrow::after {
+  content: "";
+  width: 30px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, currentColor);
+}
+
+.eyebrow::after {
+  background: linear-gradient(to left, transparent, currentColor);
+}
+
+.copy h1 {
+  margin: 0 0 14px;
+  max-width: 16ch;
+  font-size: clamp(1.9rem, 3.5vw, 3.4rem);
+  line-height: 1.22; /* نص فاتح على مشهد معتم: سطر أوسع قليلاً ليتنفس */
+  text-wrap: balance;
+  text-shadow: 0 4px 40px rgb(0 0 0 / 0.92), 0 1px 4px rgb(0 0 0 / 0.55);
+  opacity: 0;
+  animation: copyIn 0.9s 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.lead {
+  margin: 0;
+  max-width: 44ch;
+  color: rgb(243 239 232 / 0.9);
+  font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+  line-height: 1.9;
+  text-shadow: 0 2px 22px rgb(0 0 0 / 0.92), 0 1px 3px rgb(0 0 0 / 0.6);
+  opacity: 0;
+  animation: copyIn 0.9s 0.74s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 26px;
+  flex-wrap: wrap;
+  justify-content: center;
+  opacity: 0;
+  animation: copyIn 0.9s 0.86s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* أزرار الهيكل تتبع سمة الصفحة، لكن البطل معتم دائماً مهما كانت السمة —
+   نثبّت هنا نسخة داكنة عالية التباين فوق الفيديو في الوضعين معاً */
+.actions :global(.btn-ghost) {
+  border-color: rgb(243 239 232 / 0.42);
+  background: rgb(7 7 7 / 0.34);
+  color: #f3efe8;
+  backdrop-filter: blur(8px);
+}
+
+.actions :global(.btn-ghost:hover) {
+  border-color: #f3efe8;
+  background: rgb(7 7 7 / 0.5);
+}
+
+@keyframes copyIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ------------------------------ الثقة ------------------------------ */
+.trust {
+  position: absolute;
+  z-index: 3;
+  inset-inline: 0;
+  bottom: 0;
+  overflow: hidden;
+  border-block-start: 1px solid rgb(243 239 232 / 0.09);
+  background: linear-gradient(to top, rgb(4 3 3 / 0.94), rgb(4 3 3 / 0.28));
+  backdrop-filter: blur(8px);
+  font-size: 0.8rem;
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(to left, transparent, #000 7%, #000 93%, transparent);
+}
+
+.trustTrack {
+  width: max-content;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  direction: ltr;
+  animation: trustTicker 28s linear infinite;
+  will-change: transform;
+}
+
+.trustList {
+  min-width: 100vw;
+  list-style: none;
+  margin: 0;
+  padding: 0 clamp(16px, 5vw, 72px);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 24px;
+  direction: rtl;
+}
+
+.trustList li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.trustList svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  color: var(--gold);
+}
+
+@keyframes trustTicker {
+  to {
+    transform: translateX(50%);
+  }
+}
+
+@media (hover: hover) {
+  .trust:hover .trustTrack {
+    animation-play-state: paused;
+  }
+}
+
+/* ------------------------------ الختام ------------------------------ */
+/* تلاشٍ قصير إلى لون الصفحة خلف شريط الثقة: لا حدّ قاسياً بين المشهد وما بعده */
+.seam {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 12%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, #070707 96%);
+}
+
+/* ============================ الوضع العمودي ============================ */
+/* الهاتف: الوجه والرشّة ملك الشاشة؛ الرسالة والأزرار تحت ملصق الزجاجة
+   على سطح الطاولة — في متناول الإبهام وفوق شريط الثقة مباشرة */
+@media (orientation: portrait) {
+  .poster img,
+  .video {
+    /* الأجهزة الأعرض من 9:16 (الأجهزة اللوحية) تقص عمودياً: نحمي الرأس
+       في ذروة اقتراب الكاميرا ونضحي بسطح الطاولة المختفي خلف النص أصلاً */
+    object-position: 50% 32%;
+  }
+
+  .scrim {
+    background:
+      linear-gradient(180deg, rgb(5 4 4 / 0.46), transparent 16%),
+      linear-gradient(
+        0deg,
+        rgb(4 3 3 / 0.85) 0%,
+        rgb(4 3 3 / 0.52) 13%,
+        rgb(4 3 3 / 0.16) 27%,
+        transparent 40%
+      );
+  }
+
+  .copy {
+    top: auto;
+    /* انزياح فيزيائي عن عمود ملصق الزجاجة (يسار الكادر): كلمة FALCON
+       تبقى مكشوفة طوال اللقطة حتى مع اقتراب الكاميرا في نهايتها */
+    left: clamp(40px, 12vw, 64px);
+    right: 10px;
+    transform: none;
+    bottom: calc(54px + clamp(18px, 3.4svh, 34px));
+    width: auto;
+    padding-inline: 8px;
+  }
+
+  .eyebrow {
+    margin-bottom: 10px;
+    font-size: 0.78rem;
+  }
+
+  .copy h1 {
+    margin-bottom: 10px;
+    font-size: clamp(1.42rem, 5.6vw, 2rem);
+  }
+
+  .lead {
+    max-width: 28ch;
+    font-size: clamp(0.86rem, 3.5vw, 0.98rem);
+    line-height: 1.75;
+  }
+
+  .actions {
+    margin-top: 18px;
+  }
+}
+
+/* عمودي أعرض من كادر 9:16 (الأجهزة اللوحية والنوافذ العريضة): القصّ العمودي
+   مع اقتراب الكاميرا يُنزل الملصق إلى حزام النص الأوسط — فنصفّ الرسالة
+   عموداً يمينياً فوق الجانب الخالي، بعيداً عن عمود الزجاجة طوال اللقطة */
+@media (orientation: portrait) and (min-aspect-ratio: 4/7) {
+  .copy {
+    left: auto;
+    right: 4vw;
+    bottom: calc(54px + clamp(28px, 6svh, 64px));
+    width: min(46vw, 430px);
+    padding-inline: 0;
+    justify-items: start;
+    text-align: start;
+  }
+
+  .copy h1 {
+    font-size: clamp(1.4rem, 3.4vw, 2.1rem);
+  }
+
+  .lead {
+    max-width: 26ch;
+  }
+
+  .actions {
+    justify-content: flex-start;
+  }
+
+  /* في العمود الضيق تلتف شرطتا العنوان الصغير التفافاً قبيحاً — نستغني عنهما */
+  .eyebrow::before,
+  .eyebrow::after {
+    display: none;
+  }
+
+  .scrim {
+    background:
+      linear-gradient(180deg, rgb(5 4 4 / 0.46), transparent 16%),
+      linear-gradient(315deg, rgb(4 3 3 / 0.62) 0%, rgb(4 3 3 / 0.24) 34%, transparent 58%),
+      linear-gradient(0deg, rgb(4 3 3 / 0.6) 0%, rgb(4 3 3 / 0.2) 12%, transparent 24%);
+  }
+}
+
+/* نوافذ عمودية عريضة وضيقة معاً: لا مكان لعمود طويل — نطوي الوصف ونكتفي
+   بالعنوان والأزرار كي لا يصعد النص إلى منطقة اليد والبخاخ */
+@media (orientation: portrait) and (min-aspect-ratio: 4/7) and (max-width: 559px) {
+  .lead {
+    display: none;
+  }
+
+  .copy h1 {
+    max-width: 12ch;
+  }
+}
+
+/* هواتف قصيرة جداً بالعرض الأفقي أو شاشات منخفضة: نضغط الرأسية فلا تصادم */
+@media (orientation: landscape) and (max-height: 620px) {
+  .copy {
+    top: 96px;
+  }
+
+  .eyebrow {
+    display: none;
+  }
+
+  .copy h1 {
+    font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+  }
+
+  .lead {
+    display: none;
+  }
+}
+
+/* ============================ تقليل الحركة ============================ */
+@media (prefers-reduced-motion: reduce) {
+  .video {
+    transition: none;
+  }
+
+  .trustTrack {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .trustList {
+    min-width: 0;
+    width: 100vw;
+  }
+
+  .trustList[aria-hidden="true"] {
+    display: none;
+  }
+
+  .eyebrow,
+  .copy h1,
+  .lead,
+  .actions {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

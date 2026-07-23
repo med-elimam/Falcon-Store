@@ -253,34 +253,7 @@ p { text-wrap: pretty; }
 .mobile-menu .admin-link:hover { color: var(--ivory); border-color: var(--control-border-strong); }
 .menu-scrim, .drawer-scrim { position: absolute; inset: 0; width: 100%; border: 0; background: var(--scrim); }
 
-/* Hero — Falcon 3D Side Reveal: مشهد واحد متصل بخلفية الصفحة.
-   الزجاجة نحو اليسار (RTL) والنص في اليمين فوق المشهد مباشرة. */
-.hero { --hero-ink: #f3efe8; --hero-muted: rgb(243 239 232 / .84); position: relative; min-height: clamp(560px, 86vh, 920px); padding-top: 78px; color: var(--hero-ink); display: grid; grid-template-rows: minmax(0, 1fr) auto; align-items: stretch; overflow: hidden; background: #070707; border-bottom: 1px solid var(--line); }
-.hero-stage { position: absolute; inset: 0; background: transparent; }
-.hero-stage::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, rgb(7 7 7 / .22), rgb(7 7 7 / .68)); }
-.hero-3d { z-index: 0; }
-/* عرض كامل ليتوزّع النص مع مشهد الـ3D، لكن مع حشو أفقي كي لا يلتصق النص بحافة الشاشة
-   (بداية السطر في RTL هي الحافة اليمنى). بدون هذا الحشو كان width:100% يلغي هامش .shell. */
-.hero-copy-wrap { position: relative; z-index: 2; width: 100%; pointer-events: none; padding-block: clamp(28px, 5vh, 56px); padding-inline: clamp(20px, 4vw, 64px); display: grid; align-items: center; }
-.hero-copy { max-width: 540px; }
-.hero-copy a, .hero-copy button { pointer-events: auto; }
-.hero-eyebrow { display: inline-flex; align-items: center; gap: 12px; margin: 0 0 18px; color: #ff7896; font-size: clamp(.92rem, 1.4vw, 1.1rem); font-weight: 700; animation: hero-copy-in .7s var(--ease) both; }
-.hero-eyebrow::after { content: ""; width: 34px; height: 2px; background: currentColor; border-radius: 2px; }
-.hero h1 { font-size: clamp(2.5rem, 4.6vw, 4.2rem); line-height: 1.16; letter-spacing: normal; margin-bottom: 20px; animation: hero-copy-in .7s var(--ease) .08s both; }
-.hero h1 em { color: var(--crimson-hot); font-style: normal; }
-.hero-lead { max-width: 480px; margin: 0; color: var(--hero-muted); font-size: clamp(.98rem, 1.4vw, 1.15rem); line-height: 1.9; animation: hero-copy-in .7s var(--ease) .16s both; }
-.hero-actions { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; animation: hero-copy-in .7s var(--ease) .24s both; }
-.hero-trust { --trust-gap: 26px; --trust-shift: 13px; position: relative; z-index: 3; width: 100%; margin: 0; overflow: hidden; border-block-start: 1px solid var(--line); border-block-end: 0; background: var(--graphite); color: var(--ivory); font-size: .82rem; }
-.hero-trust-track { width: max-content; min-height: 58px; display: flex; align-items: center; gap: var(--trust-gap); direction: ltr; animation: hero-trust-ticker 18s linear infinite; will-change: transform; }
-.hero-trust-list { min-width: 100vw; list-style: none; margin: 0; padding: 0 clamp(20px, 5vw, 72px); display: flex; align-items: center; justify-content: space-around; flex-wrap: nowrap; gap: var(--trust-gap); direction: rtl; }
-.hero-trust li { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
-.hero-trust svg { width: 19px; height: 19px; flex: 0 0 19px; color: var(--accent-text); }
-.hero .btn-ghost { color: var(--hero-ink); border-color: var(--control-border-strong); background: transparent; }
-.hero .btn-ghost:hover { border-color: var(--hero-ink); }
-@keyframes hero-copy-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-@keyframes hero-trust-ticker { to { transform: translateX(calc(50% + var(--trust-shift))); } }
-@media (hover: hover) { .hero-trust:hover .hero-trust-track { animation-play-state: paused; } }
-@media (prefers-reduced-motion: reduce) { .hero-eyebrow, .hero h1, .hero-lead, .hero-actions, .hero-trust { animation: none; } }
+/* افتتاحية الرئيسية: فيديو بطل حقيقي — components/hero.tsx + hero.module.css */
 /* لماذا فالكون — بطاقات مزايا مبنية من بيانات المتجر الحقيقية */
 .why-section { border-block: 1px solid var(--line); background: var(--graphite); }
 .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
@@ -761,7 +734,6 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
     right: 2px;
     z-index: 2;
   }
-  .hero-copy { max-width: 470px; }
   .product-rail, .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .shop-layout { grid-template-columns: 1fr; }.filters { position: static; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }.filter-block { margin: 0; }.filters .text-button { justify-self: start; }
   .product-detail-hero { grid-template-columns: 1fr 1fr; gap: 32px; }.checkout-grid { grid-template-columns: 1fr 340px; gap: 30px; }
@@ -788,21 +760,6 @@ html[data-theme-ready] :is(.mobile-menu, .cart-drawer, .manage-shell, .manage-mo
   .shell { width: min(100% - 28px, 1320px); }.desktop-only { display: none !important; }.header-inner { height: 60px; grid-template-columns: 92px minmax(0, 1fr) 92px; gap: 0; }.menu-button { width: 44px; height: 44px; flex-basis: 44px; }.brand-lockup { gap: 5px; }.brand-lockup span small { display: none; }.brand-lockup strong { font-size: .74rem; }.brand-mark { width: 33px; }.header-actions { gap: 4px; }.cart-button svg { width: 21px; }.theme-toggle { width: 44px; height: 44px; flex-basis: 44px; }
   /* هاتف: الزجاجة تحتل ~55% من العرض جهة اليسار (تُقص عمداً)،
      والعنوان يجاورها في اليمين، ثم الوصف والأزرار يمتدان أسفل منطقة التداخل */
-  .hero { --hero-ink: #f3efe8; --hero-muted: rgb(243 239 232 / .84); min-height: 0; padding-top: 60px; grid-template-rows: auto auto; align-items: stretch; }
-  .hero-stage::after { background: linear-gradient(180deg, rgb(7 7 7 / .58), rgb(7 7 7 / .2) 38%, rgb(7 7 7 / .82)); }
-  .hero-copy-wrap { padding-block: 20px 26px; padding-inline: 0; align-items: start; }
-  .hero-copy { max-width: 100%; }
-  .hero-eyebrow { margin-bottom: 12px; font-size: .88rem; }
-  .hero-eyebrow::after { width: 24px; }
-  .hero h1 { width: min(72%, 18ch); max-width: none; font-size: clamp(1.55rem, 6.5vw, 2.1rem); line-height: 1.14; margin-bottom: 0; text-wrap: balance; }
-  .hero-lead { max-width: 36ch; margin-top: clamp(130px, 23vh, 175px); font-size: .9rem; line-height: 1.72; }
-  .hero-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; max-width: 340px; }
-  .hero-actions .btn { min-width: 0; padding-inline: 10px; white-space: nowrap; }
-  .hero-trust { --trust-gap: 8px; --trust-shift: 4px; font-size: .72rem; }
-  .hero-trust-track { min-height: 54px; animation-duration: 15s; }
-  .hero-trust-list { padding-inline: 10px; justify-content: flex-start; }
-  .hero-trust li { min-height: 36px; flex: 0 0 auto; padding: 7px 10px; border: 0; border-radius: 0; background: transparent; color: var(--ivory); box-shadow: none; }
-  .hero-trust svg { width: 17px; height: 17px; flex-basis: 17px; }
   .faq-layout { grid-template-columns: 1fr; gap: 22px; }
   /* عناوين أهدأ على الهاتف: أصغر ~15%، أسطر متوازنة بلا كلمات منفردة، ومسافات أقل */
   .section-pad { padding-block: 42px; }.section-heading { align-items: start; flex-direction: column; gap: 8px; margin-bottom: 16px; }.section-heading h2, .finder-head h2, .auth-copy h2, .decant-copy h2, .visit-content h2, .product-profile-block h2, .faq-layout h2 { width: min(100%, 21ch); font-size: clamp(1.48rem, 6.2vw, 1.95rem); line-height: 1.18; max-width: none; text-wrap: balance; }
@@ -989,6 +946,4 @@ html[data-theme="light"] .category-card { border-color: var(--line); }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-  .hero-trust-track { animation: none !important; transform: none !important; }
-  .hero-trust-list[aria-hidden="true"] { display: none; }
 }
